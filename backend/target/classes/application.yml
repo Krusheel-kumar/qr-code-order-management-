@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: Pop O Bob
+  datasource:
+    url: jdbc:h2:mem:popobob;DB_CLOSE_DELAY=-1
+    username: sa
+    password: 
+    driverClassName: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+server:
+  port: 8080
+
+gemini:
+  api:
+    key: "AQ.Ab8RN6IWgsMdvo-yii3hvAPYPL5rCDefKZb3MvMu3DqaI1tnyA"

@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #FFD54F;
+  --color-primary-foreground: #111111;
+  
+  --color-foreground: #111111;
+  --color-foreground-muted: #333333;
+  
+  --color-background: #FFFDF8;
+  --color-cream: #FFF8E8;
+  --color-surface: #FFFFFF;
+  --color-success: #22C55E;
+  
+  --color-accent-brown: #8D6E63;
+  --color-accent-caramel: #D4A373;
+  --color-accent-cream: #FAEDCD;
+  --color-accent-matcha: #A3B18A;
+  --color-accent-pink: #FFB5A7;
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Poppins', 'Inter', system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.glass-panel {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px rgba(17, 17, 17, 0.04);
+}
+
+.glass-dark {
+  background-color: rgba(17, 17, 17, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
