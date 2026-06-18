@@ -26,7 +26,7 @@ export default function Cart() {
         </button>
       </header>
 
-      <main className="flex-1 px-6 py-6 space-y-6">
+      <main className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
         
         {/* Cart Items */}
         <div className="space-y-4">
@@ -35,17 +35,17 @@ export default function Cart() {
               <img src={item.product.image} className="w-20 h-20 rounded-2xl object-cover bg-gray-50" />
               <div className="flex-1 py-1">
                 <div className="flex justify-between items-start mb-1">
-                  <h4 className="font-bold text-sm text-[var(--color-foreground)] leading-tight w-2/3">{item.product.name}</h4>
-                  <span className="font-bold text-sm">₹{item.price}</span>
+                  <h4 className="font-bold text-base text-[var(--color-foreground)] leading-tight w-2/3">{item.product.name}</h4>
+                  <span className="font-bold text-base">₹{item.price}</span>
                 </div>
-                <p className="text-[10px] text-gray-500 leading-tight mb-3 w-3/4">{item.customization}</p>
+                <p className="text-[12px] text-gray-500 leading-tight mb-3 w-3/4">{item.customization}</p>
                 
                 <div className="flex items-center justify-between w-full">
-                  <span className="text-[10px] font-bold text-primary underline" onClick={() => cartStore.removeItem(item.id)}>Remove</span>
+                  <button className="text-[12px] font-bold text-primary underline" onClick={() => cartStore.removeItem(item.id)}>Remove</button>
                   
                   <div className="flex items-center gap-3 bg-gray-50 rounded-full px-2 py-1 border border-gray-200">
                     <button onClick={() => cartStore.updateQuantity(item.id, -1)} className="w-6 h-6 flex items-center justify-center text-gray-500 font-bold active:bg-gray-200 rounded-full">-</button>
-                    <span className="font-bold text-xs">{item.quantity}</span>
+                    <span className="font-bold text-sm">{item.quantity}</span>
                     <button onClick={() => cartStore.updateQuantity(item.id, 1)} className="w-6 h-6 flex items-center justify-center text-gray-500 font-bold active:bg-gray-200 rounded-full">+</button>
                   </div>
                 </div>
@@ -63,19 +63,19 @@ export default function Cart() {
             <Ticket size={20} />
           </div>
           <div className="flex-1">
-            <h4 className="font-bold text-sm">Apply Coupon</h4>
-            <p className="text-[10px] text-gray-500">Save more on your order</p>
+            <h4 className="font-bold text-base">Apply Coupon</h4>
+            <p className="text-[12px] text-gray-500">Save more on your order</p>
           </div>
-          <button className="text-xs font-bold text-primary uppercase tracking-widest px-3 py-1.5 bg-primary/10 rounded-full">
+          <button className="text-sm font-bold text-primary uppercase tracking-widest px-3 py-1.5 bg-primary/10 rounded-full">
             Apply
           </button>
         </div>
 
         {/* Bill Details */}
         <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
-          <h4 className="font-bold text-sm mb-4 uppercase tracking-widest text-gray-500">Bill Details</h4>
+          <h4 className="font-bold text-base mb-4 uppercase tracking-widest text-gray-500">Bill Details</h4>
           
-          <div className="space-y-3 text-sm">
+          <div className="space-y-3 text-base">
             <div className="flex justify-between">
               <span className="text-gray-500">Subtotal</span>
               <span className="font-bold">₹{subtotal}</span>
@@ -102,15 +102,18 @@ export default function Cart() {
 
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-100 p-4 pb-safe flex gap-4 z-20">
+      {/* Footer pinned to the bottom of the flex container */}
+      <div className="bg-white/95 backdrop-blur-xl border-t border-gray-100 p-4 pb-24 flex gap-4 z-20 mt-auto shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
          <div className="flex flex-col justify-center px-2">
-           <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Total Pay</span>
-           <span className="font-bold text-xl leading-none">₹{total}</span>
+           <span className="text-[12px] text-gray-500 font-bold uppercase tracking-widest">Total Pay</span>
+           <span className="font-bold text-xl leading-none text-gray-900">₹{total}</span>
          </div>
           <button onClick={() => {
-            cartStore.clearCart();
-            navigate(`/tracking/${Math.floor(Math.random() * 9000) + 1000}`);
-          }} className="flex-1 bg-primary text-primary-foreground font-bold py-3.5 rounded-[1rem] flex justify-center items-center shadow-[0_8px_20px_rgba(255,213,79,0.3)] active:scale-95 transition-transform border border-primary/20">
+            if (cartItems.length > 0) {
+              cartStore.clearCart();
+              navigate(`/tracking/${Math.floor(Math.random() * 9000) + 1000}`);
+            }
+          }} className="flex-1 bg-[var(--color-premium-dark)] text-white font-bold py-4 rounded-2xl flex justify-center items-center shadow-[0_8px_20px_rgba(0,0,0,0.15)] active:scale-95 transition-transform border border-black/10 hover:bg-[var(--color-premium-dark)]">
             Checkout & Pay
           </button>
       </div>

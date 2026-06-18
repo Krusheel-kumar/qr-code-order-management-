@@ -1,32 +1,53 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Home, Grid, Gift, ShoppingCart, User } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function BottomNavigation() {
-  return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-2xl border-t border-gray-100 pb-safe z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
-      <div className="flex justify-between items-center max-w-md mx-auto h-[60px] px-6">
-        <NavItem to="/home" icon={<Home size={22} />} label="Home" active />
-        <NavItem to="/menu" icon={<Grid size={22} />} label="Menu" />
-        <NavItem to="/offers" icon={<Gift size={22} />} label="Offers" />
-        <NavItem to="/cart" icon={<ShoppingCart size={22} />} label="Cart" badge="2" />
-        <NavItem to="/profile" icon={<User size={22} />} label="Account" />
-      </div>
-    </div>
-  );
-}
+  const location = useLocation();
 
-function NavItem({ to, icon, label, active = false, badge }: { to: string, icon: React.ReactNode, label: string, active?: boolean, badge?: string }) {
+  const navItems = [
+    { path: '/home', icon: Home, label: 'Home' },
+    { path: '/menu', icon: Grid, label: 'Menu' },
+    { path: '/categories', icon: Gift, label: 'Offers' },
+    { path: '/cart', icon: ShoppingCart, label: 'Cart' },
+    { path: '/profile', icon: User, label: 'Account' },
+  ];
+
   return (
-    <Link to={to} className={`flex flex-col items-center justify-center space-y-1 w-14 transition-colors ${active ? 'text-primary' : 'text-gray-400 hover:text-gray-500'}`}>
-      <div className="relative">
-        {icon}
-        {badge && (
-          <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[9px] font-bold h-3.5 w-3.5 rounded-full flex items-center justify-center shadow-sm border border-white">
-            {badge}
-          </span>
-        )}
+    <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-100 pb-[env(safe-area-inset-bottom)] z-[9999] shadow-[0_-8px_30px_rgba(0,0,0,0.04)]">
+      <div className="flex justify-around items-center h-[75px] px-2 max-w-md mx-auto">
+        {navItems.map((item) => {
+          const isActive = location.pathname === item.path || (location.pathname === '/' && item.path === '/home');
+          return (
+            <Link 
+              key={item.path} 
+              to={item.path}
+              className="flex flex-col items-center justify-center w-full h-full relative group"
+            >
+              <div className={`flex flex-col items-center justify-center transition-all duration-300 ${isActive ? '-translate-y-1' : 'group-hover:-translate-y-0.5'}`}>
+                <div className={`relative mb-1.5 ${isActive ? 'text-primary' : 'text-gray-400 group-hover:text-gray-600'}`}>
+                  <item.icon size={26} strokeWidth={isActive ? 2.5 : 2} />
+                  {item.label === 'Cart' && (
+                    <div className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white text-[10px] font-extrabold rounded-full flex items-center justify-center border border-white">
+                      2
+                    </div>
+                  )}
+                </div>
+                <span className={`text-[11px] uppercase tracking-wide transition-colors ${isActive ? 'font-extrabold text-primary' : 'font-bold text-gray-400 group-hover:text-gray-600'}`}>
+                  {item.label}
+                </span>
+              </div>
+              
+              {isActive && (
+                <motion.div 
+                  layoutId="bottom-nav-indicator"
+                  className="absolute bottom-1 w-8 h-1 bg-primary rounded-full"
+                />
+              )}
+            </Link>
+          );
+        })}
       </div>
-      <span className={`text-[10px] ${active ? 'font-bold' : 'font-medium'}`}>{label}</span>
-    </Link>
+    </nav>
   );
 }

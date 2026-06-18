@@ -17,6 +17,8 @@
   --color-accent-cream: #FAEDCD;
   --color-accent-matcha: #A3B18A;
   --color-accent-pink: #FFB5A7;
+  
+  --color-premium-dark: #2A1B16; /* Deep rich obsidian/espresso for buttons */
 
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-heading: 'Poppins', 'Inter', system-ui, sans-serif;

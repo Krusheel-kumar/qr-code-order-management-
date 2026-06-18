@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { stories } from '../../data/mockData';
 
 interface StoryModalProps {
@@ -9,6 +10,7 @@ interface StoryModalProps {
 }
 
 export default function StoryModal({ storyId, onClose }: StoryModalProps) {
+  const navigate = useNavigate();
   const initialStoryIndex = stories.findIndex(s => s.id === storyId);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(initialStoryIndex !== -1 ? initialStoryIndex : 0);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
@@ -119,7 +121,7 @@ export default function StoryModal({ storyId, onClose }: StoryModalProps) {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: '100%' }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="fixed inset-0 z-[100] bg-black flex flex-col select-none"
+      className="fixed inset-0 z-[100000] bg-black flex flex-col select-none"
       onContextMenu={(e) => e.preventDefault()} // Prevent right-click menu on long press
     >
       {/* Progress Bars */}
@@ -163,35 +165,47 @@ export default function StoryModal({ storyId, onClose }: StoryModalProps) {
           onPointerLeave={handlePointerLeave}
         />
 
-        {/* Blurred background to fill gaps seamlessly */}
-        <img 
-          key={`bg-${currentImage}`}
-          src={currentImage} 
-          className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-50" 
-        />
-
-        {/* Uncropped sharp foreground image */}
+        {/* Foreground zoomed image */}
         <img 
           key={`fg-${currentImage}`}
           src={currentImage} 
-          className={`relative z-10 w-full h-full object-contain transition-transform duration-[5000ms] ease-linear ${isPaused ? 'scale-[1.02]' : 'scale-100'}`} 
+          className={`relative z-10 w-full h-full object-cover transition-transform duration-[5000ms] ease-linear ${isPaused ? 'scale-[1.05]' : 'scale-100'}`} 
           onError={() => {
             console.error('Failed to load story image:', currentImage);
           }}
         />
         
-        <div className={`absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30 z-20 pointer-events-none transition-opacity duration-200 ${isPaused ? 'opacity-0' : 'opacity-100'}`} />
+        <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/30 z-20 pointer-events-none transition-opacity duration-200 ${isPaused ? 'opacity-0' : 'opacity-100'}`} />
         
         {/* Order Now Floating Button */}
         <div className={`absolute bottom-10 left-0 right-0 flex justify-center z-40 pointer-events-none transition-opacity duration-200 ${isPaused ? 'opacity-0' : 'opacity-100'}`}>
           <button 
-            className="bg-primary text-[var(--color-primary-foreground)] px-10 py-3.5 rounded-full font-bold text-sm shadow-xl pointer-events-auto flex items-center gap-2"
+            className="bg-primary text-[var(--color-primary-foreground)] px-10 py-3.5 rounded-full font-extrabold text-[15px] shadow-xl pointer-events-auto flex items-center gap-2"
             onClick={(e) => {
               e.stopPropagation();
               onCloseRef.current();
+              let targetCategory = 'All';
+              let openProductId = '';
+
+              if (story.title === 'Newly Introduced') targetCategory = 'Bake House';
+              if (story.title === 'Trending') targetCategory = 'Barista';
+              if (story.title === 'Offers') targetCategory = 'All';
+              
+              // Handle Best Sellers specific slides
+              if (story.title === 'Best Sellers') {
+                targetCategory = 'Milk Teas'; // Default for best sellers
+                if (currentImage.includes('bestseller1')) openProductId = 'p-authentic-milk-tea';
+                if (currentImage.includes('bestseller2')) openProductId = 'p-taro-milk-tea';
+                if (currentImage.includes('bestseller3')) openProductId = 'p-blueberry-milk-tea';
+                if (currentImage.includes('bestseller4')) {
+                  openProductId = 'p-ferrero-rocher-boba-tea';
+                }
+              }
+
+              navigate('/menu', { state: { mainCategory: targetCategory, openProductId } });
             }}
           >
-            Order Now <span className="text-lg leading-none">&rarr;</span>
+            Order Now <span className="text-xl leading-none">&rarr;</span>
           </button>
         </div>
       </div>

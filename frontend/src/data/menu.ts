@@ -1537,6 +1537,9 @@ export const MENU: MenuItem[] = [
   rating: 4.6,
   calories: 200,
   flavorProfile: {
+    sweetness: 4,
+    creaminess: 2,
+    refreshment: 3,
     energy: 2
   },
   pairings: []

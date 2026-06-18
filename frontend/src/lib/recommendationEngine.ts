@@ -1,137 +1,99 @@
-import { drinksDatabase, type DrinkMetadata } from '../data/drinks';
+// frontend/src/lib/recommendationEngine.ts
 
-export interface UserPreferences {
-  flavors: string[]; // 'Chocolate', 'Coffee', 'Fruity', 'Tea', 'Creamy', 'Healthy'
-  sweetness: string; // 'Very Sweet', 'Medium Sweet', 'Light Sweet', 'No Sugar'
-  milk: boolean | null; // true, false
-  mood: string; // 'Refreshing', 'Comfort', 'Energy Boost', 'Dessert Treat', 'Healthy Choice', 'Coffee Craving'
-  ingredients: string[]; // 'Mango', 'Lychee', etc.
-}
+export type FlavorCategory = 'Tea' | 'Fruit' | 'Chocolate' | 'Coffee';
+export type SubFlavor = 
+  | 'Strong & Authentic' | 'Sweet Yam (Taro)' | 'Earthy (Matcha)' // Tea
+  | 'Blueberry' | 'Mango' | 'Melon (Honeydew)' // Fruit
+  | 'Ferrero Rocher' | 'Nutella' | 'Choco Fantasy' // Chocolate
+  | 'Mocha' | 'Hazelnut'; // Coffee
+export type ToppingPreference = 'Tapioca (Chewy)' | 'Popping Bubbles' | 'Jellies' | 'Recommend for me';
 
 export interface RecommendationResult {
-  drink: DrinkMetadata;
-  matchPercentage: number;
-  matchReasons: string[];
+  productId: string;
+  reason: string;
 }
 
-export type PersonalityType = 
-  | 'Tropical Explorer'
-  | 'Dessert Lover'
-  | 'Coffee Addict'
-  | 'Wellness Seeker'
-  | 'Classic Tea Enthusiast'
-  | 'Sweet Tooth'
-  | 'Adventurous Sipper';
+export const getLocalRecommendation = (
+  _category: FlavorCategory,
+  subFlavor: SubFlavor,
+  topping: ToppingPreference
+): RecommendationResult => {
+  let productId = 'p-authentic-milk-tea'; // Default fallback
+  let reason = '';
 
-export interface PersonalityResult {
-  type: PersonalityType;
-  description: string;
-}
-
-export function determinePersonality(prefs: UserPreferences): PersonalityResult {
-  if (prefs.mood === 'Healthy Choice' || prefs.flavors.includes('Healthy')) {
-    return { type: 'Wellness Seeker', description: 'You treat your body like a temple. You love light, refreshing drinks packed with goodness.' };
+  // 1. Map to exact product ID based on sub-flavor
+  switch (subFlavor) {
+    case 'Strong & Authentic':
+      productId = 'p-authentic-milk-tea';
+      reason = "Our Authentic Boba Tea features a strong Thai tea base. It's incredibly rich and pairs perfectly with chewy Tapioca Boba and our signature Cheese Foam!";
+      break;
+    case 'Sweet Yam (Taro)':
+      productId = 'p-taro-milk-tea';
+      reason = "Taro Boba Tea is a fan favorite! It has a delicious, earthy yam flavor that tastes amazing with Tapioca and Cheese Foam.";
+      break;
+    case 'Earthy (Matcha)':
+      productId = 'p-matcha-green-tea';
+      reason = "If you like a hint of authentic bitterness, our Matcha Boba Tea is perfect. We recommend it with Tapioca and a layer of rich Cheese Foam.";
+      break;
+    case 'Blueberry':
+      productId = 'p-blueberry-milk-tea';
+      reason = "Blueberry Milk Tea is bursting with fresh berry flavor! It's fantastic with Lychee or Blueberry popping bubbles, or classic Tapioca.";
+      break;
+    case 'Mango':
+      productId = 'p-mango-milk-tea';
+      reason = "Our Mango Milk Tea is a tropical delight! Try it with Strawberry popping bubbles or classic Tapioca for the ultimate treat.";
+      break;
+    case 'Melon (Honeydew)':
+      productId = 'p-honeydew-milk-tea';
+      reason = "Honeydew is one of our absolute best sellers! It has a refreshing muskmelon flavor. We highly recommend pairing it with Blueberry popping boba and Tapioca!";
+      break;
+    case 'Ferrero Rocher':
+      productId = 'p-ferrero-rocher-boba-tea';
+      reason = "Decadent and nutty! The Ferrero Rocher Boba Tea is a rich chocolate hazelnut dream. It goes beautifully with Tapioca and chocolate boba.";
+      break;
+    case 'Nutella':
+      productId = 'p-nutella-boba-tea';
+      reason = "Our Nutella Boba Tea is pure chocolate joy. Perfect for satisfying sweet cravings, especially with Tapioca and chocolate boba!";
+      break;
+    case 'Choco Fantasy':
+      productId = 'p-choco-fantasy-boba-tea';
+      reason = "Welcome to chocolate heaven! The Choco Fantasy is rich and intense. We recommend adding Tapioca and chocolate boba.";
+      break;
+    case 'Mocha':
+      productId = 'p-mocha-milk-tea';
+      reason = "The perfect mix of rich chocolate and bold coffee! Our Mocha Boba Tea gives you a great energy boost. Best enjoyed with Tapioca and chocolate bubbles.";
+      break;
+    case 'Hazelnut':
+      productId = 'p-hazelnut-milk-tea';
+      reason = "Smooth coffee paired with nutty hazelnut. A classic combination that tastes incredible with Tapioca and chocolate bubbles.";
+      break;
+    default:
+      productId = 'p-authentic-milk-tea';
+      reason = "Based on your choices, this is our perfect match for you!";
   }
-  if (prefs.flavors.includes('Coffee') || prefs.mood === 'Coffee Craving') {
-    return { type: 'Coffee Addict', description: 'You run on caffeine and good vibes. Bold flavours are your love language.' };
+
+  // 2. Personalize reason based on topping choice
+  if (topping === 'Tapioca (Chewy)') {
+    reason += " We'll make sure to load it up with our classic chewy Tapioca pearls!";
+  } else if (topping === 'Popping Bubbles') {
+    reason += " The popping bubbles will add a fantastic, juicy burst to every sip!";
+  } else if (topping === 'Jellies') {
+    reason += " We'll add our delicious textured jellies for that extra fun bite.";
   }
-  if (prefs.flavors.includes('Chocolate') || prefs.mood === 'Dessert Treat') {
-    return { type: 'Dessert Lover', description: 'Why choose between a drink and dessert when you can have both? Indulgence is key.' };
-  }
-  if (prefs.flavors.includes('Fruity') && prefs.milk === false) {
-    return { type: 'Tropical Explorer', description: 'You love refreshing fruity drinks and exciting flavours that transport you to a beach.' };
-  }
-  if (prefs.sweetness === 'Very Sweet') {
-    return { type: 'Sweet Tooth', description: 'You like your life and your drinks extra sweet! Sugar is your best friend.' };
-  }
-  if (prefs.flavors.includes('Tea') && prefs.milk === true) {
-    return { type: 'Classic Tea Enthusiast', description: 'You appreciate the classics. A perfectly brewed milk tea is all you need.' };
-  }
-  return { type: 'Adventurous Sipper', description: 'You love trying new things and mixing flavours. Every drink is a new journey!' };
-}
 
-export function getRecommendations(prefs: UserPreferences): RecommendationResult[] {
-  const scoredDrinks = drinksDatabase.map(drink => {
-    let score = 0;
-    let maxPossibleScore = 0;
-    const reasons: string[] = [];
+  return { productId, reason };
+};
 
-    // 1. Milk Preference (High Weight)
-    maxPossibleScore += 20;
-    if (prefs.milk !== null) {
-      if (drink.milk === prefs.milk) {
-        score += 20;
-        reasons.push(`Perfect match for ${prefs.milk ? 'Milk-based' : 'Non-Milk'} preference`);
-      } else {
-        score -= 10; // Penalty for wrong milk type
-      }
-    }
-
-    // 2. Sweetness (Medium Weight)
-    maxPossibleScore += 15;
-    let targetSweetness = 5;
-    if (prefs.sweetness === 'Very Sweet') targetSweetness = 9;
-    if (prefs.sweetness === 'Medium Sweet') targetSweetness = 6;
-    if (prefs.sweetness === 'Light Sweet') targetSweetness = 3;
-    if (prefs.sweetness === 'No Sugar') targetSweetness = 0;
-
-    const sweetDiff = Math.abs(drink.sweetness - targetSweetness);
-    if (sweetDiff <= 2) {
-      score += 15;
-      reasons.push(`Hits your ${prefs.sweetness} preference`);
-    } else if (sweetDiff <= 4) {
-      score += 5;
-    }
-
-    // 3. Flavors (High Weight)
-    maxPossibleScore += 25;
-    if (prefs.flavors.includes('Fruity') && drink.fruity) { score += 10; reasons.push('Fruity flavour profile'); }
-    if (prefs.flavors.includes('Chocolate') && drink.chocolate) { score += 10; reasons.push('Rich chocolate notes'); }
-    if (prefs.flavors.includes('Coffee') && drink.coffee) { score += 10; reasons.push('Coffee blend'); }
-    if (prefs.flavors.includes('Creamy') && drink.creamy) { score += 5; reasons.push('Creamy texture'); }
-    if (prefs.flavors.includes('Healthy') && drink.healthy) { score += 5; reasons.push('Healthy choice'); }
-    
-    // 4. Mood (Medium Weight)
-    maxPossibleScore += 20;
-    if (prefs.mood === 'Refreshing' && drink.refreshing) { score += 20; reasons.push('Refreshing for your mood'); }
-    if (prefs.mood === 'Energy Boost' && drink.energyBoost) { score += 20; reasons.push('Gives you an energy boost'); }
-    if (prefs.mood === 'Dessert Treat' && drink.dessert) { score += 20; reasons.push('Perfect dessert treat'); }
-    if (prefs.mood === 'Coffee Craving' && drink.coffee) { score += 20; reasons.push('Satisfies your coffee craving'); }
-    
-    // 5. Ingredients
-    if (prefs.ingredients.length > 0) {
-      maxPossibleScore += 10;
-      const nameLower = drink.name.toLowerCase();
-      const hasIngredient = prefs.ingredients.some(ing => nameLower.includes(ing.toLowerCase()));
-      if (hasIngredient) {
-        score += 10;
-        reasons.push('Contains your favourite ingredients');
-      }
-    }
-
-    // Normalize match percentage
-    let matchPercentage = Math.round((score / maxPossibleScore) * 100);
-    // Add some random fuzziness so it's not always 100% or round numbers, feels more organic (like 96%, 98%)
-    if (matchPercentage > 90) {
-       matchPercentage = Math.min(99, matchPercentage - Math.floor(Math.random() * 4));
-    }
-    
-    // Ensure it doesn't go below 40% for visual purposes
-    matchPercentage = Math.max(40, matchPercentage);
-
-    // Keep top 4 unique reasons
-    const uniqueReasons = Array.from(new Set(reasons)).slice(0, 4);
-
-    return {
-      drink,
-      matchPercentage,
-      matchReasons: uniqueReasons
-    };
+export const getLlmRecommendation = async (craving: string): Promise<RecommendationResult> => {
+  const response = await fetch('http://localhost:8080/api/ai/recommend', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ craving })
   });
 
-  // Sort by highest match percentage
-  scoredDrinks.sort((a, b) => b.matchPercentage - a.matchPercentage);
+  if (!response.ok) {
+    throw new Error('Failed to get recommendation from AI');
+  }
 
-  // Return top 3
-  return scoredDrinks.slice(0, 3);
-}
+  return response.json();
+};

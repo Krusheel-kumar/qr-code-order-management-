@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Star, Menu } from 'lucide-react';
+import { Bell, Star } from 'lucide-react';
 
 import { campaigns, stories, combos, offers } from '../../data/mockData';
 import { MENU, getBestSellers, getNewLaunches, getBakeHouseItems, getBaristaItems } from '../../data/menu';
@@ -16,7 +16,7 @@ export default function DiscoveryHome() {
   const navigate = useNavigate();
   
   // State
-  const [activeBanner, setActiveBanner] = useState(0);
+  const [_activeBanner, setActiveBanner] = useState(0);
   const [selectedStory, setSelectedStory] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -76,12 +76,12 @@ export default function DiscoveryHome() {
       </div>
       
       <div className="p-3.5 pt-3 flex flex-col flex-1">
-        <h4 className="font-extrabold text-[14px] text-gray-900 leading-tight mb-0.5">{product.name}</h4>
-        <span className="text-[10px] font-medium text-gray-400 mb-2 uppercase tracking-wider">{product.category.replace('cat_', '')}</span>
+        <h4 className="font-extrabold text-[16px] text-gray-900 leading-tight mb-0.5">{product.name}</h4>
+        <span className="text-[12px] font-medium text-gray-400 mb-2 uppercase tracking-wider">{product.category.replace('cat_', '')}</span>
         
         <div className="flex justify-between items-center mt-auto">
-          <span className="font-extrabold text-[15px] text-black tracking-tight">₹{product.price}</span>
-          <button className="bg-black text-white hover:bg-primary hover:text-black w-8 h-8 rounded-full flex items-center justify-center text-lg font-light leading-none pb-0.5 transition-colors shadow-sm">
+          <span className="font-extrabold text-[17px] text-black tracking-tight">₹{product.price}</span>
+          <button className="bg-[var(--color-premium-dark)] text-white hover:bg-primary hover:text-black w-8 h-8 rounded-full flex items-center justify-center text-lg font-light leading-none pb-0.5 transition-colors shadow-sm">
             +
           </button>
         </div>
@@ -90,22 +90,22 @@ export default function DiscoveryHome() {
   );
 
   return (
-    <div className="min-h-screen pb-24 bg-[var(--color-background)] font-sans overflow-x-hidden">
+    <div className="min-h-[100dvh] pb-24 bg-[var(--color-background)] font-sans">
       
       {/* Top Navigation Bar */}
-      <header className="flex justify-center items-center px-6 pt-4 pb-3 bg-white/90 backdrop-blur-xl sticky top-0 z-40 border-b border-black/5 shadow-sm relative">
-        <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100 bg-white flex items-center justify-center shrink-0 shadow-sm">
+      <header className="flex justify-center items-center px-6 pt-4 pb-3 bg-white/90 backdrop-blur-xl sticky top-0 z-40 border-b border-black/5 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-14 h-14 rounded-full overflow-hidden border border-gray-100 bg-white flex items-center justify-center shrink-0 shadow-sm">
             <img src={logoImg} alt="Logo" className="w-[120%] h-[120%] object-cover" />
           </div>
-          <div className="flex flex-col items-start pt-0.5">
+          <div className="flex flex-col items-start pt-1">
             <div className="flex items-start">
-              <h1 className="font-heading font-black text-[26px] tracking-tighter lowercase flex items-center leading-none text-gray-900">
+              <h1 className="font-heading font-black text-[32px] tracking-tighter lowercase flex items-center leading-none text-gray-900">
                 pop<span className="text-primary">o</span>bob
               </h1>
-              <span className="text-[9px] font-extrabold ml-1 mt-0.5 text-gray-400">&reg;</span>
+              <span className="text-[10px] font-extrabold ml-1 mt-1 text-gray-400">&reg;</span>
             </div>
-            <span className="text-[7.5px] font-extrabold uppercase tracking-[0.25em] text-gray-500 mt-0.5">Specialty Bubble Tea</span>
+            <span className="text-[8.5px] font-extrabold uppercase tracking-[0.25em] text-gray-500 mt-1">Specialty Bubble Tea</span>
           </div>
         </div>
         
@@ -120,15 +120,22 @@ export default function DiscoveryHome() {
       {/* Screen 02: Hero Campaign Carousel */}
       <section className="mb-8 mt-1">
         <div ref={carouselRef} className="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory gap-4 px-4 pb-2 scroll-smooth">
-          {campaigns.map((campaign, idx) => (
-            <div 
-              key={idx}
-              onClick={() => navigate(campaign.link)}
-              className="relative shrink-0 snap-center w-full aspect-square rounded-[1.5rem] overflow-hidden shadow-sm bg-gray-100 cursor-pointer active:scale-[0.98] transition-transform"
-            >
-              <img src={campaign.image} className="w-full h-full object-cover" />
-            </div>
-          ))}
+          {campaigns.map((campaign, idx) => {
+            let targetCategory = 'All';
+            if (campaign.image.includes('herobanner1')) targetCategory = 'Barista';
+            if (campaign.image.includes('herobanner2')) targetCategory = 'All';
+            if (campaign.image.includes('herobanner3')) targetCategory = 'Bake House';
+
+            return (
+              <div 
+                key={idx}
+                onClick={() => navigate('/menu', { state: { mainCategory: targetCategory } })}
+                className="relative shrink-0 snap-center w-full aspect-square rounded-[1.5rem] overflow-hidden shadow-sm bg-gray-100 cursor-pointer active:scale-[0.98] transition-transform"
+              >
+                <img src={campaign.image} className="w-full h-full object-cover" />
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -215,9 +222,9 @@ export default function DiscoveryHome() {
           <div className="relative z-10 w-2/3">
             <h4 className="font-extrabold text-xl mb-1">{offers[0].title}</h4>
             <p className="text-xs font-bold text-red-500 mb-2">{offers[0].description}</p>
-            <p className="text-[10px] text-gray-500 mb-4">{offers[0].validUntil}</p>
+            <p className="text-[12px] text-gray-500 mb-4">{offers[0].validUntil}</p>
             <button className="bg-primary text-primary-foreground text-xs font-bold px-5 py-2.5 rounded-full flex items-center gap-1 shadow-md">
-              Order Now <span className="text-[10px]">&rarr;</span>
+              Order Now <span className="text-[12px]">&rarr;</span>
             </button>
           </div>
         </div>
@@ -231,8 +238,8 @@ export default function DiscoveryHome() {
         <div className="bg-[var(--color-foreground)] rounded-[1.5rem] p-5 text-white relative overflow-hidden flex flex-col justify-between aspect-[4/3]">
           <div className="relative z-10">
             <h4 className="font-extrabold text-2xl font-heading mb-1">{MENU[1]?.name.split(' ')[0]}<br/>{MENU[1]?.name.split(' ').slice(1).join(' ')}</h4>
-            <p className="text-white/60 text-[11px] w-[55%] line-clamp-3 mb-2">{MENU[1]?.story}</p>
-            <div className="flex items-center gap-1 text-primary text-[11px] font-bold mb-3">
+            <p className="text-white/60 text-[13px] w-[55%] line-clamp-3 mb-2">{MENU[1]?.story}</p>
+            <div className="flex items-center gap-1 text-primary text-[13px] font-bold mb-3">
               <Star size={10} className="fill-primary" /> {MENU[1]?.rating} ({MENU[1]?.ordersToday || '1.2k'} reviews)
             </div>
             <p className="font-bold text-lg mb-3">₹{MENU[1]?.price}</p>
@@ -277,7 +284,7 @@ export default function DiscoveryHome() {
               <h4 className="font-extrabold text-[13px] mb-1 tracking-widest uppercase bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">New Here?</h4>
               <p className="text-xs text-gray-500 font-medium line-clamp-2 leading-relaxed">Ask our POB AI to find your perfect match!</p>
             </div>
-            <button onClick={() => navigate('/quiz')} className="bg-gray-900 text-white text-[11px] font-extrabold px-4 py-2.5 rounded-full shrink-0 flex items-center gap-1.5 shadow-[0_4px_15px_rgba(0,0,0,0.1)] hover:bg-gray-800 hover:scale-105 transition-all uppercase tracking-wider">
+            <button onClick={() => navigate('/quiz')} className="bg-[var(--color-premium-dark)] text-white text-[13px] font-extrabold px-4 py-2.5 rounded-full shrink-0 flex items-center gap-1.5 shadow-[0_4px_15px_rgba(0,0,0,0.1)] hover:bg-gray-800 hover:scale-105 transition-all uppercase tracking-wider">
               POB AI <span className="text-primary text-sm">✦</span>
             </button>
           </div>

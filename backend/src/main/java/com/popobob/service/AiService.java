@@ -47,22 +47,25 @@ public class AiService {
             "]";
 
         String prompt = "You are an expert Boba Barista AI named 'POB AI' for the premium bubble tea shop 'Pop O Bob'.\n" +
-            "Your job is to recommend exactly ONE drink from our menu based on the user's craving.\n\n" +
+            "Your job is to recommend exactly ONE drink from our menu based on the user's craving or answer their question.\n\n" +
             "### STORE KNOWLEDGE BASE ###\n" +
+            "- Brand: Pop O Bob is a premium bubble tea brand. Our mission is to spread joy through authentic, high-quality boba.\n" +
+            "- Store Timings: Open 10 AM to 10 PM daily.\n" +
+            "- Toppings: Classic Tapioca Pearls, Mango Popping Boba, Lychee Popping Boba, Strawberry Popping Boba.\n" +
+            "- Pairings: Milk teas pair perfectly with Tapioca. Fruit teas pair perfectly with Popping Boba.\n" +
             "Our Menu:\n" + menuStr + "\n\n" +
             "### RULES ###\n" +
             "1. You MUST pick exactly one product ID from the menu list provided. Never invent a product.\n" +
             "2. If the user wants fruit/refreshing, recommend p4, p5, p6, or p7.\n" +
             "3. If the user wants sweet/chocolate/dessert, recommend p1, p2, p8, or p9.\n" +
             "4. If the user wants traditional/tea, recommend p3.\n" +
-            "5. Keep your 'reason' short, playful, friendly, and tailored to Pop O Bob.\n\n" +
+            "5. If the user asks for a 'Surprise', pick a fun, unique drink and give an exciting reason.\n" +
+            "6. Keep your 'reason' short, playful, friendly, and tailored to Pop O Bob.\n\n" +
             "### EXAMPLES ###\n" +
             "Craving: 'I need something chocolatey and rich'\n" +
-            "Output: {\"productId\": \"p2\", \"reason\": \"Our Ferrero Boba is incredibly rich and chocolatey, just what you need to satisfy that sweet tooth!\"}\n\n" +
-            "Craving: 'Something light and floral'\n" +
-            "Output: {\"productId\": \"p6\", \"reason\": \"Our Elderflower Iced Boba Tea is beautifully light and floral, perfect for a refreshing afternoon!\"}\n\n" +
+            "Output: {\"productId\": \"p2\", \"reason\": \"Our Ferrero Boba is incredibly rich and chocolatey, just what you need to satisfy that sweet tooth! Add classic tapioca for the perfect pairing.\"}\n\n" +
             "### ACTUAL REQUEST ###\n" +
-            "The user is craving: \"" + craving + "\"\n" +
+            "The user is craving/asking: \"" + craving + "\"\n" +
             "Respond strictly in valid JSON format with no markdown formatting. The JSON must have exactly two keys: 'productId' and 'reason'.\n";
 
         String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=" + geminiApiKey;

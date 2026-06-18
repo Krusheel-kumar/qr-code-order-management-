@@ -1,22 +1,23 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Flame, Droplets, Wind, ShoppingBag, X, HelpCircle, Info } from 'lucide-react';
-import { MENU, CATEGORIES, getRecommendedToppings } from '../../data/menu';
+import { useLocation } from 'react-router-dom';
+import { Search, ShoppingBag } from 'lucide-react';
+import { MENU, CATEGORIES } from '../../data/menu';
 import type { MenuItem } from '../../data/menu';
 import { useCartStore } from '../../store/useCartStore';
 
 import CustomizerSheet from '../../components/CustomizerSheet';
 
 export default function FullMenu() {
+  const location = useLocation();
+  const initialCategory = location.state?.mainCategory || CATEGORIES[0];
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [mainCategory, setMainCategory] = useState(CATEGORIES[0]);
+  const [mainCategory, setMainCategory] = useState(initialCategory);
   const [activeCategory, setActiveCategory] = useState('');
   
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
   
   const cartStore = useCartStore();
-  const cartCount = cartStore.items.reduce((total, item) => total + item.quantity, 0);
-  const cartTotal = cartStore.getSubtotal();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const categoryRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
@@ -58,6 +59,20 @@ export default function FullMenu() {
       setActiveCategory(categories[0]);
     }
   }, [categories, activeCategory]);
+
+  // Handle openProductId from location state
+  useEffect(() => {
+    const openProductId = location.state?.openProductId;
+    if (openProductId) {
+      const productToOpen = MENU.find(p => p.id === openProductId);
+      if (productToOpen) {
+        // Wait a small delay to ensure UI is ready
+        setTimeout(() => {
+          setSelectedProduct(productToOpen);
+        }, 100);
+      }
+    }
+  }, [location.state]);
 
   // ScrollSpy logic
   useEffect(() => {

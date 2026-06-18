@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, ShoppingBag } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import type { MenuItem } from '../data/menu';
 import { useCartStore } from '../store/useCartStore';
 
@@ -19,7 +18,6 @@ interface CustomizerSheetProps {
 }
 
 export default function CustomizerSheet({ product, isOpen, onClose }: CustomizerSheetProps) {
-  const navigate = useNavigate();
   const cartStore = useCartStore();
 
   const [size, setSize] = useState('Regular');
@@ -79,19 +77,18 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+            className="fixed inset-0 bg-[var(--color-premium-dark)]/60 backdrop-blur-sm z-[100000]"
           />
           
-          {/* Bottom Sheet Drawer */}
           <motion.div
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed bottom-0 left-0 right-0 max-h-[90vh] bg-white rounded-t-[2rem] z-[101] overflow-y-auto hide-scrollbar shadow-2xl flex flex-col"
+            className="fixed bottom-0 left-0 right-0 max-h-[90vh] bg-white rounded-t-[2rem] z-[100001] flex flex-col shadow-[0_-10px_40px_rgba(0,0,0,0.1)]"
           >
-            {/* Sticky Header with Title and Image */}
-            <div className="sticky top-0 bg-white/95 backdrop-blur-xl px-6 py-4 flex items-center gap-4 border-b border-gray-100 z-20">
+            {/* Header */}
+            <div className="bg-white/95 backdrop-blur-xl px-6 py-4 flex items-center gap-4 border-b border-gray-100 z-20 shrink-0 rounded-t-[2rem]">
               {product.image ? (
                 <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border-2 border-gray-100 shadow-sm">
                   <img src={product.image} className="w-full h-full object-cover" />
@@ -106,7 +103,6 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
                 <h3 className="font-heading font-extrabold text-xl text-foreground line-clamp-1">{product.name}</h3>
                 <span className="font-bold text-primary">₹{product.price}</span>
               </div>
-
               <button 
                 onClick={onClose}
                 className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-foreground/50 hover:bg-gray-200 active:scale-95 transition-all shrink-0"
@@ -114,111 +110,113 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
                 <X size={18} />
               </button>
             </div>
+            {/* Scrollable Content */}
+            <div className="flex-1 min-h-0 overflow-y-auto hide-scrollbar relative flex flex-col">
+              <div className="p-6 space-y-8 flex-1">
+                
+                {/* Story */}
+                <p className="text-base text-gray-500 leading-relaxed bg-gray-50 p-4 rounded-2xl italic border border-gray-100">
+                  "{product.story}"
+                </p>
 
-            <div className="p-6 space-y-8 pb-32">
-              
-              {/* Story */}
-              <p className="text-sm text-gray-500 leading-relaxed bg-gray-50 p-4 rounded-2xl italic border border-gray-100">
-                "{product.story}"
-              </p>
-
-              {/* Size */}
-              <div>
-                <h4 className="font-bold text-sm text-foreground mb-3 uppercase tracking-widest text-gray-500 text-xs">Size</h4>
-                <div className="flex gap-3">
-                  {['Regular', 'Large'].map(s => (
-                    <button 
-                      key={s} 
-                      onClick={() => setSize(s)}
-                      className={`flex-1 py-3 rounded-2xl border text-sm font-bold transition-all flex flex-col items-center justify-center gap-1 ${size === s ? 'border-primary bg-[var(--color-cream)] text-primary-foreground' : 'border-gray-200 text-gray-400 hover:border-gray-300'}`}
-                    >
-                      {s}
-                      <span className="text-[10px] font-medium opacity-60">
-                        {s === 'Regular' ? `₹${product.price}` : `₹${product.price + (product.largePriceAddOn || 30)}`}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Choice of Milk (Only for Milk Teas) */}
-              {product.category === 'Milk Teas' && (
+                {/* Size */}
                 <div>
-                  <h4 className="font-bold text-sm text-foreground mb-3 uppercase tracking-widest text-gray-500 text-xs">Choice of Milk</h4>
-                  <div className="flex flex-col gap-2">
-                    {MILK_OPTIONS.map(m => (
+                  <h4 className="font-bold text-foreground mb-3 uppercase tracking-widest text-gray-500 text-sm">Size</h4>
+                  <div className="flex gap-3">
+                    {['Regular', 'Large'].map(s => (
                       <button 
-                        key={m} 
-                        onClick={() => setMilk(m)}
-                        className={`w-full py-3.5 px-5 rounded-2xl border text-sm font-bold transition-all flex justify-between items-center ${milk === m ? 'border-primary bg-primary/10 text-primary-foreground shadow-sm' : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-white'}`}
+                        key={s} 
+                        onClick={() => setSize(s)}
+                        className={`flex-1 py-3 rounded-2xl border text-base font-bold transition-all flex flex-col items-center justify-center gap-1 ${size === s ? 'border-primary bg-[var(--color-cream)] text-primary-foreground shadow-sm' : 'border-gray-200 text-gray-400 hover:border-gray-300 bg-white'}`}
                       >
-                        {m}
-                        {milk === m && <Check size={18} className="text-primary" />}
+                        {s}
+                        <span className="text-[12px] font-medium opacity-60">
+                          {s === 'Regular' ? `₹${product.price}` : `₹${product.price + (product.largePriceAddOn || 30)}`}
+                        </span>
                       </button>
                     ))}
                   </div>
                 </div>
-              )}
 
-              {/* Choice of Free Topping */}
-              <div>
-                <h4 className="font-bold text-sm text-foreground mb-1 uppercase tracking-widest text-gray-500 text-xs">Choice of Free Topping</h4>
-                <p className="text-[10px] text-gray-400 mb-3">(Choose 1) • Included</p>
-                <div className="flex flex-col gap-2">
-                   {ALL_TOPPINGS.map(t => {
-                      const isSelected = freeTopping === t;
-                      const isExtra = extraToppings.includes(t);
-                      return (
+                {/* Choice of Milk */}
+                {product.category === 'Milk Teas' && (
+                  <div>
+                    <h4 className="font-bold text-foreground mb-3 uppercase tracking-widest text-gray-500 text-sm">Choice of Milk</h4>
+                    <div className="flex flex-col gap-2">
+                      {MILK_OPTIONS.map(m => (
                         <button 
-                          key={t} 
-                          onClick={() => {
-                              if (isExtra) setExtraToppings(extraToppings.filter(item => item !== t));
-                              setFreeTopping(isSelected ? '' : t);
-                          }}
-                          className={`w-full py-3.5 px-5 rounded-2xl border text-sm font-bold transition-all flex justify-between items-center ${isSelected ? 'border-primary bg-primary/10 text-primary-foreground shadow-sm' : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-white'}`}
+                          key={m} 
+                          onClick={() => setMilk(m)}
+                          className={`w-full py-3.5 px-5 rounded-2xl border text-base font-bold transition-all flex justify-between items-center ${milk === m ? 'border-primary bg-primary/10 text-primary-foreground shadow-sm' : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-white'}`}
                         >
-                          <span>{t}</span>
-                          {isSelected && <Check size={18} className="text-primary" />}
+                          {m}
+                          {milk === m && <Check size={18} className="text-primary" />}
                         </button>
-                      )
-                   })}
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Choice of Free Topping */}
+                <div>
+                  <h4 className="font-bold text-foreground mb-1 uppercase tracking-widest text-gray-500 text-sm">Choice of Free Topping</h4>
+                  <p className="text-[12px] text-gray-400 mb-3">(Choose 1) • Included</p>
+                  <div className="flex flex-col gap-2">
+                     {ALL_TOPPINGS.map(t => {
+                        const isSelected = freeTopping === t;
+                        const isExtra = extraToppings.includes(t);
+                        return (
+                          <button 
+                            key={t} 
+                            onClick={() => {
+                                if (isExtra) setExtraToppings(extraToppings.filter(item => item !== t));
+                                setFreeTopping(isSelected ? '' : t);
+                            }}
+                            className={`w-full py-3.5 px-5 rounded-2xl border text-base font-bold transition-all flex justify-between items-center ${isSelected ? 'border-primary bg-primary/10 text-primary-foreground shadow-sm' : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-white'}`}
+                          >
+                            <span>{t}</span>
+                            {isSelected && <Check size={18} className="text-primary" />}
+                          </button>
+                        )
+                     })}
+                  </div>
                 </div>
-              </div>
 
-              {/* Choice of Extra Toppings */}
-              <div>
-                <h4 className="font-bold text-sm text-foreground mb-1 uppercase tracking-widest text-gray-500 text-xs">Choice of Extra Toppings</h4>
-                <p className="text-[10px] text-primary font-bold mb-3">+₹60 each</p>
-                <div className="flex flex-col gap-2">
-                   {ALL_TOPPINGS.map(t => {
-                      const isSelected = extraToppings.includes(t);
-                      const isFree = freeTopping === t;
-                      return (
-                        <button 
-                          key={t} 
-                          onClick={() => {
-                              if (isFree) setFreeTopping('');
-                              toggleExtraTopping(t);
-                          }}
-                          className={`w-full py-3.5 px-5 rounded-2xl border text-sm font-bold transition-all flex justify-between items-center ${isSelected ? 'border-primary bg-primary/10 text-primary-foreground shadow-sm' : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-white'}`}
-                        >
-                          <span>{t}</span>
-                          {isSelected && <Check size={18} className="text-primary" />}
-                        </button>
-                      )
-                   })}
+                {/* Choice of Extra Toppings */}
+                <div>
+                  <h4 className="font-bold text-foreground mb-1 uppercase tracking-widest text-gray-500 text-sm">Choice of Extra Toppings</h4>
+                  <p className="text-[12px] text-primary font-bold mb-3">+₹60 each</p>
+                  <div className="flex flex-col gap-2">
+                     {ALL_TOPPINGS.map(t => {
+                        const isSelected = extraToppings.includes(t);
+                        const isFree = freeTopping === t;
+                        return (
+                          <button 
+                            key={t} 
+                            onClick={() => {
+                                if (isFree) setFreeTopping('');
+                                toggleExtraTopping(t);
+                            }}
+                            className={`w-full py-3.5 px-5 rounded-2xl border text-base font-bold transition-all flex justify-between items-center ${isSelected ? 'border-primary bg-primary/10 text-primary-foreground shadow-sm' : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-white'}`}
+                          >
+                            <span>{t}</span>
+                            {isSelected && <Check size={18} className="text-primary" />}
+                          </button>
+                        )
+                     })}
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Fixed Add To Cart Button in Drawer */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-xl border-t border-gray-100 z-50">
+            {/* Footer */}
+            <div className="shrink-0 p-4 bg-white/95 backdrop-blur-xl border-t border-gray-100 z-50">
               <button
                 onClick={handleAddToCart}
-                className="w-full bg-primary text-primary-foreground py-4 rounded-2xl font-bold text-lg shadow-[0_8px_20px_rgba(255,213,79,0.3)] active:scale-95 transition-transform flex justify-between items-center px-6 border border-primary/20"
+                className="w-full bg-[var(--color-premium-dark)] text-white py-4 rounded-2xl font-bold text-lg shadow-[0_8px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.2)] hover:bg-[var(--color-premium-dark)] hover:scale-[1.02] active:scale-95 transition-all flex justify-between items-center px-6 border border-black/10"
               >
-                <span>Add to Cart</span>
-                <span className="opacity-90 text-xl tracking-tight font-extrabold">₹{totalPrice}</span>
+                <span className="uppercase tracking-widest text-sm">Add to Cart</span>
+                <span className="opacity-90 text-[17px] tracking-tight font-extrabold text-primary">₹{totalPrice}</span>
               </button>
             </div>
 
