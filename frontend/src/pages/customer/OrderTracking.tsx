@@ -4,26 +4,38 @@ import { ArrowLeft, MapPin, Phone } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const STAGES = [
-  { id: 'received', label: 'Order Confirmed', time: '10:30 AM' },
-  { id: 'preparing', label: 'Preparing', time: '10:32 AM' },
-  { id: 'almost', label: 'Almost Ready', time: 'Pending' },
-  { id: 'ready', label: 'Ready For Pickup', time: 'Pending' },
+  { id: 'PLACED', label: 'Order Confirmed' },
+  { id: 'PREPARING', label: 'Preparing' },
+  { id: 'READY', label: 'Ready For Pickup' },
 ];
 
 export default function OrderTracking() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [currentStage, setCurrentStage] = useState(0); // 'Order Confirmed'
+  const [currentStage, setCurrentStage] = useState(0); 
+  const [orderData, setOrderData] = useState<any>(null);
 
-  // Mock progress animation to simulate WebSockets
   useEffect(() => {
-    const intervals = [
-      setTimeout(() => setCurrentStage(1), 3000), // to Preparing
-      setTimeout(() => setCurrentStage(2), 6000), // to Almost Ready
-      setTimeout(() => setCurrentStage(3), 9000), // to Ready For Pickup
-    ];
-    return () => intervals.forEach(clearTimeout);
-  }, []);
+    if (!id) return;
+    
+    const fetchStatus = async () => {
+      try {
+        const { getOrderById } = await import('../../api');
+        const order = await getOrderById(id);
+        setOrderData(order);
+        
+        if (order.status === 'PLACED' || order.status === 'NEW') setCurrentStage(0);
+        else if (order.status === 'PREPARING') setCurrentStage(1);
+        else if (order.status === 'READY' || order.status === 'DELIVERED') setCurrentStage(2);
+      } catch (err) {
+        console.error("Failed to fetch order", err);
+      }
+    };
+
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 3000);
+    return () => clearInterval(interval);
+  }, [id]);
 
   return (
     <div className="min-h-screen bg-[var(--color-background)] font-sans flex flex-col pb-6">
@@ -32,7 +44,7 @@ export default function OrderTracking() {
         <button onClick={() => navigate('/home')} className="w-10 h-10 flex items-center justify-center -ml-2">
           <ArrowLeft size={24} />
         </button>
-        <h1 className="font-heading font-extrabold text-lg tracking-wide uppercase">Order #{id}</h1>
+        <h1 className="font-heading font-extrabold text-lg tracking-wide uppercase">Order #{id?.substring(0, 8)}</h1>
         <div className="w-10"></div>
       </header>
 
@@ -45,10 +57,12 @@ export default function OrderTracking() {
             animate={{ scale: 1 }}
             className="w-24 h-24 mx-auto bg-[var(--color-cream)] rounded-full flex items-center justify-center mb-4"
           >
-            <span className="text-5xl">🧋</span>
+            <span className="text-5xl">{currentStage >= 2 ? '🎉' : '🧋'}</span>
           </motion.div>
-          <h2 className="font-heading font-extrabold text-2xl mb-1">{STAGES[currentStage].label}</h2>
-          <p className="text-gray-500 text-sm">Estimated Pickup: 10:45 AM</p>
+          <h2 className="font-heading font-extrabold text-2xl mb-1">{STAGES[currentStage]?.label || 'Loading...'}</h2>
+          {orderData?.tableNumber && (
+            <p className="text-gray-500 text-sm mt-1 font-bold text-primary">Table: {orderData.tableNumber}</p>
+          )}
         </div>
 
         {/* Tracking Timeline */}
@@ -79,7 +93,6 @@ export default function OrderTracking() {
                   </div>
                   <div className="flex-1 pb-2">
                     <h4 className={`font-bold text-sm ${isCompleted ? 'text-black' : 'text-gray-400'}`}>{stage.label}</h4>
-                    <p className="text-[10px] text-gray-400 font-medium">{stage.time}</p>
                   </div>
                 </div>
               );

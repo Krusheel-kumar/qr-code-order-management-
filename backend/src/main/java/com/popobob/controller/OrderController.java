@@ -26,6 +26,11 @@ public class OrderController {
         return orderService.getActiveOrders();
     }
 
+    @GetMapping("/{id}")
+    public Order getOrderById(@PathVariable UUID id) {
+        return orderService.getOrderById(id);
+    }
+
     @PatchMapping("/{id}/status")
     public Order updateStatus(@PathVariable UUID id, @RequestParam String status) {
         return orderService.updateOrderStatus(id, status);

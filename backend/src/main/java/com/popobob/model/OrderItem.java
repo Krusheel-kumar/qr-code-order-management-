@@ -15,13 +15,15 @@ public class OrderItem {
     
     @ManyToOne
     @JoinColumn(name = "order_id")
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Order order;
     
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
+    private String productId;
+    private String productName;
     
     private Integer quantity;
     private BigDecimal subtotal;
     private String specialInstructions;
+    @Column(columnDefinition = "TEXT")
+    private String customizations;
 }

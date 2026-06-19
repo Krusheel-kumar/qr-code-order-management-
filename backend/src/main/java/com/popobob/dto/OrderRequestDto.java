@@ -6,6 +6,7 @@ import java.util.UUID;
 
 @Data
 public class OrderRequestDto {
-    private String tableId;
+    private String customerName;
+    private String tableNumber;
     private List<OrderItemDto> items;
 }

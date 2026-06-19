@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trash2, Ticket } from 'lucide-react';
 import { useCartStore } from '../../store/useCartStore';
+import { getStoreSettings } from '../../api';
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -8,9 +10,16 @@ export default function Cart() {
 
   const cartItems = cartStore.items;
   const subtotal = cartStore.getSubtotal();
+  
+  const [storeSettings, setStoreSettings] = useState({ taxRate: 5, deliveryFee: 40, packingCharge: 15 });
+  
+  useEffect(() => {
+    getStoreSettings().then(setStoreSettings).catch(console.error);
+  }, []);
+
   const discount = 0; 
-  const taxes = Math.round(subtotal * 0.05); 
-  const total = subtotal - discount + taxes;
+  const taxes = Math.round(subtotal * (storeSettings.taxRate / 100)); 
+  const total = subtotal - discount + taxes + storeSettings.packingCharge;
 
   return (
     <div className="min-h-screen pb-28 bg-[var(--color-background)] font-sans flex flex-col">
@@ -87,9 +96,15 @@ export default function Cart() {
               </div>
             )}
             <div className="flex justify-between">
-              <span className="text-gray-500">Taxes & Fees</span>
+              <span className="text-gray-500">Taxes</span>
               <span className="font-bold">₹{taxes}</span>
             </div>
+            {storeSettings.packingCharge > 0 && (
+              <div className="flex justify-between">
+                <span className="text-gray-500">Packaging Fee</span>
+                <span className="font-bold">₹{storeSettings.packingCharge}</span>
+              </div>
+            )}
             
             <div className="w-full h-[1px] bg-gray-100 my-4" />
             
@@ -97,6 +112,33 @@ export default function Cart() {
               <span className="font-bold text-lg">Total</span>
               <span className="font-bold text-xl">₹{total}</span>
             </div>
+          </div>
+        </div>
+
+        {/* Customer Details */}
+        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm space-y-4">
+          <h4 className="font-bold text-base uppercase tracking-widest text-gray-500">Order Details</h4>
+          
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Your Name</label>
+            <input 
+              type="text" 
+              placeholder="e.g. John Doe" 
+              value={cartStore.customerName}
+              onChange={(e) => cartStore.setCustomerName(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Table Number</label>
+            <input 
+              type="text" 
+              placeholder="e.g. 5" 
+              value={cartStore.tableNumber}
+              onChange={(e) => cartStore.setTableNumber(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
+            />
           </div>
         </div>
 
@@ -108,12 +150,46 @@ export default function Cart() {
            <span className="text-[12px] text-gray-500 font-bold uppercase tracking-widest">Total Pay</span>
            <span className="font-bold text-xl leading-none text-gray-900">₹{total}</span>
          </div>
-          <button onClick={() => {
-            if (cartItems.length > 0) {
-              cartStore.clearCart();
-              navigate(`/tracking/${Math.floor(Math.random() * 9000) + 1000}`);
-            }
-          }} className="flex-1 bg-[var(--color-premium-dark)] text-white font-bold py-4 rounded-2xl flex justify-center items-center shadow-[0_8px_20px_rgba(0,0,0,0.15)] active:scale-95 transition-transform border border-black/10 hover:bg-[var(--color-premium-dark)]">
+          <button 
+            onClick={async () => {
+              if (cartItems.length === 0) return;
+              if (!cartStore.customerName) {
+                alert("Please enter your name!");
+                return;
+              }
+              if (!cartStore.tableNumber) {
+                alert("Please enter your table number or scan the QR code again.");
+                return;
+              }
+              
+              try {
+                // Prepare API Payload
+                const orderPayload = {
+                  customerName: cartStore.customerName,
+                  tableNumber: cartStore.tableNumber,
+                  items: cartItems.map(item => ({
+                    productId: item.product.id,
+                    productName: item.product.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    subtotal: item.price * item.quantity,
+                    customizations: item.customization
+                  }))
+                };
+                
+                // We need to import placeOrder inside the click handler to avoid circular dependencies if any
+                const { placeOrder } = await import('../../api');
+                const result = await placeOrder(orderPayload);
+                
+                cartStore.clearCart();
+                navigate(`/tracking/${result.id}`);
+              } catch (error) {
+                console.error("Failed to place order", error);
+                alert("Failed to place order. Please try again.");
+              }
+            }} 
+            className="flex-1 bg-[var(--color-premium-dark)] text-white font-bold py-4 rounded-2xl flex justify-center items-center shadow-[0_8px_20px_rgba(0,0,0,0.15)] active:scale-95 transition-transform border border-black/10 hover:bg-[var(--color-premium-dark)]"
+          >
             Checkout & Pay
           </button>
       </div>

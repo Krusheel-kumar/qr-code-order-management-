@@ -17,11 +17,10 @@ public class Order {
     
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private User user; // Optional, for logged-in users
     
-    @ManyToOne
-    @JoinColumn(name = "table_id")
-    private CafeTable cafeTable;
+    private String customerName;
+    private String tableNumber;
     
     private String status;
     private BigDecimal totalAmount;

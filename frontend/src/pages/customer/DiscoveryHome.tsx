@@ -3,14 +3,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Bell, Star } from 'lucide-react';
 
-import { campaigns, stories, combos, offers } from '../../data/mockData';
 import { MENU, getBestSellers, getNewLaunches, getBakeHouseItems, getBaristaItems } from '../../data/menu';
 import type { MenuItem } from '../../data/menu';
+import type { Campaign, Story, Offer, Combo } from '../../data/models';
 import StoryModal from '../../components/feed/StoryModal';
 import CustomizerSheet from '../../components/CustomizerSheet';
 import { useCartStore } from '../../store/useCartStore';
+import { getCampaigns, getStories } from '../../api';
 
 import logoImg from '../../assets/logo 2.png';
+import { campaigns as initialCampaigns, stories as initialStories } from '../../data/mockData';
 
 export default function DiscoveryHome() {
   const navigate = useNavigate();
@@ -21,10 +23,29 @@ export default function DiscoveryHome() {
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
 
+  // Dynamic CMS State
+  const [campaigns, setCampaigns] = useState<Campaign[]>(initialCampaigns);
+  const [stories, setStories] = useState<Story[]>(initialStories);
+  
+  // Mock data for offers and combos until they are fully integrated
+  const offers: Offer[] = [{ id: 'o1', title: 'Special Discount', description: '20% OFF', image: '', code: 'DISC20', validUntil: 'Valid until Sunday', ctaText: 'Order Now' }];
+  const combos: Combo[] = [];
+
+  useEffect(() => {
+    getCampaigns().then(data => {
+      if (data && data.length > 0) setCampaigns(data);
+    }).catch(console.error);
+    
+    getStories().then(data => {
+      if (data && data.length > 0) setStories(data);
+    }).catch(console.error);
+  }, []);
+
   // Auto-rotate Hero Carousel
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveBanner((prev) => {
+        if (campaigns.length === 0) return 0;
         const next = (prev + 1) % campaigns.length;
         if (carouselRef.current) {
           const slide = carouselRef.current.children[next] as HTMLElement;
@@ -37,7 +58,7 @@ export default function DiscoveryHome() {
       });
     }, 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [campaigns.length]);
 
   const cartStore = useCartStore();
 

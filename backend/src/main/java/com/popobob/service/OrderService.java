@@ -27,22 +27,23 @@ public class OrderService {
     @Transactional
     public Order createOrder(OrderRequestDto request) {
         Order order = new Order();
-        order.setStatus("NEW");
+        order.setStatus("PLACED"); // Changed from NEW to PLACED
+        order.setCustomerName(request.getCustomerName());
+        order.setTableNumber(request.getTableNumber());
         
         List<OrderItem> items = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (OrderItemDto itemDto : request.getItems()) {
-            Product product = productRepository.findById(itemDto.getProductId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
-            
             OrderItem item = new OrderItem();
             item.setOrder(order);
-            item.setProduct(product);
+            item.setProductId(itemDto.getProductId());
+            item.setProductName(itemDto.getProductName());
             item.setQuantity(itemDto.getQuantity());
             item.setSpecialInstructions(itemDto.getSpecialInstructions());
+            item.setCustomizations(itemDto.getCustomizations());
             
-            BigDecimal subtotal = itemDto.getSubtotal() != null ? itemDto.getSubtotal() : product.getPrice().multiply(new BigDecimal(itemDto.getQuantity()));
+            BigDecimal subtotal = itemDto.getSubtotal() != null ? itemDto.getSubtotal() : itemDto.getPrice().multiply(new BigDecimal(itemDto.getQuantity()));
             item.setSubtotal(subtotal);
             totalAmount = totalAmount.add(subtotal);
             items.add(item);
@@ -74,6 +75,10 @@ public class OrderService {
     }
 
     public List<Order> getActiveOrders() {
-        return orderRepository.findByStatusInOrderByCreatedAtDesc(List.of("NEW", "PREPARING", "READY"));
+        return orderRepository.findByStatusInOrderByCreatedAtDesc(List.of("PLACED", "PREPARING", "READY"));
+    }
+
+    public Order getOrderById(UUID id) {
+        return orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
     }
 }
