@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api';
+// Use VITE_API_URL if defined, otherwise default to local development server
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 export const adminApi = axios.create({
   baseURL: `${API_URL}/admin`,
