@@ -183,9 +183,10 @@ export default function Cart() {
                 
                 cartStore.clearCart();
                 navigate(`/tracking/${result.id}`);
-              } catch (error) {
+              } catch (error: any) {
                 console.error("Failed to place order", error);
-                alert("Failed to place order. Please try again.");
+                const backendError = error.response?.data?.trace || error.message;
+                alert(`Backend Error: ${backendError}\nPlease copy this and send it to me!`);
               }
             }} 
             className="flex-1 bg-[var(--color-premium-dark)] text-white font-bold py-4 rounded-2xl flex justify-center items-center shadow-[0_8px_20px_rgba(0,0,0,0.15)] active:scale-95 transition-transform border border-black/10 hover:bg-[var(--color-premium-dark)]"
