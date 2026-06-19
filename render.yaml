@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: popobob-backend
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./backend
+    plan: free
+    healthCheckPath: /api/orders/active
