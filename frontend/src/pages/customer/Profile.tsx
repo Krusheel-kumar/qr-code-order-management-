@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { LogOut, Clock, Award, Mail, Lock, User as UserIcon } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { getUserOrders, loginUser, registerUser } from '../../api';
