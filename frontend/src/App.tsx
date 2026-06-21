@@ -9,6 +9,7 @@ import CategoryHub from './pages/customer/CategoryHub';
 import FullMenu from './pages/customer/FullMenu';
 import Cart from './pages/customer/Cart';
 import OrderTracking from './pages/customer/OrderTracking';
+import Profile from './pages/customer/Profile';
 
 import AIChatScreen from './pages/customer/chat/AIChatScreen';
 
@@ -88,6 +89,9 @@ function App() {
 
             {/* Screen 17 */}
             <Route path="/cart" element={<Cart />} />
+            
+            {/* User Profile */}
+            <Route path="/profile" element={<Profile />} />
           </Route>
 
           {/* Full Screen Flows (No Bottom Nav) */}

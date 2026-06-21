@@ -1,25 +1,32 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2, Ticket } from 'lucide-react';
+import { ArrowLeft, Trash2, Ticket, Wallet } from 'lucide-react';
 import { useCartStore } from '../../store/useCartStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { getStoreSettings } from '../../api';
 
 export default function Cart() {
   const navigate = useNavigate();
   const cartStore = useCartStore();
+  const { user } = useAuthStore();
 
   const cartItems = cartStore.items;
   const subtotal = cartStore.getSubtotal();
   
   const [storeSettings, setStoreSettings] = useState({ taxRate: 5, deliveryFee: 40, packingCharge: 15 });
+  const [usePoints, setUsePoints] = useState(false);
   
   useEffect(() => {
     getStoreSettings().then(setStoreSettings).catch(console.error);
   }, []);
 
-  const discount = 0; 
-  const taxes = Math.round(subtotal * (storeSettings.taxRate / 100)); 
-  const total = subtotal - discount + taxes + storeSettings.packingCharge;
+  // Boba Wallet Math
+  const loyaltyPoints = user?.loyaltyPoints || 0;
+  const canUsePoints = loyaltyPoints >= 100;
+  const loyaltyDiscount = usePoints ? Math.floor(loyaltyPoints / 10) : 0;
+
+  const taxes = Math.round((subtotal - loyaltyDiscount) * (storeSettings.taxRate / 100)); 
+  const total = Math.max(0, subtotal - loyaltyDiscount + taxes + storeSettings.packingCharge);
 
   return (
     <div className="min-h-screen pb-28 bg-[var(--color-background)] font-sans flex flex-col">
@@ -80,6 +87,39 @@ export default function Cart() {
           </button>
         </div>
 
+        {/* Boba Wallet */}
+        {user && (
+          <div className={`rounded-3xl p-5 border shadow-sm transition-all ${usePoints ? 'bg-[#FFFBF2] border-[#FFB300]/30' : 'bg-white border-gray-100'}`}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${usePoints ? 'bg-[#FFB300] text-white' : 'bg-gray-50 text-gray-400'}`}>
+                  <Wallet size={20} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-base flex items-center gap-2">
+                    Boba Wallet
+                    <span className="text-[10px] font-extrabold uppercase bg-black text-[#FFB300] px-2 py-0.5 rounded-full">
+                      {loyaltyPoints} PTS
+                    </span>
+                  </h4>
+                  <p className="text-[12px] text-gray-500 mt-0.5">
+                    {canUsePoints ? `You can save ₹${Math.floor(loyaltyPoints / 10)} on this order!` : 'Earn 100 pts to unlock discounts.'}
+                  </p>
+                </div>
+              </div>
+              
+              {canUsePoints && (
+                <button 
+                  onClick={() => setUsePoints(!usePoints)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${usePoints ? 'bg-[#FFB300]' : 'bg-gray-200'}`}
+                >
+                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${usePoints ? 'translate-x-6' : 'translate-x-1'}`} />
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Bill Details */}
         <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
           <h4 className="font-bold text-base mb-4 uppercase tracking-widest text-gray-500">Bill Details</h4>
@@ -89,10 +129,10 @@ export default function Cart() {
               <span className="text-gray-500">Subtotal</span>
               <span className="font-bold">₹{subtotal}</span>
             </div>
-            {discount > 0 && (
-              <div className="flex justify-between text-green-500">
-                <span>Discount</span>
-                <span className="font-bold">-₹{discount}</span>
+            {loyaltyDiscount > 0 && (
+              <div className="flex justify-between text-[#FF8F00] font-bold">
+                <span>Points Used ({loyaltyPoints} pts)</span>
+                <span>-₹{loyaltyDiscount}</span>
               </div>
             )}
             <div className="flex justify-between">
@@ -110,7 +150,7 @@ export default function Cart() {
             
             <div className="flex justify-between items-center">
               <span className="font-bold text-lg">Total</span>
-              <span className="font-bold text-xl">₹{total}</span>
+              <span className="font-black text-2xl text-[var(--color-premium-dark)]">₹{total}</span>
             </div>
           </div>
         </div>
@@ -124,7 +164,7 @@ export default function Cart() {
             <input 
               type="text" 
               placeholder="e.g. John Doe" 
-              value={cartStore.customerName}
+              value={cartStore.customerName || user?.username || ''}
               onChange={(e) => cartStore.setCustomerName(e.target.value)}
               className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
             />
@@ -148,12 +188,12 @@ export default function Cart() {
       <div className="bg-white/95 backdrop-blur-xl border-t border-gray-100 p-4 pb-24 flex gap-4 z-20 mt-auto shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
          <div className="flex flex-col justify-center px-2">
            <span className="text-[12px] text-gray-500 font-bold uppercase tracking-widest">Total Pay</span>
-           <span className="font-bold text-xl leading-none text-gray-900">₹{total}</span>
+           <span className="font-black text-2xl leading-none text-gray-900">₹{total}</span>
          </div>
           <button 
             onClick={async () => {
               if (cartItems.length === 0) return;
-              if (!cartStore.customerName) {
+              if (!cartStore.customerName && !user?.username) {
                 alert("Please enter your name!");
                 return;
               }
@@ -164,9 +204,10 @@ export default function Cart() {
               
               try {
                 // Prepare API Payload
-                const orderPayload = {
-                  customerName: cartStore.customerName,
+                const orderPayload: any = {
+                  customerName: cartStore.customerName || user?.username,
                   tableNumber: cartStore.tableNumber,
+                  pointsUsed: usePoints ? loyaltyPoints : 0,
                   items: cartItems.map(item => ({
                     productId: item.product.id,
                     productName: item.product.name,
@@ -177,10 +218,25 @@ export default function Cart() {
                   }))
                 };
                 
-                // We need to import placeOrder inside the click handler to avoid circular dependencies if any
-                const { placeOrder } = await import('../../api');
+                if (user) {
+                  orderPayload.userId = user.id;
+                }
+                
+                const { placeOrder, getUserProfile } = await import('../../api');
                 const result = await placeOrder(orderPayload);
                 
+                // Fetch the real updated user profile from the backend so points sync perfectly!
+                if (user) {
+                   try {
+                     const updatedUser = await getUserProfile(user.id);
+                     if (updatedUser) {
+                       useAuthStore.getState().setUser(updatedUser);
+                     }
+                   } catch (e) {
+                     console.error('Failed to sync user points', e);
+                   }
+                }
+
                 cartStore.clearCart();
                 navigate(`/tracking/${result.id}`);
               } catch (error: any) {

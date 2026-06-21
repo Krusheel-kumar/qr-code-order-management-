@@ -17,19 +17,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.popobob.model.User;
+import com.popobob.repository.UserRepository;
+
 @Service
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public Order createOrder(OrderRequestDto request) {
         Order order = new Order();
-        order.setStatus("PLACED"); // Changed from NEW to PLACED
+        order.setStatus("PLACED");
         order.setCustomerName(request.getCustomerName());
         order.setTableNumber(request.getTableNumber());
+        
+        if (request.getUserId() != null) {
+            userRepository.findById(request.getUserId()).ifPresent(order::setUser);
+        }
         
         List<OrderItem> items = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
@@ -50,7 +58,39 @@ public class OrderService {
         }
 
         order.setItems(items);
+        // Apply Wallet Discount if points used
+        if (request.getPointsUsed() != null && request.getPointsUsed() > 0 && order.getUser() != null) {
+            User user = order.getUser();
+            int currentPoints = user.getLoyaltyPoints() == null ? 0 : user.getLoyaltyPoints();
+            if (currentPoints >= request.getPointsUsed()) {
+                user.setLoyaltyPoints(currentPoints - request.getPointsUsed());
+                // 10 points = 1 currency unit
+                BigDecimal discount = new BigDecimal(request.getPointsUsed()).divide(new BigDecimal("10"));
+                totalAmount = totalAmount.subtract(discount);
+                if (totalAmount.compareTo(BigDecimal.ZERO) < 0) {
+                    totalAmount = BigDecimal.ZERO;
+                }
+            }
+        }
+        
         order.setTotalAmount(totalAmount);
+        
+        // Calculate and add loyalty points based on Tier Multiplier
+        if (order.getUser() != null) {
+            User user = order.getUser();
+            int currentPoints = user.getLoyaltyPoints() == null ? 0 : user.getLoyaltyPoints();
+            
+            // Determine multiplier based on current points (Tiers)
+            double multiplier = 1.0; // Bronze
+            if (currentPoints >= 2000) multiplier = 1.5; // Gold
+            else if (currentPoints >= 500) multiplier = 1.2; // Silver
+            
+            int basePoints = totalAmount.divideToIntegralValue(new BigDecimal("10")).intValue();
+            int earnedPoints = (int) (basePoints * multiplier);
+            
+            user.setLoyaltyPoints(currentPoints + earnedPoints);
+            userRepository.save(user);
+        }
         
         Order savedOrder = orderRepository.save(order);
         

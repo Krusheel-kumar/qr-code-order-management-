@@ -8,5 +8,7 @@ import java.util.UUID;
 public class OrderRequestDto {
     private String customerName;
     private String tableNumber;
+    private UUID userId;
+    private Integer pointsUsed;
     private List<OrderItemDto> items;
 }

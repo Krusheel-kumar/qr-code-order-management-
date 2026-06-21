@@ -1,14 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Star } from 'lucide-react';
+import { Star, Search, User } from 'lucide-react';
 
 import { MENU, getBestSellers, getNewLaunches, getBakeHouseItems, getBaristaItems } from '../../data/menu';
 import type { MenuItem } from '../../data/menu';
 import type { Campaign, Story, Offer, Combo } from '../../data/models';
 import StoryModal from '../../components/feed/StoryModal';
 import CustomizerSheet from '../../components/CustomizerSheet';
+import SearchModal from '../../components/ui/SearchModal';
+import AuthModal from '../../components/ui/AuthModal';
+import ProfileSheet from '../../components/ui/ProfileSheet';
 import { useCartStore } from '../../store/useCartStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { getCampaigns, getStories } from '../../api';
 
 import logoImg from '../../assets/logo 2.png';
@@ -21,7 +25,11 @@ export default function DiscoveryHome() {
   const [_activeBanner, setActiveBanner] = useState(0);
   const [selectedStory, setSelectedStory] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuthStore();
 
   // Dynamic CMS State
   const [campaigns, setCampaigns] = useState<Campaign[]>(initialCampaigns);
@@ -113,30 +121,47 @@ export default function DiscoveryHome() {
   return (
     <div className="min-h-[100dvh] pb-24 bg-[var(--color-background)] font-sans">
       
-      {/* Top Navigation Bar */}
-      <header className="flex justify-center items-center px-6 pt-4 pb-3 bg-white/90 backdrop-blur-xl sticky top-0 z-40 border-b border-black/5 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="w-14 h-14 rounded-full overflow-hidden border border-gray-100 bg-white flex items-center justify-center shrink-0 shadow-sm">
-            <img src={logoImg} alt="Logo" className="w-[120%] h-[120%] object-cover" />
-          </div>
-          <div className="flex flex-col items-start pt-1">
-            <div className="flex items-start">
-              <h1 className="font-heading font-black text-[32px] tracking-tighter lowercase flex items-center leading-none text-gray-900">
-                pop<span className="text-primary">o</span>bob
-              </h1>
-              <span className="text-[10px] font-extrabold ml-1 mt-1 text-gray-400">&reg;</span>
-            </div>
-            <span className="text-[8.5px] font-extrabold uppercase tracking-[0.25em] text-gray-500 mt-1">Specialty Bubble Tea</span>
-          </div>
-        </div>
+      {/* Ultra-Modern Non-Sticky Header */}
+      <div className="relative z-50 w-full mb-6">
+        {/* Subtle top gradient to ensure readability */}
+        <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-[#FFFBF2] to-transparent pointer-events-none z-0"></div>
         
-        <div className="absolute right-6 top-1/2 -translate-y-1/2 mt-1">
-          <button className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-black border border-gray-100 hover:bg-gray-100 active:scale-95 transition-all relative">
-            <Bell size={18} />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-          </button>
-        </div>
-      </header>
+        <header className="relative pt-6 px-5 pb-3 flex justify-between items-center z-10">
+          
+          {/* Logo Section */}
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full overflow-hidden bg-white/60 backdrop-blur-md border border-white/80 shadow-[0_4px_16px_rgba(0,0,0,0.03)] flex items-center justify-center shrink-0">
+              <img src={logoImg} alt="Logo" className="w-[110%] h-[110%] object-cover" />
+            </div>
+            <div className="flex flex-col items-start pt-0.5">
+              <div className="flex items-start">
+                <h1 className="font-heading font-black text-[26px] tracking-tight lowercase leading-none text-gray-900 drop-shadow-sm">
+                  pop<span className="text-[#FFB300] drop-shadow-sm">o</span>bob
+                </h1>
+                <span className="text-[9px] font-extrabold ml-0.5 mt-0.5 text-[#FFB300]">&reg;</span>
+              </div>
+              <span className="text-[8px] font-extrabold uppercase tracking-[0.25em] text-gray-500 mt-1 opacity-90">Specialty Bubble Tea</span>
+            </div>
+          </div>
+          
+          {/* Action Buttons: Account & Search */}
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => user ? setIsProfileOpen(true) : setIsAuthOpen(true)} 
+              className={`w-11 h-11 rounded-full flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.03)] active:scale-95 transition-all relative border border-white/80 ${user ? 'bg-[#FFB300] text-white hover:bg-[#FF8F00]' : 'bg-white/60 backdrop-blur-md text-gray-700 hover:bg-white/90'}`}
+            >
+              {user ? (
+                <span className="font-heading font-black text-lg">{user?.username?.charAt(0)?.toUpperCase() || 'U'}</span>
+              ) : (
+                <User size={20} strokeWidth={2.5} />
+              )}
+            </button>
+            <button onClick={() => setIsSearchOpen(true)} className="w-11 h-11 rounded-full bg-white/60 backdrop-blur-md flex items-center justify-center text-gray-700 shadow-[0_4px_16px_rgba(0,0,0,0.03)] active:scale-95 transition-all relative border border-white/80 hover:bg-white/90">
+              <Search size={20} strokeWidth={2.5} />
+            </button>
+          </div>
+        </header>
+      </div>
 
       {/* Screen 02: Hero Campaign Carousel */}
       <section className="mb-8 mt-1">
@@ -326,6 +351,22 @@ export default function DiscoveryHome() {
         product={selectedProduct} 
         isOpen={selectedProduct !== null} 
         onClose={() => setSelectedProduct(null)} 
+      />
+
+      <SearchModal 
+        isOpen={isSearchOpen} 
+        onClose={() => setIsSearchOpen(false)} 
+        onSelectProduct={handleProductClick} 
+      />
+
+      <AuthModal 
+        isOpen={isAuthOpen} 
+        onClose={() => setIsAuthOpen(false)} 
+      />
+
+      <ProfileSheet 
+        isOpen={isProfileOpen} 
+        onClose={() => setIsProfileOpen(false)} 
       />
 
     </div>
