@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import logoImg from '../../assets/logo 2.png';
+
 
 export default function SplashScreen() {
   const navigate = useNavigate();
@@ -148,7 +148,7 @@ export default function SplashScreen() {
             }}
             className="w-[180px] h-[180px] rounded-full overflow-hidden flex items-center justify-center drop-shadow-[0_16px_32px_rgba(255,179,0,0.25)]"
           >
-            <img src={logoImg} alt="Exact Logo" className="w-[125%] h-[125%] object-cover" />
+            <img src="/assets/logo 2.png" alt="Exact Logo" className="w-[125%] h-[125%] object-cover" />
           </motion.div>
         </div>
 
