@@ -15,7 +15,6 @@ import { useCartStore } from '../../store/useCartStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { getCampaigns, getStories } from '../../api';
 
-import logoImg from '../../assets/logo 2.png';
 import { campaigns as initialCampaigns, stories as initialStories } from '../../data/mockData';
 
 export default function DiscoveryHome() {
@@ -131,7 +130,7 @@ export default function DiscoveryHome() {
           {/* Logo Section */}
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full overflow-hidden bg-white/60 backdrop-blur-md border border-white/80 shadow-[0_4px_16px_rgba(0,0,0,0.03)] flex items-center justify-center shrink-0">
-              <img src={logoImg} alt="Logo" className="w-[110%] h-[110%] object-cover" />
+              <img src="/assets/logo 2.png" alt="Logo" className="w-[110%] h-[110%] object-cover" />
             </div>
             <div className="flex flex-col items-start pt-0.5">
               <div className="flex items-start">
