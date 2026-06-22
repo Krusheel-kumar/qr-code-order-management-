@@ -14,6 +14,7 @@ export default function Profile() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [loadingAuth, setLoadingAuth] = useState(false);
   const [error, setError] = useState('');
 
@@ -37,7 +38,7 @@ export default function Profile() {
         const u = await loginUser({ email, password });
         setUser(u);
       } else {
-        const u = await registerUser({ name, email, password });
+        const u = await registerUser({ name, email, password, phoneNumber });
         setUser(u);
       }
     } catch (err: any) {
@@ -65,16 +66,28 @@ export default function Profile() {
 
         <form onSubmit={handleAuthSubmit} className="flex flex-col gap-4">
           {!isLogin && (
-            <div className="relative">
-              <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input
-                type="text"
-                placeholder="Your Name"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full bg-white border border-gray-200 rounded-xl pl-12 pr-4 py-3.5 focus:ring-2 focus:ring-[#FFB300] outline-none text-sm font-medium"
-              />
+            <div className="flex flex-col gap-4">
+                <div className="relative">
+                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                  <input
+                    type="text"
+                    placeholder="Your Name"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full bg-white border border-gray-200 rounded-xl pl-12 pr-4 py-3.5 focus:ring-2 focus:ring-[#FFB300] outline-none text-sm font-medium"
+                  />
+                </div>
+                <div className="relative">
+                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                  <input
+                    type="tel"
+                    placeholder="Mobile Number (Optional)"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="w-full bg-white border border-gray-200 rounded-xl pl-12 pr-4 py-3.5 focus:ring-2 focus:ring-[#FFB300] outline-none text-sm font-medium"
+                  />
+                </div>
             </div>
           )}
           

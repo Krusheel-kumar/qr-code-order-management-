@@ -7,7 +7,9 @@ import java.util.UUID;
 @Data
 public class OrderRequestDto {
     private String customerName;
+    private String customerPhone;
     private String tableNumber;
+    private String paymentReference;
     private UUID userId;
     private Integer pointsUsed;
     private List<OrderItemDto> items;

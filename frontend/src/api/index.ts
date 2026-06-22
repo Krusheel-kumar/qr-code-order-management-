@@ -130,6 +130,16 @@ export const ordersApi = axios.create({
   },
 });
 
+export const createRazorpayOrder = async (amount: number) => {
+  const response = await fetch(`${API_URL}/payments/create-order`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ amount }),
+  });
+  if (response.ok) return await response.json();
+  throw new Error('Payment initialization failed');
+};
+
 export const placeOrder = async (order: any) => {
   try {
     const res = await ordersApi.post('', order);

@@ -22,6 +22,7 @@ public class AuthController {
         String name = body.get("name");
         String email = body.get("email");
         String password = body.get("password");
+        String phoneNumber = body.get("phoneNumber");
 
         if (userRepository.findByEmail(email).isPresent()) {
             return ResponseEntity.badRequest().body(Map.of("message", "Email already exists"));
@@ -30,6 +31,7 @@ public class AuthController {
         User user = new User();
         user.setUsername(name);
         user.setEmail(email);
+        user.setPhoneNumber(phoneNumber);
         user.setPasswordHash(password); // Note: Should be hashed in prod
         user.setRole("USER");
         user.setLoyaltyPoints(0);

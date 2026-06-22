@@ -20,7 +20,11 @@ public class Order {
     private User user; // Optional, for logged-in users
     
     private String customerName;
+    private String customerPhone;
     private String tableNumber;
+    
+    private String paymentReference;
+    private String paymentStatus;
     
     private String status;
     private BigDecimal totalAmount;

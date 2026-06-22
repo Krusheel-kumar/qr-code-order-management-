@@ -33,7 +33,10 @@ public class OrderService {
         Order order = new Order();
         order.setStatus("PLACED");
         order.setCustomerName(request.getCustomerName());
+        order.setCustomerPhone(request.getCustomerPhone());
         order.setTableNumber(request.getTableNumber());
+        order.setPaymentReference(request.getPaymentReference());
+        order.setPaymentStatus(request.getPaymentReference() != null ? "PAID" : "PENDING");
         
         if (request.getUserId() != null) {
             userRepository.findById(request.getUserId()).ifPresent(order::setUser);

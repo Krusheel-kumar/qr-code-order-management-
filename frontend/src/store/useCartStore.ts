@@ -19,8 +19,10 @@ interface CartStore {
   getSubtotal: () => number;
   tableNumber: string;
   customerName: string;
+  customerPhone: string;
   setTableNumber: (table: string) => void;
   setCustomerName: (name: string) => void;
+  setCustomerPhone: (phone: string) => void;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -29,8 +31,10 @@ export const useCartStore = create<CartStore>()(
       items: [],
       tableNumber: '',
       customerName: '',
+      customerPhone: '',
       setTableNumber: (table) => set({ tableNumber: table }),
       setCustomerName: (name) => set({ customerName: name }),
+      setCustomerPhone: (phone) => set({ customerPhone: phone }),
       addItem: (item) => set((state) => {
         // Check if identical item already exists (same product and exact same customization)
         const existingItemIndex = state.items.findIndex(

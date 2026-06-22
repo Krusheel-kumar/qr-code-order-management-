@@ -180,6 +180,17 @@ export default function Cart() {
               className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
             />
           </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Mobile Number <span className="text-gray-400 font-normal">(Optional)</span></label>
+            <input 
+              type="tel" 
+              placeholder="e.g. 9876543210" 
+              value={cartStore.customerPhone}
+              onChange={(e) => cartStore.setCustomerPhone(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
+            />
+          </div>
         </div>
 
       </main>
@@ -203,46 +214,75 @@ export default function Cart() {
               }
               
               try {
-                // Prepare API Payload
-                const orderPayload: any = {
-                  customerName: cartStore.customerName || user?.username,
-                  tableNumber: cartStore.tableNumber,
-                  pointsUsed: usePoints ? loyaltyPoints : 0,
-                  items: cartItems.map(item => ({
-                    productId: item.product.id,
-                    productName: item.product.name,
-                    price: item.price,
-                    quantity: item.quantity,
-                    subtotal: item.price * item.quantity,
-                    customizations: item.customization
-                  }))
+                const { createRazorpayOrder, placeOrder, getUserProfile } = await import('../../api');
+                
+                // 1. Ask backend to generate a Razorpay Order ID
+                const rzpOrderString = await createRazorpayOrder(total);
+                const rzpOrder = JSON.parse(rzpOrderString);
+                
+                // 2. Configure Razorpay Options
+                const options = {
+                    key: 'rzp_test_T4aQ5u6TRc7G0O',
+                    amount: rzpOrder.amount,
+                    currency: rzpOrder.currency,
+                    name: 'Pop O Bob',
+                    description: 'Premium Order Payment',
+                    order_id: rzpOrder.id,
+                    handler: async function (response: any) {
+                        // 3. Payment Success - Place the actual order!
+                        try {
+                            const orderPayload: any = {
+                              customerName: cartStore.customerName || user?.username,
+                              customerPhone: cartStore.customerPhone,
+                              tableNumber: cartStore.tableNumber,
+                              paymentReference: response.razorpay_payment_id,
+                              pointsUsed: usePoints ? loyaltyPoints : 0,
+                              items: cartItems.map(item => ({
+                                productId: item.product.id,
+                                productName: item.product.name,
+                                price: item.price,
+                                quantity: item.quantity,
+                                subtotal: item.price * item.quantity,
+                                customizations: item.customization
+                              }))
+                            };
+                            
+                            if (user) orderPayload.userId = user.id;
+                            
+                            const result = await placeOrder(orderPayload);
+                            
+                            if (user) {
+                               try {
+                                 const updatedUser = await getUserProfile(user.id);
+                                 if (updatedUser) useAuthStore.getState().setUser(updatedUser);
+                               } catch (e) {}
+                            }
+            
+                            cartStore.clearCart();
+                            navigate(`/tracking/${result.id}`);
+                        } catch (error: any) {
+                            console.error("Failed to place order after payment", error);
+                            alert("Payment succeeded but order placement failed! Please contact staff.");
+                        }
+                    },
+                    prefill: {
+                        name: cartStore.customerName || user?.username || '',
+                        contact: cartStore.customerPhone || '',
+                        email: user?.email || ''
+                    },
+                    theme: { color: '#000000' }
                 };
                 
-                if (user) {
-                  orderPayload.userId = user.id;
-                }
-                
-                const { placeOrder, getUserProfile } = await import('../../api');
-                const result = await placeOrder(orderPayload);
-                
-                // Fetch the real updated user profile from the backend so points sync perfectly!
-                if (user) {
-                   try {
-                     const updatedUser = await getUserProfile(user.id);
-                     if (updatedUser) {
-                       useAuthStore.getState().setUser(updatedUser);
-                     }
-                   } catch (e) {
-                     console.error('Failed to sync user points', e);
-                   }
-                }
+                // Open Razorpay
+                const rzp = new (window as any).Razorpay(options);
+                rzp.on('payment.failed', function (response: any) {
+                    alert("Payment Failed! " + response.error.description);
+                });
+                rzp.open();
 
-                cartStore.clearCart();
-                navigate(`/tracking/${result.id}`);
               } catch (error: any) {
-                console.error("Failed to place order", error);
-                const backendError = error.response?.data?.trace || error.message;
-                alert(`Backend Error: ${backendError}\nPlease copy this and send it to me!`);
+                console.error("Failed to initialize payment", error);
+                alert("Could not connect to payment gateway.");
               }
             }} 
             className="flex-1 bg-[var(--color-premium-dark)] text-white font-bold py-4 rounded-2xl flex justify-center items-center shadow-[0_8px_20px_rgba(0,0,0,0.15)] active:scale-95 transition-transform border border-black/10 hover:bg-[var(--color-premium-dark)]"
