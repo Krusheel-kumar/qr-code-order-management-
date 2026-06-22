@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMascotStore } from '../store/useMascotStore';
-import mascotImg from '../assets/macott.png';
 
 export default function Mascot() {
   const { mood, isEnabled, setMood } = useMascotStore();
@@ -69,7 +68,7 @@ export default function Mascot() {
           <div 
             className="w-full h-full mix-blend-multiply"
             style={{
-              backgroundImage: `url(${mascotImg})`,
+              backgroundImage: `url('/assets/macott.png')`,
               backgroundSize: currentConfig.bgSize,
               backgroundPosition: currentConfig.bgPos,
               backgroundRepeat: 'no-repeat'
