@@ -60,6 +60,11 @@ export default function ManageOrders() {
   const preparingOrders = orders.filter(o => o.status === 'PREPARING');
   const readyOrders = orders.filter(o => o.status === 'READY');
 
+  const playAlarm = () => {
+    const audio = new Audio(alarmSound);
+    audio.play().catch(e => console.error("Audio playback failed:", e));
+  };
+
   useEffect(() => {
     if (isInitialLoad.current) {
       isInitialLoad.current = false;
@@ -76,22 +81,13 @@ export default function ManageOrders() {
     });
 
     if (hasNewOrder && isSoundEnabled) {
-      if (audioRef.current) {
-        audioRef.current.currentTime = 0;
-        audioRef.current.play().catch(e => console.error("Audio playback failed:", e));
-      }
+      playAlarm();
     }
   }, [placedOrders, isSoundEnabled]);
 
   const toggleSound = () => {
     if (!isSoundEnabled) {
-      if (audioRef.current) {
-        audioRef.current.volume = 0;
-        audioRef.current.play().then(() => {
-           audioRef.current!.pause();
-           audioRef.current!.volume = 1;
-        }).catch(e => console.error("Audio unlock failed:", e));
-      }
+      playAlarm(); // Play immediately to confirm and unlock browser audio
     }
     setIsSoundEnabled(!isSoundEnabled);
   };
