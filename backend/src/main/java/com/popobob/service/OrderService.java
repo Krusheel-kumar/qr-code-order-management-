@@ -5,6 +5,8 @@ import com.popobob.dto.OrderRequestDto;
 import com.popobob.model.Order;
 import com.popobob.model.OrderItem;
 import com.popobob.model.Product;
+import com.popobob.model.OrderSequence;
+import com.popobob.repository.OrderSequenceRepository;
 import com.popobob.repository.OrderRepository;
 import com.popobob.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +28,22 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final OrderSequenceRepository sequenceRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     public Order createOrder(OrderRequestDto request) {
         Order order = new Order();
+        
+        // Generate Order Number
+        OrderSequence seq = sequenceRepository.findAndLockById().orElseGet(() -> {
+            OrderSequence newSeq = new OrderSequence();
+            return sequenceRepository.save(newSeq);
+        });
+        order.setOrderNumber("POB-" + seq.getNextVal());
+        seq.setNextVal(seq.getNextVal() + 1);
+        sequenceRepository.save(seq);
+
         order.setStatus("PLACED");
         order.setCustomerName(request.getCustomerName());
         order.setCustomerPhone(request.getCustomerPhone());
@@ -123,5 +136,9 @@ public class OrderService {
 
     public Order getOrderById(UUID id) {
         return orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+    }
+
+    public List<Order> getAllOrdersHistory() {
+        return orderRepository.findAllByOrderByCreatedAtDesc();
     }
 }

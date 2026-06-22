@@ -15,6 +15,9 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     
+    @Column(unique = true)
+    private String orderNumber;
+    
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user; // Optional, for logged-in users

@@ -16,6 +16,7 @@ interface OrderItem {
 
 interface Order {
   id: string;
+  orderNumber?: string;
   customerName: string;
   tableNumber: string;
   status: string;
@@ -75,7 +76,7 @@ export default function ManageOrders() {
     <div key={order.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4 flex flex-col">
       <div className="flex justify-between items-start mb-2">
         <div>
-          <h3 className="font-bold text-lg">#{order.id.substring(0, 8)}</h3>
+          <h3 className="font-bold text-lg">{order.orderNumber || `#${order.id.substring(0, 8).toUpperCase()}`}</h3>
           <p className="text-sm text-gray-500">{new Date(order.createdAt).toLocaleTimeString()}</p>
         </div>
         <div className={`px-2 py-1 rounded-lg text-xs font-bold ${colorClass}`}>

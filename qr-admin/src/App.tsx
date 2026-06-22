@@ -9,6 +9,7 @@ import DiscoverySettings from './pages/admin/DiscoverySettings';
 import AISettings from './pages/admin/AISettings';
 import StoreSettings from './pages/admin/StoreSettings';
 import ManageCoupons from './pages/admin/ManageCoupons';
+import OrderHistory from './pages/admin/OrderHistory';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="ai-settings" element={<AISettings />} />
           <Route path="store-settings" element={<StoreSettings />} />
           <Route path="coupons" element={<ManageCoupons />} />
+          <Route path="history" element={<OrderHistory />} />
           
           {/* Dummy routes for other sidebar items to prevent errors */}
           <Route path="profile" element={<div className="p-8">Profile settings...</div>} />

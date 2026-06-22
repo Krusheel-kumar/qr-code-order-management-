@@ -44,7 +44,7 @@ export default function OrderTracking() {
         <button onClick={() => navigate('/home')} className="w-10 h-10 flex items-center justify-center -ml-2">
           <ArrowLeft size={24} />
         </button>
-        <h1 className="font-heading font-extrabold text-lg tracking-wide uppercase">Order #{id?.substring(0, 8)}</h1>
+        <h1 className="font-heading font-extrabold text-lg tracking-wide uppercase">{orderData?.orderNumber || `Order #${id?.substring(0, 8)}`}</h1>
         <div className="w-10"></div>
       </header>
 

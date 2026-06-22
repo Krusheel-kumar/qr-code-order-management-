@@ -1,6 +1,6 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import { useAdminStore } from '../../store/useAdminStore';
-import { Store, LayoutDashboard, Settings, Star, User, Bell, ShoppingBag, Coffee, Bot, Ticket } from 'lucide-react';
+import { Store, LayoutDashboard, Settings, Star, User, Bell, ShoppingBag, Coffee, Bot, Ticket, FileText } from 'lucide-react';
 import { useEffect } from 'react';
 
 export default function AdminLayout() {
@@ -12,7 +12,8 @@ export default function AdminLayout() {
 
   const navItems = [
     { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'Orders', path: '/admin/orders', icon: ShoppingBag },
+    { name: 'Live Orders', path: '/admin/orders', icon: ShoppingBag },
+    { name: 'History', path: '/admin/history', icon: FileText },
     { name: 'Menu', path: '/admin/menu', icon: Coffee },
     { name: 'Discovery', path: '/admin/discovery', icon: Star },
     { name: 'AI Settings', path: '/admin/ai-settings', icon: Bot },

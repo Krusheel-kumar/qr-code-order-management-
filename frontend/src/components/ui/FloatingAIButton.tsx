@@ -16,11 +16,11 @@ export default function FloatingAIButton() {
       <motion.div
         animate={{ 
           scale: [1, 1.2, 1],
-          opacity: [0.2, 0.5, 0.2]
+          opacity: [0.15, 0.4, 0.15]
         }}
         transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-        className="absolute top-0 bg-[#FFD54F]/30 rounded-full blur-xl pointer-events-none"
-        style={{ width: '65px', height: '65px' }}
+        className="absolute top-0 bg-[#FFD54F]/40 rounded-2xl blur-xl pointer-events-none"
+        style={{ width: '52px', height: '52px' }}
       />
 
       <motion.button
@@ -31,8 +31,8 @@ export default function FloatingAIButton() {
         whileTap={{ scale: 0.95 }}
         className="pointer-events-auto relative flex flex-col items-center justify-center group"
       >
-        {/* Container forcing a perfect circle */}
-        <div className="relative z-10 w-[70px] h-[70px] rounded-full overflow-hidden shadow-[0_12px_24px_rgba(0,0,0,0.25)] border-[3px] border-white bg-white">
+        {/* Premium Squircle Container */}
+        <div className="relative z-10 w-[56px] h-[56px] rounded-[18px] overflow-hidden shadow-[0_8px_24px_rgba(255,179,0,0.25)] border-2 border-white/90 bg-white/90 backdrop-blur-md transition-all group-hover:shadow-[0_12px_28px_rgba(255,179,0,0.35)]">
           <img 
             src="/assets/logo 2.png" 
             alt="POB AI" 
@@ -41,7 +41,7 @@ export default function FloatingAIButton() {
         </div>
         
         {/* Glowing Notification Dot */}
-        <span className="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white z-20 shadow-md" />
+        <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white z-20 shadow-md" />
       </motion.button>
       
       {/* Sleek Floating Glass Badge */}

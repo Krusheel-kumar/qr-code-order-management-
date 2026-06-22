@@ -148,16 +148,16 @@ export default function DiscoveryHome() {
           <div className="flex items-center gap-2">
             <button 
               onClick={() => user ? setIsProfileOpen(true) : setIsAuthOpen(true)} 
-              className={`w-11 h-11 rounded-full flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.03)] active:scale-95 transition-all relative border border-white/80 ${user ? 'bg-[#FFB300] text-white hover:bg-[#FF8F00]' : 'bg-white/60 backdrop-blur-md text-gray-700 hover:bg-white/90'}`}
+              className={`w-9 h-9 rounded-full flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.03)] active:scale-95 transition-all relative border border-white/80 ${user ? 'bg-[#FFB300] text-white hover:bg-[#FF8F00]' : 'bg-white/60 backdrop-blur-md text-gray-700 hover:bg-white/90'}`}
             >
               {user ? (
-                <span className="font-heading font-black text-lg">{user?.username?.charAt(0)?.toUpperCase() || 'U'}</span>
+                <span className="font-heading font-black text-sm">{user?.username?.charAt(0)?.toUpperCase() || 'U'}</span>
               ) : (
-                <User size={20} strokeWidth={2.5} />
+                <User size={18} strokeWidth={2.5} />
               )}
             </button>
-            <button onClick={() => setIsSearchOpen(true)} className="w-11 h-11 rounded-full bg-white/60 backdrop-blur-md flex items-center justify-center text-gray-700 shadow-[0_4px_16px_rgba(0,0,0,0.03)] active:scale-95 transition-all relative border border-white/80 hover:bg-white/90">
-              <Search size={20} strokeWidth={2.5} />
+            <button onClick={() => setIsSearchOpen(true)} className="w-9 h-9 rounded-full bg-white/60 backdrop-blur-md flex items-center justify-center text-gray-700 shadow-[0_4px_16px_rgba(0,0,0,0.03)] active:scale-95 transition-all relative border border-white/80 hover:bg-white/90">
+              <Search size={18} strokeWidth={2.5} />
             </button>
           </div>
         </header>

@@ -36,4 +36,9 @@ public class OrderController {
     public Order updateStatus(@PathVariable UUID id, @RequestParam String status) {
         return orderService.updateOrderStatus(id, status);
     }
+
+    @GetMapping("/history")
+    public List<Order> getOrderHistory() {
+        return orderService.getAllOrdersHistory();
+    }
 }

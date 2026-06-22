@@ -1,9 +1,14 @@
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Grid, Gift, ShoppingCart, User } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useCartStore } from '../../store/useCartStore';
 
 export default function BottomNavigation() {
   const location = useLocation();
+  const { items } = useCartStore();
+  
+  // Calculate total quantity of items in the cart
+  const cartItemCount = items.reduce((total, item) => total + item.quantity, 0);
 
   const navItems = [
     { path: '/home', icon: Home, label: 'Home' },
@@ -27,9 +32,9 @@ export default function BottomNavigation() {
               <div className={`flex flex-col items-center justify-center transition-all duration-300 ${isActive ? '-translate-y-1' : 'group-hover:-translate-y-0.5'}`}>
                 <div className={`relative mb-1.5 ${isActive ? 'text-primary' : 'text-gray-400 group-hover:text-gray-600'}`}>
                   <item.icon size={26} strokeWidth={isActive ? 2.5 : 2} />
-                  {item.label === 'Cart' && (
+                  {item.label === 'Cart' && cartItemCount > 0 && (
                     <div className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-500 text-white text-[10px] font-extrabold rounded-full flex items-center justify-center border border-white">
-                      2
+                      {cartItemCount}
                     </div>
                   )}
                 </div>

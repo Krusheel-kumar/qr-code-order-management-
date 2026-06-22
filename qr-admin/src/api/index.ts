@@ -47,5 +47,6 @@ export const ordersApi = axios.create({
 });
 
 export const getActiveOrders = async () => (await ordersApi.get('/active')).data;
+export const getOrderHistory = async () => (await ordersApi.get('/history')).data;
 export const updateOrderStatus = async (id: string, status: string) => 
   (await ordersApi.patch(`/${id}/status?status=${status}`)).data;

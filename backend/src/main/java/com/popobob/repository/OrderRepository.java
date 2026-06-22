@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface OrderRepository extends JpaRepository<Order, UUID> {
     List<Order> findByStatusInOrderByCreatedAtDesc(List<String> statuses);
+    List<Order> findAllByOrderByCreatedAtDesc();
 }
