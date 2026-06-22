@@ -119,7 +119,7 @@ export default function SplashScreen() {
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1.8, opacity: [0, 0.8, 0] }}
           transition={{ delay: 2.6, duration: 1.2, ease: "easeOut" }}
-          className="absolute w-[180px] h-[180px] rounded-full border-[3px] border-[#FFB300] z-10"
+          className="absolute w-[140px] h-[140px] rounded-full border-[3px] border-[#FFB300] z-10"
         />
         
         {/* Second Ripple */}
@@ -127,7 +127,7 @@ export default function SplashScreen() {
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 2.2, opacity: [0, 0.4, 0] }}
           transition={{ delay: 2.75, duration: 1.5, ease: "easeOut" }}
-          className="absolute w-[180px] h-[180px] rounded-full border-[2px] border-[#FFD54F] z-10"
+          className="absolute w-[140px] h-[140px] rounded-full border-[2px] border-[#FFD54F] z-10"
         />
 
         {/* The EXACT Official Logo Image */}
@@ -146,7 +146,7 @@ export default function SplashScreen() {
               rotate: { delay: 2.6, duration: 0.6, type: "spring", stiffness: 200, damping: 12 },
               y: { delay: 3.2, duration: 3, repeat: Infinity, ease: "easeInOut" } // Floats endlessly after landing
             }}
-            className="w-[180px] h-[180px] rounded-full overflow-hidden flex items-center justify-center drop-shadow-[0_16px_32px_rgba(255,179,0,0.25)]"
+            className="w-[140px] h-[140px] rounded-full overflow-hidden flex items-center justify-center drop-shadow-[0_16px_32px_rgba(255,179,0,0.25)]"
           >
             <img src="/assets/logo 2.png" alt="Exact Logo" className="w-[125%] h-[125%] object-cover" />
           </motion.div>
