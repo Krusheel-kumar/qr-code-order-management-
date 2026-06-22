@@ -2,13 +2,10 @@ spring:
   application:
     name: Pop O Bob
   datasource:
-    url: jdbc:h2:mem:popobob;DB_CLOSE_DELAY=-1
-    username: sa
-    password: 
-    driverClassName: org.h2.Driver
-  h2:
-    console:
-      enabled: true
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://ep-patient-cloud-aiznb5ds-pooler.c-4.us-east-1.aws.neon.tech:5432/neondb?sslmode=require&prepareThreshold=0}
+    username: ${SPRING_DATASOURCE_USERNAME:neondb_owner}
+    password: ${SPRING_DATASOURCE_PASSWORD:npg_PS1Crclw7Xpy}
+    driverClassName: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
@@ -16,8 +13,18 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+razorpay:
+  key-id: rzp_test_T4aQ5u6TRc7G0O
+  key-secret: wds1TgsHLGs5qdrb7NwmAhtN
+
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 gemini:
   api:
