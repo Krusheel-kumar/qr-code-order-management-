@@ -2,9 +2,9 @@ spring:
   application:
     name: Pop O Bob
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:5964}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://ep-patient-cloud-aiznb5ds-pooler.c-4.us-east-1.aws.neon.tech:5432/neondb?sslmode=require}
+    username: ${SPRING_DATASOURCE_USERNAME:neondb_owner}
+    password: ${SPRING_DATASOURCE_PASSWORD:npg_PS1Crclw7Xpy}
     driverClassName: org.postgresql.Driver
   jpa:
     hibernate:
