@@ -217,8 +217,7 @@ export default function Cart() {
                 const { createRazorpayOrder, placeOrder, getUserProfile } = await import('../../api');
                 
                 // 1. Ask backend to generate a Razorpay Order ID
-                const rzpOrderString = await createRazorpayOrder(total);
-                const rzpOrder = JSON.parse(rzpOrderString);
+                const rzpOrder = await createRazorpayOrder(total);
                 
                 // 2. Configure Razorpay Options
                 const options = {
