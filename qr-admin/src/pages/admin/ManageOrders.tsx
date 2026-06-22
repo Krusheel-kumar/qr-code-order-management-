@@ -29,7 +29,7 @@ export default function ManageOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isSoundEnabled, setIsSoundEnabled] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const prevPlacedCountRef = useRef(0);
+  const knownOrderIdsRef = useRef<Set<string>>(new Set());
   const isInitialLoad = useRef(true);
 
   const fetchOrders = async () => {
@@ -63,18 +63,25 @@ export default function ManageOrders() {
   useEffect(() => {
     if (isInitialLoad.current) {
       isInitialLoad.current = false;
-      prevPlacedCountRef.current = placedOrders.length;
+      knownOrderIdsRef.current = new Set(placedOrders.map(o => o.id));
       return;
     }
 
-    if (placedOrders.length > prevPlacedCountRef.current && isSoundEnabled) {
+    let hasNewOrder = false;
+    placedOrders.forEach(o => {
+      if (!knownOrderIdsRef.current.has(o.id)) {
+        hasNewOrder = true;
+        knownOrderIdsRef.current.add(o.id);
+      }
+    });
+
+    if (hasNewOrder && isSoundEnabled) {
       if (audioRef.current) {
         audioRef.current.currentTime = 0;
         audioRef.current.play().catch(e => console.error("Audio playback failed:", e));
       }
     }
-    prevPlacedCountRef.current = placedOrders.length;
-  }, [placedOrders.length, isSoundEnabled]);
+  }, [placedOrders, isSoundEnabled]);
 
   const toggleSound = () => {
     if (!isSoundEnabled) {
