@@ -22,7 +22,8 @@ public class PaymentController {
     @PostMapping("/create-order")
     public ResponseEntity<?> createOrder(@RequestBody Map<String, Object> data) {
         try {
-            int amount = Integer.parseInt(data.get("amount").toString());
+            double parsedAmount = Double.parseDouble(data.get("amount").toString());
+            int amount = (int) Math.round(parsedAmount);
             
             RazorpayClient razorpay = new RazorpayClient(keyId, keySecret);
             

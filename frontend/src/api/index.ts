@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-// Hardcoded to Railway production server for seamless Vercel deployment
-const API_URL = import.meta.env.VITE_API_URL || 'https://popobob-backend-production.up.railway.app/api';
+const API_URL = 'https://popobob-backend-production.up.railway.app/api';
 
 export const adminApi = axios.create({
   baseURL: `${API_URL}/admin`,
