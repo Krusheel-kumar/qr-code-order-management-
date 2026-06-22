@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import alarmSound from '../../assets/alarm.mp3';
 import { getActiveOrders, updateOrderStatus } from '../../api';
-import { ChefHat, CheckCircle2, Clock } from 'lucide-react';
+import { ChefHat, CheckCircle2, Clock, Volume2, VolumeX } from 'lucide-react';
 
 interface OrderItem {
   id: string;
@@ -27,6 +27,8 @@ interface Order {
 
 export default function ManageOrders() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [isSoundEnabled, setIsSoundEnabled] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const prevPlacedCountRef = useRef(0);
   const isInitialLoad = useRef(true);
 
@@ -65,12 +67,27 @@ export default function ManageOrders() {
       return;
     }
 
-    if (placedOrders.length > prevPlacedCountRef.current) {
-      const audio = new Audio(alarmSound);
-      audio.play().catch(e => console.error("Audio playback failed:", e));
+    if (placedOrders.length > prevPlacedCountRef.current && isSoundEnabled) {
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play().catch(e => console.error("Audio playback failed:", e));
+      }
     }
     prevPlacedCountRef.current = placedOrders.length;
-  }, [placedOrders.length]);
+  }, [placedOrders.length, isSoundEnabled]);
+
+  const toggleSound = () => {
+    if (!isSoundEnabled) {
+      if (audioRef.current) {
+        audioRef.current.volume = 0;
+        audioRef.current.play().then(() => {
+           audioRef.current!.pause();
+           audioRef.current!.volume = 1;
+        }).catch(e => console.error("Audio unlock failed:", e));
+      }
+    }
+    setIsSoundEnabled(!isSoundEnabled);
+  };
 
   const renderOrderCard = (order: Order, nextStatus: string, nextStatusLabel: string, colorClass: string) => (
     <div key={order.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4 flex flex-col">
@@ -127,9 +144,19 @@ export default function ManageOrders() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <div className="mb-6 shrink-0">
-        <h1 className="text-2xl font-bold text-gray-900">Manage Orders</h1>
-        <p className="text-gray-500 mt-1">Live Kitchen Display System (KDS)</p>
+      <audio ref={audioRef} src={alarmSound} preload="auto" />
+      <div className="mb-6 shrink-0 flex justify-between items-end">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Manage Orders</h1>
+          <p className="text-gray-500 mt-1">Live Kitchen Display System (KDS)</p>
+        </div>
+        <button 
+          onClick={toggleSound}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${isSoundEnabled ? 'bg-[#FFB300] text-white shadow-md' : 'bg-gray-100 text-gray-500'}`}
+        >
+          {isSoundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+          {isSoundEnabled ? 'Alerts On' : 'Alerts Off'}
+        </button>
       </div>
 
       <div className="flex-1 grid grid-cols-3 gap-6 min-h-0 overflow-hidden">
