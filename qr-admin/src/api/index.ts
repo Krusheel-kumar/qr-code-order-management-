@@ -10,7 +10,7 @@ export const adminApi = axios.create({
   },
 });
 
-export const getStoreSettings = async () => (await adminApi.get('/settings')).data;
+export const getStoreSettings = async () => (await adminApi.get('/settings', { params: { t: new Date().getTime() } })).data;
 export const updateStoreSettings = async (settings: any) => (await adminApi.post('/settings', settings)).data;
 
 export const getCampaigns = async () => (await adminApi.get('/campaigns')).data;
