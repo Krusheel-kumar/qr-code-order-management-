@@ -290,7 +290,12 @@ export default function AIChatScreen() {
 
 // Sub-component for displaying a product inside the chat
 function ProductRecommendationCard({ productId }: { productId: string }) {
-  const product = MENU.find(p => p.id === productId);
+  const product = MENU.find(p => 
+    p.id === productId || 
+    p.name.toLowerCase() === productId.toLowerCase() || 
+    p.id === 'p-' + productId.toLowerCase().replace(/ /g, '-') ||
+    p.name.toLowerCase().includes(productId.toLowerCase().replace('boba tea', '').trim())
+  );
   const cartStore = useCartStore();
   const [added, setAdded] = useState(false);
   

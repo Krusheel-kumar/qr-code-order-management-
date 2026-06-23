@@ -1,15 +1,14 @@
 package com.popobob.service;
 
 import com.popobob.dto.AiResponse;
-import com.popobob.model.Product;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
+import org.springframework.jdbc.core.JdbcTemplate;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -19,83 +18,136 @@ public class AiService {
     @Value("${gemini.api.key:}")
     private String geminiApiKey;
 
-    private final MenuService menuService;
+    @Value("${groq.api.key:}")
+    private String groqApiKey;
+
+    private final JdbcTemplate jdbcTemplate;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    public AiService(MenuService menuService) {
-        this.menuService = menuService;
+    public AiService(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
         this.restTemplate = new RestTemplate();
         this.objectMapper = new ObjectMapper();
     }
 
-    public AiResponse recommendDrink(String craving) {
+    public List<Float> embedText(String text) {
         if (geminiApiKey == null || geminiApiKey.isEmpty()) {
             throw new RuntimeException("Gemini API key is not configured.");
         }
 
-        String menuStr = "[\n" +
-            "  {id: 'p1', name: 'Brown Sugar Boba'},\n" +
-            "  {id: 'p2', name: 'Ferrero Boba'},\n" +
-            "  {id: 'p3', name: 'Matcha Boba'},\n" +
-            "  {id: 'p4', name: 'Mango Fruit Tea'},\n" +
-            "  {id: 'p5', name: 'Yuzu Iced Boba Tea'},\n" +
-            "  {id: 'p6', name: 'Elderflower Iced Boba Tea'},\n" +
-            "  {id: 'p7', name: 'Pink Grapefruit Iced Boba Tea'},\n" +
-            "  {id: 'p8', name: 'Lotus Biscoff Boba Tea'},\n" +
-            "  {id: 'p9', name: 'Sea Salt Biscoff Boba Tea'}\n" +
-            "]";
-
-        String prompt = "You are an expert Boba Barista AI named 'POB AI' for the premium bubble tea shop 'Pop O Bob'.\n" +
-            "Your job is to recommend exactly ONE drink from our menu based on the user's craving or answer their question.\n\n" +
-            "### STORE KNOWLEDGE BASE ###\n" +
-            "- Brand: Pop O Bob is a premium bubble tea brand. Our mission is to spread joy through authentic, high-quality boba.\n" +
-            "- Store Timings: Open 10 AM to 10 PM daily.\n" +
-            "- Toppings: Classic Tapioca Pearls, Mango Popping Boba, Lychee Popping Boba, Strawberry Popping Boba.\n" +
-            "- Pairings: Milk teas pair perfectly with Tapioca. Fruit teas pair perfectly with Popping Boba.\n" +
-            "Our Menu:\n" + menuStr + "\n\n" +
-            "### RULES ###\n" +
-            "1. You MUST pick exactly one product ID from the menu list provided. Never invent a product.\n" +
-            "2. If the user wants fruit/refreshing, recommend p4, p5, p6, or p7.\n" +
-            "3. If the user wants sweet/chocolate/dessert, recommend p1, p2, p8, or p9.\n" +
-            "4. If the user wants traditional/tea, recommend p3.\n" +
-            "5. If the user asks for a 'Surprise', pick a fun, unique drink and give an exciting reason.\n" +
-            "6. Keep your 'reason' short, playful, friendly, and tailored to Pop O Bob.\n\n" +
-            "### EXAMPLES ###\n" +
-            "Craving: 'I need something chocolatey and rich'\n" +
-            "Output: {\"productId\": \"p2\", \"reason\": \"Our Ferrero Boba is incredibly rich and chocolatey, just what you need to satisfy that sweet tooth! Add classic tapioca for the perfect pairing.\"}\n\n" +
-            "### ACTUAL REQUEST ###\n" +
-            "The user is craving/asking: \"" + craving + "\"\n" +
-            "Respond strictly in valid JSON format with no markdown formatting. The JSON must have exactly two keys: 'productId' and 'reason'.\n";
-
-        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=" + geminiApiKey;
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2:embedContent?key=" + geminiApiKey;
 
         try {
             Map<String, Object> requestBody = new HashMap<>();
             Map<String, Object> parts = new HashMap<>();
-            parts.put("text", prompt);
-            Map<String, Object> contents = new HashMap<>();
-            contents.put("parts", new Object[]{parts});
-            requestBody.put("contents", new Object[]{contents});
+            parts.put("text", text);
+            Map<String, Object> content = new HashMap<>();
+            content.put("parts", new Object[]{parts});
+            requestBody.put("content", content);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
             ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
-            
             JsonNode rootNode = objectMapper.readTree(response.getBody());
-            String textResponse = rootNode.path("candidates").get(0).path("content").path("parts").get(0).path("text").asText();
+            
+            JsonNode valuesNode = rootNode.path("embedding").path("values");
+            List<Float> embedding = objectMapper.convertValue(valuesNode, objectMapper.getTypeFactory().constructCollectionType(List.class, Float.class));
+            return embedding;
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to generate embedding: " + e.getMessage());
+        }
+    }
+
+    public AiResponse recommendDrink(String craving) {
+        if (groqApiKey == null || groqApiKey.isEmpty()) {
+            throw new RuntimeException("Groq API key is not configured.");
+        }
+
+        // 1. Generate embedding for the user's craving (still using Gemini for this)
+        List<Float> queryEmbedding = embedText(craving);
+        String embeddingString = queryEmbedding.toString();
+
+        // 2. Query the Vector DB for the top 5 most relevant pieces of knowledge
+        String sql = "SELECT content FROM knowledge_base ORDER BY embedding <=> CAST(? AS vector) LIMIT 5";
+        List<String> relevantFacts = jdbcTemplate.query(
+            sql,
+            (rs, rowNum) -> rs.getString("content"),
+            embeddingString
+        );
+
+        StringBuilder knowledgeContext = new StringBuilder();
+        for (String fact : relevantFacts) {
+            knowledgeContext.append("- ").append(fact).append("\n");
+        }
+
+        // 3. Construct the RAG Prompt
+        String prompt = "You are an expert Boba Barista AI named 'POB AI' for the premium bubble tea shop 'Pop O Bob'.\n" +
+            "Your job is to recommend exactly ONE drink from our menu based on the user's craving or answer their question.\n\n" +
+            "### RELEVANT STORE KNOWLEDGE ###\n" +
+            "Use the following retrieved facts from our database to answer the user's request accurately:\n" +
+            knowledgeContext.toString() + "\n" +
+            "### RULES ###\n" +
+            "1. You MUST pick a product mentioned in the retrieved facts or menu. Never invent a product.\n" +
+            "2. Ensure you strictly follow any AI Recommendation Rules provided in the knowledge base.\n" +
+            "3. Keep your 'reason' short, playful, friendly, and tailored to Pop O Bob.\n\n" +
+            "### ACTUAL REQUEST ###\n" +
+            "The user is craving/asking: \"" + craving + "\"\n" +
+            "Respond strictly in valid JSON format with no markdown formatting. The JSON must have exactly two keys: 'productId' (which should contain the exact name of the product) and 'reason'.\n";
+
+        String url = "https://api.groq.com/openai/v1/chat/completions";
+
+        try {
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("model", "llama-3.1-8b-instant");
+            
+            Map<String, Object> message = new HashMap<>();
+            message.put("role", "user");
+            message.put("content", prompt);
+            
+            requestBody.put("messages", new Object[]{message});
+            // We use JSON mode to ensure the output is valid JSON
+            Map<String, String> responseFormat = new HashMap<>();
+            responseFormat.put("type", "json_object");
+            requestBody.put("response_format", responseFormat);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(groqApiKey);
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+            ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+            String responseBody = response.getBody();
+            System.out.println("RAW GROQ RESPONSE: " + responseBody);
+            
+            JsonNode rootNode = objectMapper.readTree(responseBody);
+            JsonNode choices = rootNode.path("choices");
+            
+            if (choices.isMissingNode() || !choices.isArray() || choices.isEmpty()) {
+                throw new RuntimeException("Groq returned an empty choices array. Raw response: " + responseBody);
+            }
+            
+            JsonNode messageNode = choices.get(0).path("message");
+            String textResponse = messageNode.path("content").asText();
             
             // Clean up possible markdown code blocks
             textResponse = textResponse.replaceAll("```json", "").replaceAll("```", "").trim();
             
             AiResponse aiResponse = objectMapper.readValue(textResponse, AiResponse.class);
             return aiResponse;
-            
+        } catch (org.springframework.web.client.HttpStatusCodeException e) {
+            System.err.println("Groq API HTTP Error: " + e.getStatusCode() + " " + e.getResponseBodyAsString());
+            if (e.getStatusCode().value() == 429) {
+                throw new RuntimeException("Groq API is experiencing rate limiting (Too Many Requests). Please wait a few seconds and try again.");
+            }
+            throw new RuntimeException("Groq API error: " + e.getStatusCode());
         } catch (Exception e) {
             e.printStackTrace();
-            throw new RuntimeException("Failed to get recommendation from AI: " + e.getMessage());
+            throw new RuntimeException("Failed to get recommendation from AI: " + e.getMessage(), e);
         }
     }
 }

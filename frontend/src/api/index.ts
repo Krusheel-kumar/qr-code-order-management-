@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://popobob-backend-production.up.railway.app/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://popobob-backend-production.up.railway.app/api';
 
 export const adminApi = axios.create({
   baseURL: `${API_URL}/admin`,

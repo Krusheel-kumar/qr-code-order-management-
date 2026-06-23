@@ -1,0 +1,158 @@
+[
+  {
+    "type": "GLOBAL_RULES",
+    "content": "Global Rules for Milk Teas: Sizes available are Regular (Base Price) and Large (+₹69). Milk Options: Fresh Milk (included), Soy Milk (+₹50), Almond Milk (+₹90), Non Dairy Creamer (+₹50). Toppings rules: 1 free topping is allowed. Extra toppings cost ₹60 each. Available toppings are: Pearls (Tapioca Pearls), Cheese Foam, Popping Bubbles (Strawberry, Blueberry, Mango, Chocolate), Jellies (Coconut, Brown Sugar, Passion Fruit), Cream (Whipped Cream)."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Authentic Thai Boba Tea (Classics). Price: ₹249. Tea Base: Thai Black Tea. Flavor Profile: Bold, Creamy, Traditional, Tea Forward. Best For: First Timers, Classic Milk Tea Lovers. Most Loved Toppings: Tapioca Pearls, Cheese Foam, Brown Sugar Jelly. AI Recommendation: The safest and most authentic introduction to bubble tea."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Hong Kong Style Boba Tea (Classics). Price: ₹249. Tea Base: Strong Black Tea. Flavor Profile: Rich, Silky, Robust, Tea Forward. Best For: Coffee Drinkers, Strong Tea Lovers. Most Loved Toppings: Tapioca Pearls, Cheese Foam, Brown Sugar Jelly. AI Recommendation: If you enjoy strong tea flavors, this is your perfect choice."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Taro Boba Tea (Classics). Price: ₹249. Flavor Profile: Sweet, Nutty, Creamy, Dessert Like. Best For: Dessert Lovers, First Timers. Most Loved Toppings: Tapioca Pearls, Cheese Foam, Brown Sugar Jelly. AI Recommendation: A creamy dessert-style bubble tea with natural taro sweetness."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Brown Sugar Boba Tea (Classics). Price: ₹249. Flavor Profile: Caramel, Rich, Sweet, Indulgent. Best For: First Timers, Sweet Lovers. Most Loved Toppings: Tapioca Pearls, Cheese Foam, Brown Sugar Jelly. AI Recommendation: Our most popular sweet milk tea with caramelized brown sugar notes."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Matcha Boba Tea (Classics). Price: ₹249. Tea Base: Premium Japanese Matcha. Description: Ceremonial-grade Japanese matcha whisked with milk to create a smooth, earthy, and naturally creamy tea experience. Delicate vegetal notes balance perfectly with subtle sweetness. Flavor Profile: Earthy, Creamy, Umami, Smooth, Refreshing. Most Loved Toppings: Tapioca Pearls, Cheese Foam, Brown Sugar Jelly. AI Recommendation: Recommended for customers who enjoy green tea, matcha lattes, or less-sweet premium beverages."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Strawberry Boba Tea (Fruit Boba Milk Teas). Price: ₹269. Flavor: Fruity, Sweet, Creamy. First Time Toppings: Strawberry Popping Bubbles, Mango Popping Bubbles, Cheese Foam."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Mango Boba Tea (Fruit Boba Milk Teas). Price: ₹269. Flavor: Tropical, Juicy, Creamy. First Time Toppings: Mango Popping Bubbles, Cheese Foam."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Lychee Boba Tea (Fruit Boba Milk Teas). Price: ₹269. Flavor: Floral, Delicate, Sweet, Creamy. First Time Toppings: Strawberry Popping Bubbles, Mango Popping Bubbles, Cheese Foam."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Blueberry Boba Tea (Fruit Boba Milk Teas). Description: Blueberry fruit crush blended with milk and subtle tea notes, offering a sweet berry flavour with a smooth, creamy finish. Most Loved Toppings: Blueberry Popping Bubbles, Tapioca Pearls, Cheese Foam."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Honeydew Boba Tea (Fruit Boba Milk Teas). Description: Honeydew melon fruit crush blended with milk and subtle tea notes, delivering a refreshing tropical sweetness with a silky smooth finish. Most Loved Toppings: Blueberry Popping Bubbles, Tapioca Pearls, Cheese Foam."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Chocolate Boba Tea. Flavor: Cocoa, Creamy, Smooth. Choco Fantasy. Flavor: Rich Chocolate, Wafer Chocolate, Dessert Style. Dark Cocoa. Flavor: Intense Chocolate, Velvety, Premium Cocoa. Choco Caramel. Flavor: Caramel, Chocolate, Creamy."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Nutella Boba Tea (Signature Chocolate Series). Flavor: Hazelnut, Chocolate, Rich. Best For: Ferrero Lovers, Dessert Lovers."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Ferrero Rocher Boba Tea (Signature Chocolate Series). Flavor: Hazelnut, Premium Chocolate, Luxurious."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Oreo Boba Tea (Signature Chocolate Series). Flavor: Cookies & Cream, Chocolate Biscuit, Thick Texture."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Lotus Biscoff Boba Tea (Signature Chocolate Series). Flavor: Caramelized Biscuit, Creamy, Rich."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Desi Coffee Boba Tea (Coffee Boba Milk Teas). Description: A nostalgic Indian coffee experience blended with creamy milk and subtle tea notes, delivering a comforting and familiar flavour profile."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Hazelnut Coffee Boba Tea (Coffee Boba Milk Teas). Description: Roasted arabica coffee blended with hazelnuts and milk, creating a nutty, smooth, and aromatic beverage."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Mocha Boba Tea (Coffee Boba Milk Teas). Description: Coffee meets chocolate in a bold mocha blend balanced with creamy milk and chewy boba pearls."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Caramel Coffee Boba Tea (Coffee Boba Milk Teas). Description: Freshly brewed coffee blended with buttery caramel and milk, creating a smooth, sweet, and energizing beverage with a rich finish."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Sea Salt Biscoff (Signature Boba Milk Teas). Flavor: Sweet, Salty, Caramelized Biscuit. Unique Feature: Sea Salt Foam. Caramel Popcorn. Flavor: Buttery, Caramel, Sweet. Tender Coconut. Flavor: Tropical, Light, Refreshing. Mango Pulp. Flavor: Real Mango, Thick Texture, Tropical."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Lemon Iced Boba Tea (Pop O'Bob Boba Iced Teas - Non Milk). Base Price: ₹229. Description: A bright and refreshing iced tea infused with tangy lemon flavor, served over ice with chewy boba pearls. Light, citrusy. Best for customers seeking a refreshing, low-calorie, citrus-forward beverage. Flavor Profile: Citrus, Tangy, Crisp, Refreshing."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Strawberry Iced Boba Tea (Pop O'Bob Boba Iced Teas - Non Milk). Base Price: ₹229. Description: Sweet and juicy strawberry flavor, served with chewy boba pearls. Perfect for customers who enjoy sweet fruit flavors and refreshing drinks. Flavor Profile: Sweet, Fruity, Berry, Refreshing."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Orange Iced Boba Tea (Pop O'Bob Boba Iced Teas - Non Milk). Base Price: ₹229. Description: Juicy orange flavor, zesty and invigorating sip. Flavor Profile: Orange, Citrus, Zesty, Fresh."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Blueberry Iced Boba Tea (Pop O'Bob Boba Iced Teas - Non Milk). Base Price: ₹229. Description: Sweet blueberry flavored iced tea. Flavor Profile: Berry, Sweet, Tangy, Fruity."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Lychee Iced Boba Tea (Pop O'Bob Boba Iced Teas - Non Milk). Base Price: ₹229. Description: Delicate lychee flavor, light, tropical, and floral. Smooth, aromatic, delightfully refreshing. Flavor Profile: Floral, Tropical, Sweet, Exotic."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Apple Twist Iced Boba Tea (Signature Iced Boba Teas). Base Price: ₹249. Description: Crisp and refreshing iced tea infused with juicy apple flavor. Light, fruity, perfectly invigorating. Flavor Profile: Crisp, Fruity, Fresh Apple, Refreshing."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Elderflower Iced Boba Tea (Signature Iced Boba Teas). Base Price: ₹249. Description: Delicate and refreshing iced tea infused with fragrant elderflower flavor. Light, floral, soothing. Premium choice for sophisticated floral flavors. Flavor Profile: Floral, Aromatic, Elegant, Refreshing."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Peach Iced Boba Tea (Signature Iced Boba Teas). Base Price: ₹249. Description: Juicy peach flavor, light, sweet. Flavor Profile: Peach, Sweet, Fruity, Smooth."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Pink Grapefruit Iced Boba Tea (Signature Iced Boba Teas). Base Price: ₹249. Description: Vibrant iced tea infused with tangy pink grapefruit flavor. Balance of sweet citrus and gentle tartness. Flavor Profile: Citrus, Tart, Refreshing, Bright."
+  },
+  {
+    "type": "PRODUCT",
+    "content": "Yuzu Berry Iced Boba Tea (Signature Iced Boba Teas). Base Price: ₹249. Description: Fusion of vibrant Japanese yuzu citrus and sweet berry flavors. Bright, tangy, fruity, incredibly refreshing. Perfect for adventurous customers. Flavor Profile: Citrus, Berry, Tangy, Refreshing."
+  },
+  {
+    "type": "AI_RULE",
+    "content": "AI Recommendation Rule: If user says 'I love Ferrero Rocher', recommend Ferrero Boba immediately."
+  },
+  {
+    "type": "AI_RULE",
+    "content": "AI Recommendation Rule: When a customer says 'I am trying boba for first time', recommend: Authentic Thai, Brown Sugar, Mango, or Ferrero."
+  },
+  {
+    "type": "AI_RULE",
+    "content": "AI Recommendation Rule: When a customer says 'I like coffee', recommend: Hazelnut Coffee, Mocha, or Caramel Coffee."
+  },
+  {
+    "type": "AI_RULE",
+    "content": "AI Recommendation Rule: When a customer says 'I like chocolate', recommend: Ferrero, Nutella, Choco Fantasy, or Oreo."
+  },
+  {
+    "type": "AI_RULE",
+    "content": "AI Recommendation Rule: When a customer says 'I want something refreshing', recommend: Yuzu Berry, Lemon, Pink Grapefruit, Elderflower, Mango, Lychee, Tender Coconut, or Honeydew."
+  },
+  {
+    "type": "AI_RULE",
+    "content": "AI Recommendation Rule: When a customer says 'I don't like milk', recommend: Lychee, Peach, Yuzu Berry, or Apple Twist."
+  },
+  {
+    "type": "AI_RULE",
+    "content": "AI Recommendation Rule: When a customer says 'I want something unique', recommend: Elderflower, Yuzu Berry, Pink Grapefruit, or Lychee."
+  },
+  {
+    "type": "AI_RULE",
+    "content": "AI Recommendation Rule: When a customer says 'I want a healthy option', recommend: Lemon, Pink Grapefruit, Elderflower, or Yuzu Berry."
+  }
+]
