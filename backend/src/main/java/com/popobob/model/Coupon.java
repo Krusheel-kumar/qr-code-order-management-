@@ -14,6 +14,9 @@ public class Coupon {
     private String code;
     
     private String type; // 'percentage' or 'flat'
+    
+    @Column(name = "coupon_value")
     private Double value;
+    
     private Boolean active = true;
 }
