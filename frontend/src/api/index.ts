@@ -26,7 +26,7 @@ export const getProducts = async () => {
   const { data } = await menuApi.get('/products', { params: { t: new Date().getTime() } });
   return data.map((item: any) => ({
     ...item,
-    category: item.category?.name || item.category?.id || (typeof item.category === 'string' ? item.category : 'Unknown'),
+    category: item.category?.name?.split(' - ')[0] || item.category?.id || (typeof item.category === 'string' ? item.category : 'Unknown'),
     image: item.image || item.imageUrl || ''
   }));
 };
