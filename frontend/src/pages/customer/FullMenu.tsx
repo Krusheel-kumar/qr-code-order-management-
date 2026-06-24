@@ -1,11 +1,13 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Search, ShoppingBag } from 'lucide-react';
-import { MENU, CATEGORIES } from '../../data/menu';
+import { Search, ShoppingBag, Share2 } from 'lucide-react';
+import { CATEGORIES } from '../../data/menu';
 import type { MenuItem } from '../../data/menu';
 import { useCartStore } from '../../store/useCartStore';
-
+import { useMenuStore } from '../../store/useMenuStore';
+import { shareContent } from '../../utils/shareUtils';
 import CustomizerSheet from '../../components/CustomizerSheet';
+import ShareModal from '../../components/ui/ShareModal';
 
 export default function FullMenu() {
   const location = useLocation();
@@ -16,8 +18,10 @@ export default function FullMenu() {
   const [activeCategory, setActiveCategory] = useState('');
   
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
+  const [shareModal, setShareModal] = useState<{isOpen: boolean, title: string, url: string}>({isOpen: false, title: '', url: ''});
   
   const cartStore = useCartStore();
+  const { menuItems: MENU } = useMenuStore();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const categoryRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
@@ -49,7 +53,7 @@ export default function FullMenu() {
     });
     
     return groups;
-  }, [searchQuery, mainCategory]);
+  }, [searchQuery, mainCategory, MENU]);
 
   const categories = Object.keys(groupedMenu);
 
@@ -60,9 +64,16 @@ export default function FullMenu() {
     }
   }, [categories, activeCategory]);
 
-  // Handle openProductId from location state
+  // Handle openProductId from location state or URL params
   useEffect(() => {
-    const openProductId = location.state?.openProductId;
+    let openProductId = location.state?.openProductId;
+    
+    // Check URL params for deep link
+    if (!openProductId) {
+      const params = new URLSearchParams(window.location.search);
+      openProductId = params.get('p');
+    }
+
     if (openProductId) {
       const productToOpen = MENU.find(p => p.id === openProductId);
       if (productToOpen) {
@@ -72,7 +83,7 @@ export default function FullMenu() {
         }, 100);
       }
     }
-  }, [location.state]);
+  }, [location.state, location.search]);
 
   // ScrollSpy logic
   useEffect(() => {
@@ -125,7 +136,26 @@ export default function FullMenu() {
     setSelectedProduct(null);
   };
 
-
+  const handleShare = (e: React.MouseEvent, product: MenuItem) => {
+    e.stopPropagation();
+    const shareUrl = `${window.location.origin}/menu?p=${product.id}`;
+    shareContent(
+      {
+        title: `Hey! You have to try ${product.name} at Pop O Bob! 🧋`,
+        text: product.story ? `"${product.story}"` : `It's absolutely delicious and I thought you'd love it.`,
+        url: shareUrl,
+        imageUrl: product.image,
+      },
+      () => {
+        // Fallback
+        setShareModal({
+          isOpen: true,
+          title: `Check out ${product.name} at Pop O Bob!`,
+          url: shareUrl
+        });
+      }
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-32 animate-in fade-in duration-500 font-sans" ref={containerRef}>
@@ -209,6 +239,12 @@ export default function FullMenu() {
                         {product.badge}
                       </div>
                     )}
+                    <button 
+                      onClick={(e) => handleShare(e, product)}
+                      className="absolute top-2 right-2 z-10 bg-white/60 backdrop-blur-md hover:bg-white/90 text-gray-800 p-1.5 rounded-full shadow-sm transition-all active:scale-95"
+                    >
+                      <Share2 size={14} />
+                    </button>
                     {product.image ? (
                       <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
                     ) : (
@@ -251,6 +287,13 @@ export default function FullMenu() {
         onClose={closeCustomizer} 
       />
 
+      {/* Share Modal Fallback */}
+      <ShareModal
+        isOpen={shareModal.isOpen}
+        onClose={() => setShareModal(prev => ({ ...prev, isOpen: false }))}
+        title={shareModal.title}
+        url={shareModal.url}
+      />
     </div>
   );
 }

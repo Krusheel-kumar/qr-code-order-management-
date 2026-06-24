@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
-import { Star, Search, User } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Star, Search, User, Share2 } from 'lucide-react';
+import { shareContent } from '../../utils/shareUtils';
+import ShareModal from '../../components/ui/ShareModal';
 
-import { MENU, getBestSellers, getNewLaunches, getBakeHouseItems, getBaristaItems } from '../../data/menu';
+import { useMenuStore } from '../../store/useMenuStore';
 import type { MenuItem } from '../../data/menu';
 import type { Campaign, Story, Offer, Combo } from '../../data/models';
 import StoryModal from '../../components/feed/StoryModal';
@@ -19,16 +21,20 @@ import { campaigns as initialCampaigns, stories as initialStories } from '../../
 
 export default function DiscoveryHome() {
   const navigate = useNavigate();
+  const location = useLocation();
   
   // State
   const [_activeBanner, setActiveBanner] = useState(0);
   const [selectedStory, setSelectedStory] = useState<string | null>(null);
+  const [shareModal, setShareModal] = useState<{isOpen: boolean, title: string, url: string}>({isOpen: false, title: '', url: ''});
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const { user } = useAuthStore();
+  const { menuItems: MENU, getFeaturedProducts, getBestSellers, getNewLaunches, getBakeHouseItems, getBaristaItems } = useMenuStore();
+  const featuredProduct = getFeaturedProducts()[0] || MENU[0];
 
   // Dynamic CMS State
   const [campaigns, setCampaigns] = useState<Campaign[]>(initialCampaigns);
@@ -44,9 +50,42 @@ export default function DiscoveryHome() {
     }).catch(console.error);
     
     getStories().then(data => {
-      if (data && data.length > 0) setStories(data);
+      if (data && data.length > 0) {
+        setStories(data);
+        // Handle deep links after data loads
+        const params = new URLSearchParams(window.location.search);
+        const storyParam = params.get('story');
+        if (storyParam) {
+          setTimeout(() => setSelectedStory(storyParam), 100);
+        }
+        
+        // const campaignParam = params.get('campaign');
+      }
     }).catch(console.error);
   }, []);
+
+  // Handle campaign deep links
+  useEffect(() => {
+    if (campaigns.length > 0 && carouselRef.current) {
+      const params = new URLSearchParams(window.location.search);
+      const campaignParam = params.get('campaign');
+      if (campaignParam) {
+        const idx = campaigns.findIndex(c => c.id === campaignParam);
+        if (idx !== -1) {
+          setTimeout(() => {
+            const carousel = carouselRef.current;
+            if (carousel) {
+              const slide = carousel.children[idx] as HTMLElement;
+              if (slide) {
+                const scrollLeft = slide.offsetLeft - carousel.offsetLeft - 16;
+                carousel.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+              }
+            }
+          }, 300);
+        }
+      }
+    }
+  }, [campaigns, location.search]);
 
   // Auto-rotate Hero Carousel
   useEffect(() => {
@@ -100,7 +139,7 @@ export default function DiscoveryHome() {
             {badgeText}
           </div>
         )}
-        <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+        <img src={product.image || 'https://images.unsplash.com/photo-1558857563-b37102e95cb4?auto=format&fit=crop&q=80&w=800'} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
       </div>
       
       <div className="p-3.5 pt-3 flex flex-col flex-1">
@@ -174,10 +213,38 @@ export default function DiscoveryHome() {
             return (
               <div 
                 key={idx}
-                onClick={() => navigate('/menu', { state: { mainCategory: targetCategory } })}
-                className="relative shrink-0 snap-center w-full aspect-square rounded-[1.5rem] overflow-hidden shadow-sm bg-gray-100 cursor-pointer active:scale-[0.98] transition-transform"
+                className="relative shrink-0 snap-center w-full aspect-square rounded-[1.5rem] overflow-hidden shadow-sm bg-gray-100 cursor-pointer transition-transform"
               >
-                <img src={campaign.image} className="w-full h-full object-cover" />
+                <img 
+                  src={campaign.image} 
+                  className="w-full h-full object-cover active:scale-[0.98]" 
+                  onClick={() => navigate('/menu', { state: { mainCategory: targetCategory } })}
+                />
+                
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const shareUrl = `${window.location.origin}/?campaign=${campaign.id}`;
+                    shareContent(
+                      {
+                        title: `Wow! Check out this special offer at Pop O Bob! 🎉`,
+                        text: `I just found this amazing promotion. Don't miss out on it!`,
+                        url: shareUrl,
+                        imageUrl: campaign.image,
+                      },
+                      () => {
+                        setShareModal({
+                          isOpen: true,
+                          title: `Check out this promotion at Pop O Bob!`,
+                          url: shareUrl
+                        });
+                      }
+                    );
+                  }}
+                  className="absolute top-4 right-4 z-10 bg-white/60 backdrop-blur-md hover:bg-white/90 text-gray-800 p-2 rounded-full shadow-md transition-all active:scale-95"
+                >
+                  <Share2 size={16} />
+                </button>
               </div>
             );
           })}
@@ -282,17 +349,17 @@ export default function DiscoveryHome() {
         </div>
         <div className="bg-[var(--color-foreground)] rounded-[1.5rem] p-5 text-white relative overflow-hidden flex flex-col justify-between aspect-[4/3]">
           <div className="relative z-10">
-            <h4 className="font-extrabold text-2xl font-heading mb-1">{MENU[1]?.name.split(' ')[0]}<br/>{MENU[1]?.name.split(' ').slice(1).join(' ')}</h4>
-            <p className="text-white/60 text-[13px] w-[55%] line-clamp-3 mb-2">{MENU[1]?.story}</p>
+            <h4 className="font-extrabold text-2xl font-heading mb-1">{featuredProduct?.name.split(' ')[0]}<br/>{featuredProduct?.name.split(' ').slice(1).join(' ')}</h4>
+            <p className="text-white/60 text-[13px] w-[55%] line-clamp-3 mb-2">{featuredProduct?.story}</p>
             <div className="flex items-center gap-1 text-primary text-[13px] font-bold mb-3">
-              <Star size={10} className="fill-primary" /> {MENU[1]?.rating} ({MENU[1]?.ordersToday || '1.2k'} reviews)
+              <Star size={10} className="fill-primary" /> {featuredProduct?.rating} ({featuredProduct?.ordersToday || '1.2k'} reviews)
             </div>
-            <p className="font-bold text-lg mb-3">₹{MENU[1]?.price}</p>
-            <button onClick={() => MENU[1] && setSelectedProduct(MENU[1])} className="bg-primary text-[var(--color-primary-foreground)] text-[13px] font-bold px-5 py-2.5 rounded-full flex items-center gap-1 w-max">
+            <p className="font-bold text-lg mb-3">₹{featuredProduct?.price}</p>
+            <button onClick={() => featuredProduct && setSelectedProduct(featuredProduct)} className="bg-primary text-[var(--color-primary-foreground)] text-[13px] font-bold px-5 py-2.5 rounded-full flex items-center gap-1 w-max">
               Order Now <span className="text-[12px]">&rarr;</span>
             </button>
           </div>
-          <img src={MENU[1]?.image || 'https://images.unsplash.com/photo-1558857563-b37102e95cb4?auto=format&fit=crop&q=80&w=800'} className="absolute right-0 top-0 w-[55%] h-full object-cover" style={{ maskImage: 'linear-gradient(to right, transparent, black 25%)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 25%)' }} />
+          <img src={featuredProduct?.image || 'https://images.unsplash.com/photo-1558857563-b37102e95cb4?auto=format&fit=crop&q=80&w=800'} className="absolute right-0 top-0 w-[55%] h-full object-cover" style={{ maskImage: 'linear-gradient(to right, transparent, black 25%)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 25%)' }} />
         </div>
       </section>
 
@@ -341,7 +408,13 @@ export default function DiscoveryHome() {
         {selectedStory && (
           <StoryModal 
             storyId={selectedStory} 
-            onClose={() => setSelectedStory(null)} 
+            onClose={() => {
+              setSelectedStory(null);
+              // Clean up URL so it doesn't re-open on refresh
+              const url = new URL(window.location.href);
+              url.searchParams.delete('story');
+              window.history.replaceState({}, '', url);
+            }} 
           />
         )}
       </AnimatePresence>
@@ -350,6 +423,14 @@ export default function DiscoveryHome() {
         product={selectedProduct} 
         isOpen={selectedProduct !== null} 
         onClose={() => setSelectedProduct(null)} 
+      />
+
+      {/* Share Modal Fallback */}
+      <ShareModal
+        isOpen={shareModal.isOpen}
+        onClose={() => setShareModal(prev => ({ ...prev, isOpen: false }))}
+        title={shareModal.title}
+        url={shareModal.url}
       />
 
       <SearchModal 

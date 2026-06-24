@@ -14,5 +14,6 @@ public class StoreSettings {
     private Double deliveryFee;
     private Double packingCharge;
     private Integer prepTime;
+    @com.fasterxml.jackson.annotation.JsonProperty("isStoreActive")
     private Boolean isStoreActive = true;
 }

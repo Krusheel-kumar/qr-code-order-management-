@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://popobob-backend-production.up.railway.app/api';
+const API_URL = import.meta.env.VITE_API_URL?.includes('localhost') ? `http://${window.location.hostname}:8080/api` : import.meta.env.VITE_API_URL || `http://${window.location.hostname}:8080/api`;
 
 export const adminApi = axios.create({
   baseURL: `${API_URL}/admin`,
@@ -22,7 +22,14 @@ export const menuApi = axios.create({
   },
 });
 
-export const getProducts = async () => (await menuApi.get('/products')).data;
+export const getProducts = async () => {
+  const { data } = await menuApi.get('/products', { params: { t: new Date().getTime() } });
+  return data.map((item: any) => ({
+    ...item,
+    category: item.category?.name || item.category?.id || (typeof item.category === 'string' ? item.category : 'Unknown'),
+    image: item.image || item.imageUrl || ''
+  }));
+};
 export const getCategories = async () => (await menuApi.get('/categories')).data;
 
 

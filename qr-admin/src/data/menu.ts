@@ -23,6 +23,10 @@ export interface MenuItem {
   ordersToday?: number;
   calories: number;
   flavorProfile: ProductFlavorProfile;
+  isAvailable?: boolean;
+  isFeatured?: boolean;
+  isBestseller?: boolean;
+  isNewLaunch?: boolean;
   pairings: string[]; // IDs of paired items
   recommendedToppings?: string[];
 }

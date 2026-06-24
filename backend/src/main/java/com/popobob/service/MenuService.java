@@ -19,7 +19,27 @@ public class MenuService {
         return categoryRepository.findAll();
     }
 
+    public Category saveCategory(Category category) {
+        return categoryRepository.save(category);
+    }
+
+    public void deleteCategory(String id) {
+        categoryRepository.deleteById(id);
+    }
+
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
+    }
+
     public List<Product> getAvailableProducts() {
         return productRepository.findByIsAvailableTrue();
+    }
+
+    public Product saveProduct(Product product) {
+        return productRepository.save(product);
+    }
+
+    public void deleteProduct(String id) {
+        productRepository.deleteById(id);
     }
 }

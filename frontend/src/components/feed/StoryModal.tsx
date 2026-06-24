@@ -1,8 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Share2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { stories } from '../../data/mockData';
+import { shareContent } from '../../utils/shareUtils';
+import ShareModal from '../ui/ShareModal';
 
 interface StoryModalProps {
   storyId: string;
@@ -16,6 +18,7 @@ export default function StoryModal({ storyId, onClose }: StoryModalProps) {
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [shareModal, setShareModal] = useState<{isOpen: boolean, title: string, url: string}>({isOpen: false, title: '', url: ''});
 
   const story = stories[currentStoryIndex];
   const slides = story.slides && story.slides.length > 0 ? story.slides : [story.image];
@@ -115,7 +118,30 @@ export default function StoryModal({ storyId, onClose }: StoryModalProps) {
 
   const currentImage = slides[activeSlideIndex];
 
+  const handleShare = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Don't trigger slide taps
+    setIsPaused(true); // Pause the story while sharing
+    
+    const shareUrl = `${window.location.origin}/?story=${story.id}`;
+    shareContent(
+      {
+        title: `Check out this amazing story from Pop O Bob! ✨`,
+        text: `"${story.title}"\nI thought you might want to see this.`,
+        url: shareUrl,
+        imageUrl: story.image,
+      },
+      () => {
+        setShareModal({
+          isOpen: true,
+          title: `Check out ${story.title} at Pop O Bob!`,
+          url: shareUrl
+        });
+      }
+    );
+  };
+
   return (
+    <>
     <motion.div
       initial={{ opacity: 0, y: '100%' }}
       animate={{ opacity: 1, y: 0 }}
@@ -144,9 +170,20 @@ export default function StoryModal({ storyId, onClose }: StoryModalProps) {
           <img src={story.image} className="w-8 h-8 rounded-full border border-white object-cover" />
           <span className="text-white font-bold text-sm shadow-sm">{story.title}</span>
         </div>
-        <button onClick={() => onCloseRef.current()} className="w-8 h-8 flex items-center justify-center text-white bg-black/20 rounded-full backdrop-blur-md pointer-events-auto">
-          <X size={20} />
-        </button>
+        <div className="flex items-center gap-2 pointer-events-auto">
+          <button 
+            onClick={handleShare} 
+            className="w-8 h-8 flex items-center justify-center text-white bg-black/20 rounded-full backdrop-blur-md pointer-events-auto active:scale-95"
+          >
+            <Share2 size={16} />
+          </button>
+          <button 
+            onClick={() => onCloseRef.current()} 
+            className="w-8 h-8 flex items-center justify-center text-white bg-black/20 rounded-full backdrop-blur-md pointer-events-auto active:scale-95"
+          >
+            <X size={20} />
+          </button>
+        </div>
       </div>
 
       {/* Content */}
@@ -210,5 +247,15 @@ export default function StoryModal({ storyId, onClose }: StoryModalProps) {
         </div>
       </div>
     </motion.div>
+    <ShareModal
+      isOpen={shareModal.isOpen}
+      onClose={() => {
+        setShareModal(prev => ({ ...prev, isOpen: false }));
+        setIsPaused(false); // Resume story when modal closes
+      }}
+      title={shareModal.title}
+      url={shareModal.url}
+    />
+    </>
   );
 }

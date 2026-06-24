@@ -13,7 +13,7 @@ public class VectorDbConfig {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    @PostConstruct
+    // @PostConstruct
     public void initVectorDatabase() {
         try {
             // Enable pgvector extension

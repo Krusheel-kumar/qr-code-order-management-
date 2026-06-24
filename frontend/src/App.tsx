@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getStoreSettings } from './api';
+import { useMenuStore } from './store/useMenuStore';
 
 // Screens
 import SplashScreen from './pages/customer/SplashScreen';
@@ -52,6 +53,9 @@ function App() {
       import('./store/useCartStore').then(m => m.useCartStore.getState().setTableNumber(tableParam));
     }
 
+    useMenuStore.getState().initializeMenu();
+    useMenuStore.getState().startPolling();
+
     // Poll or fetch once. For now, fetch once on load and every 2s.
     const fetchStatus = () => {
       getStoreSettings().then(settings => {
@@ -64,8 +68,11 @@ function App() {
     };
 
     fetchStatus();
-    const interval = setInterval(fetchStatus, 2000);
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchStatus, 15000);
+    return () => {
+      clearInterval(interval);
+      useMenuStore.getState().stopPolling();
+    };
   }, []);
 
   return (

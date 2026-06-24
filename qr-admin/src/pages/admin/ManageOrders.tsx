@@ -43,16 +43,43 @@ export default function ManageOrders() {
 
   useEffect(() => {
     fetchOrders();
-    const interval = setInterval(fetchOrders, 3000); // Poll every 3 seconds
-    return () => clearInterval(interval);
+    
+    // Use a Web Worker for polling so that modern browsers don't throttle
+    // the interval down to 1 minute when the tab is in the background.
+    const workerCode = `
+      let intervalId;
+      self.onmessage = function(e) {
+        if (e.data === 'start') {
+          intervalId = setInterval(() => self.postMessage('tick'), 3000);
+        } else if (e.data === 'stop') {
+          clearInterval(intervalId);
+        }
+      };
+    `;
+    const blob = new Blob([workerCode], { type: 'application/javascript' });
+    const worker = new Worker(URL.createObjectURL(blob));
+    
+    worker.onmessage = () => {
+      fetchOrders();
+    };
+    worker.postMessage('start');
+    
+    return () => {
+      worker.postMessage('stop');
+      worker.terminate();
+    };
   }, []);
 
   const handleStatusUpdate = async (id: string, status: string) => {
+    // Optimistic UI update for instant feedback
+    setOrders(prevOrders => prevOrders.map(o => o.id === id ? { ...o, status } : o));
+    
     try {
       await updateOrderStatus(id, status);
-      fetchOrders(); // Refresh instantly
+      fetchOrders(); // Refresh to sync any other changes
     } catch (e) {
       console.error('Failed to update status', e);
+      fetchOrders(); // Revert back to true state on failure
     }
   };
 
@@ -61,8 +88,20 @@ export default function ManageOrders() {
   const readyOrders = orders.filter(o => o.status === 'READY');
 
   const playAlarm = () => {
-    const audio = new Audio(alarmSound);
-    audio.play().catch(e => console.error("Audio playback failed:", e));
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(e => console.error("Audio playback failed:", e));
+    } else {
+      const audio = new Audio(alarmSound);
+      audio.play().catch(e => console.error("Audio fallback playback failed:", e));
+    }
+
+    // If the tab is in the background, trigger an OS-level notification
+    if (document.hidden && "Notification" in window && Notification.permission === "granted") {
+      new Notification("New Order Received!", {
+        body: "A new order just arrived at Pop O Bob. Please check the Admin Panel.",
+      });
+    }
   };
 
   useEffect(() => {
@@ -88,6 +127,11 @@ export default function ManageOrders() {
   const toggleSound = () => {
     if (!isSoundEnabled) {
       playAlarm(); // Play immediately to confirm and unlock browser audio
+      
+      // Request notification permissions when enabling alerts
+      if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+        Notification.requestPermission();
+      }
     }
     setIsSoundEnabled(!isSoundEnabled);
   };

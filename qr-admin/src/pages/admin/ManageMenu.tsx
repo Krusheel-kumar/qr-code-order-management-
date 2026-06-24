@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useAdminStore } from '../../store/useAdminStore';
+import type { MenuItem } from '../../data/menu';
 import { Search, Plus, Edit2, Trash2 } from 'lucide-react';
 import ItemEditModal from '../../components/admin/ItemEditModal';
 import type { Addon } from '../../data/models'; 
@@ -169,9 +170,23 @@ export default function ManageMenu() {
                         </td>
                       </tr>
                     ) : (
-                      displayedItems.map((item) => {
-                        const isActiveItem = activeItems[item.id];
-                        return (
+                      Object.entries(
+                        displayedItems.reduce((acc, item) => {
+                          const sub = item.subcategory || 'Uncategorized';
+                          if (!acc[sub]) acc[sub] = [];
+                          acc[sub].push(item);
+                          return acc;
+                        }, {} as Record<string, MenuItem[]>)
+                      ).map(([subcategory, items]) => (
+                        <React.Fragment key={subcategory}>
+                          <tr className="bg-gray-100">
+                            <td colSpan={4} className="px-6 py-2 text-sm font-bold text-gray-800 uppercase tracking-wider">
+                              {subcategory}
+                            </td>
+                          </tr>
+                          {items.map((item) => {
+                            const isActiveItem = activeItems[item.id];
+                            return (
                           <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                             <td className="px-6 py-4">
                               <div className="flex items-center">
@@ -215,8 +230,11 @@ export default function ManageMenu() {
                           </tr>
                         );
                       })
+                      }
+                      </React.Fragment>
+                      ))
                     )}
-                  </tbody>
+                  </tbody >
                 </table>
               </div>
             </div>

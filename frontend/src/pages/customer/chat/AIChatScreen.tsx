@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '../../../store/useCartStore';
+import { useMenuStore } from '../../../store/useMenuStore';
 import { 
   getLocalRecommendation, 
   getLlmRecommendation
@@ -12,7 +13,7 @@ import type {
   SubFlavor,
   ToppingPreference
 } from '../../../lib/recommendationEngine';
-import { MENU } from '../../../data/menu';
+
 
 type MessageSender = 'ai' | 'user';
 
@@ -290,6 +291,7 @@ export default function AIChatScreen() {
 
 // Sub-component for displaying a product inside the chat
 function ProductRecommendationCard({ productId }: { productId: string }) {
+  const { menuItems: MENU } = useMenuStore();
   const product = MENU.find(p => 
     p.id === productId || 
     p.name.toLowerCase() === productId.toLowerCase() || 

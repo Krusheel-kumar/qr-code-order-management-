@@ -24,7 +24,7 @@ public class KnowledgeBaseSeeder {
         this.objectMapper = new ObjectMapper();
     }
 
-    @PostConstruct
+    // @PostConstruct
     public void seedKnowledgeBase() {
         try {
             // Check if knowledge base is empty

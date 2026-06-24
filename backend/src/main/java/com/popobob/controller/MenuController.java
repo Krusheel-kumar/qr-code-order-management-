@@ -26,4 +26,31 @@ public class MenuController {
     public List<Product> getProducts() {
         return menuService.getAvailableProducts();
     }
+
+    // --- Admin Endpoints ---
+
+    @GetMapping("/admin/products")
+    public List<Product> getAllProducts() {
+        return menuService.getAllProducts();
+    }
+
+    @org.springframework.web.bind.annotation.PostMapping("/categories")
+    public Category saveCategory(@org.springframework.web.bind.annotation.RequestBody Category category) {
+        return menuService.saveCategory(category);
+    }
+
+    @org.springframework.web.bind.annotation.DeleteMapping("/categories/{id}")
+    public void deleteCategory(@org.springframework.web.bind.annotation.PathVariable String id) {
+        menuService.deleteCategory(id);
+    }
+
+    @org.springframework.web.bind.annotation.PostMapping("/products")
+    public Product saveProduct(@org.springframework.web.bind.annotation.RequestBody Product product) {
+        return menuService.saveProduct(product);
+    }
+
+    @org.springframework.web.bind.annotation.DeleteMapping("/products/{id}")
+    public void deleteProduct(@org.springframework.web.bind.annotation.PathVariable String id) {
+        menuService.deleteProduct(id);
+    }
 }

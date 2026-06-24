@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, ShoppingBag } from 'lucide-react';
+import { X, Check, ShoppingBag, Share2 } from 'lucide-react';
 import type { MenuItem } from '../data/menu';
 import { useCartStore } from '../store/useCartStore';
+import { shareContent } from '../utils/shareUtils';
+import ShareModal from './ui/ShareModal';
 
 const MILK_OPTIONS = ['Fresh Milk', 'Soy Milk', 'Non Dairy', 'Oat Milk', 'Almond Milk'];
 const ALL_TOPPINGS = [
@@ -24,6 +26,8 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
   const [milk, setMilk] = useState(MILK_OPTIONS[0]);
   const [freeTopping, setFreeTopping] = useState('');
   const [extraToppings, setExtraToppings] = useState<string[]>([]);
+  
+  const [shareModal, setShareModal] = useState<{isOpen: boolean, title: string, url: string}>({isOpen: false, title: '', url: ''});
 
   // Reset state when product changes
   useEffect(() => {
@@ -67,6 +71,26 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
     }
   };
 
+  const handleShare = () => {
+    if (!product) return;
+    const shareUrl = `${window.location.origin}/menu?p=${product.id}`;
+    shareContent(
+      {
+        title: `Hey! You have to try ${product.name} at Pop O Bob! 🧋`,
+        text: product.story ? `"${product.story}"` : `It's absolutely delicious and I thought you'd love it.`,
+        url: shareUrl,
+        imageUrl: product.image,
+      },
+      () => {
+        setShareModal({
+          isOpen: true,
+          title: `Check out ${product.name} at Pop O Bob!`,
+          url: shareUrl
+        });
+      }
+    );
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -103,12 +127,20 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
                 <h3 className="font-heading font-extrabold text-xl text-foreground line-clamp-1">{product.name}</h3>
                 <span className="font-bold text-primary">₹{product.price}</span>
               </div>
-              <button 
-                onClick={onClose}
-                className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-foreground/50 hover:bg-gray-200 active:scale-95 transition-all shrink-0"
-              >
-                <X size={18} />
-              </button>
+              <div className="flex items-center gap-2 shrink-0">
+                <button 
+                  onClick={handleShare}
+                  className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-foreground/50 hover:bg-gray-200 active:scale-95 transition-all shrink-0"
+                >
+                  <Share2 size={16} />
+                </button>
+                <button 
+                  onClick={onClose}
+                  className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-foreground/50 hover:bg-gray-200 active:scale-95 transition-all shrink-0"
+                >
+                  <X size={18} />
+                </button>
+              </div>
             </div>
             {/* Scrollable Content */}
             <div className="flex-1 min-h-0 overflow-y-auto hide-scrollbar relative flex flex-col">
@@ -223,6 +255,14 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
           </motion.div>
         </>
       )}
+      
+      {/* Share Modal Fallback */}
+      <ShareModal
+        isOpen={shareModal.isOpen}
+        onClose={() => setShareModal(prev => ({ ...prev, isOpen: false }))}
+        title={shareModal.title}
+        url={shareModal.url}
+      />
     </AnimatePresence>
   );
 }

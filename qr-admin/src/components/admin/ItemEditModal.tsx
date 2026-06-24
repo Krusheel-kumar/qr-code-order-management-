@@ -9,6 +9,12 @@ interface ItemEditModalProps {
   item: MenuItem | null; // null implies we're adding a new item
 }
 
+const SUBCATEGORIES: Record<string, string[]> = {
+  'Milk Teas': ['Classics', 'Fruit Series', 'Chocolate', 'Coffee', 'Signatures'],
+  'Boba Shakes': ['All Time Boba Milkshakes', 'Signature Boba Milkshakes'],
+  'Chillers': ['Lemonades', 'Virgin Mojitos']
+};
+
 export default function ItemEditModal({ isOpen, onClose, item }: ItemEditModalProps) {
   const { addItem, updateItem, categories } = useAdminStore();
   const [formData, setFormData] = useState<Partial<MenuItem>>({
@@ -16,6 +22,7 @@ export default function ItemEditModal({ isOpen, onClose, item }: ItemEditModalPr
     price: 0,
     story: '',
     category: categories[0],
+    subcategory: '',
     image: ''
   });
 
@@ -28,6 +35,7 @@ export default function ItemEditModal({ isOpen, onClose, item }: ItemEditModalPr
         price: 0,
         story: '',
         category: categories[0],
+        subcategory: '',
         image: ''
       });
     }
@@ -45,6 +53,7 @@ export default function ItemEditModal({ isOpen, onClose, item }: ItemEditModalPr
         price: formData.price || 0,
         image: formData.image || '',
         story: formData.story || '',
+        subcategory: formData.subcategory || '',
         flavorNotes: [],
         mood: 'Happy Mood',
         rating: 0,
@@ -113,6 +122,22 @@ export default function ItemEditModal({ isOpen, onClose, item }: ItemEditModalPr
                   ))}
                 </select>
               </div>
+
+              {SUBCATEGORIES[formData.category as string] && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
+                  <select 
+                    value={formData.subcategory || ''}
+                    onChange={(e) => setFormData({...formData, subcategory: e.target.value})}
+                    className="w-full border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  >
+                    <option value="">Select Subcategory</option>
+                    {SUBCATEGORIES[formData.category as string].map(sub => (
+                      <option key={sub} value={sub}>{sub}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
 
             {/* Image Section */}
@@ -137,7 +162,14 @@ export default function ItemEditModal({ isOpen, onClose, item }: ItemEditModalPr
                     <div className="flex text-sm text-gray-600 justify-center">
                       <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
                         <span>Upload a file</span>
-                        <input type="file" className="sr-only" />
+                        <input type="file" className="sr-only" accept="image/*" onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => setFormData({...formData, image: reader.result as string});
+                            reader.readAsDataURL(file);
+                          }
+                        }} />
                       </label>
                     </div>
                     <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
@@ -154,6 +186,49 @@ export default function ItemEditModal({ isOpen, onClose, item }: ItemEditModalPr
                   className="w-full border border-gray-300 rounded-lg p-2 text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Display Flags Section */}
+          <div className="pt-4 border-t border-gray-100">
+            <h3 className="text-sm font-bold text-gray-900 mb-3">Discovery App Display Flags</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer transition-colors border-gray-200 hover:bg-gray-50">
+                <input 
+                  type="checkbox" 
+                  className="w-4 h-4 text-blue-600 rounded border-gray-300"
+                  checked={formData.isFeatured || false}
+                  onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})}
+                />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-gray-900">Feature on Discovery Home</span>
+                  <span className="text-xs text-gray-500">Shows up as the giant banner</span>
+                </div>
+              </label>
+              <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer transition-colors border-gray-200 hover:bg-gray-50">
+                <input 
+                  type="checkbox" 
+                  className="w-4 h-4 text-blue-600 rounded border-gray-300"
+                  checked={formData.isBestseller || false}
+                  onChange={(e) => setFormData({...formData, isBestseller: e.target.checked})}
+                />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-gray-900">Mark as Bestseller</span>
+                  <span className="text-xs text-gray-500">Shows up in 'Best Sellers' list</span>
+                </div>
+              </label>
+              <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer transition-colors border-gray-200 hover:bg-gray-50">
+                <input 
+                  type="checkbox" 
+                  className="w-4 h-4 text-blue-600 rounded border-gray-300"
+                  checked={formData.isNewLaunch || false}
+                  onChange={(e) => setFormData({...formData, isNewLaunch: e.target.checked})}
+                />
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-gray-900">Mark as New Launch</span>
+                  <span className="text-xs text-gray-500">Shows up in 'New Launches' list</span>
+                </div>
+              </label>
             </div>
           </div>
 

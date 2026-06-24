@@ -24,6 +24,10 @@ export interface MenuItem {
   flavorProfile: ProductFlavorProfile;
   pairings: string[]; // IDs of paired items
   recommendedToppings?: string[];
+  isAvailable?: boolean;
+  isFeatured?: boolean;
+  isBestseller?: boolean;
+  isNewLaunch?: boolean;
 }
 
 export const CATEGORIES = [

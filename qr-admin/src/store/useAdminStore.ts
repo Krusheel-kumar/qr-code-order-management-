@@ -90,21 +90,24 @@ export const useAdminStore = create<AdminState>((set) => ({
 
   initializeStore: async () => {
     try {
-      const [campaigns, stories, addons, coupons, storeSettings] = await Promise.all([
-        import('../api').then(m => m.getCampaigns()),
-        import('../api').then(m => m.getStories()),
-        import('../api').then(m => m.getAddons()),
-        import('../api').then(m => m.getCoupons()),
-        import('../api').then(m => m.getStoreSettings())
+      const [storeSettings, products] = await Promise.all([
+        import('../api').then(m => m.getStoreSettings()),
+        import('../api').then(m => m.getProducts())
       ]);
-      set({ 
-        campaigns, 
-        stories, 
-        addons, 
-        coupons, 
+      
+      const newActiveItems = { ...useAdminStore.getState().activeItems };
+      if (products.length > 0) {
+        products.forEach((p: any) => {
+          newActiveItems[p.id] = p.isAvailable !== false; // Default to true if missing
+        });
+      }
+
+      set((state) => ({ 
         storeSettings,
-        isStoreActive: storeSettings.isStoreActive !== false // default to true
-      });
+        isStoreActive: storeSettings.isStoreActive !== false, // default to true
+        menuItems: products.length > 0 ? products : state.menuItems, // Fallback to mock if DB empty
+        activeItems: newActiveItems
+      }));
     } catch (e) {
       console.error('Failed to initialize admin store from API', e);
     }
@@ -203,12 +206,22 @@ export const useAdminStore = create<AdminState>((set) => ({
   },
   
   activeItems: initialActiveItems,
-  toggleItemActive: (id) => set((state) => ({
-    activeItems: {
-      ...state.activeItems,
-      [id]: !state.activeItems[id]
-    }
-  })),
+  toggleItemActive: async (id) => {
+    try {
+      const api = await import('../api');
+      const item = useAdminStore.getState().menuItems.find(i => i.id === id);
+      const isActive = !useAdminStore.getState().activeItems[id];
+      if (item) {
+        await api.updateProduct({ ...item, isAvailable: isActive });
+      }
+      set((state) => ({
+        activeItems: {
+          ...state.activeItems,
+          [id]: isActive
+        }
+      }));
+    } catch (e) { console.error('Failed to toggle', e); }
+  },
   
   activeCategories: initialActiveCategories,
   toggleCategoryActive: (category) => set((state) => ({
@@ -218,22 +231,49 @@ export const useAdminStore = create<AdminState>((set) => ({
     }
   })),
 
-  deleteItem: (id) => set((state) => {
-    const updatedItems = state.menuItems.filter(item => item.id !== id);
-    const updatedActiveItems = { ...state.activeItems };
-    delete updatedActiveItems[id];
-    return {
-      menuItems: updatedItems,
-      activeItems: updatedActiveItems
-    };
-  }),
+  deleteItem: async (id) => {
+    try {
+      const api = await import('../api');
+      await api.deleteProduct(id);
+      set((state) => {
+        const updatedItems = state.menuItems.filter(item => item.id !== id);
+        const updatedActiveItems = { ...state.activeItems };
+        delete updatedActiveItems[id];
+        return {
+          menuItems: updatedItems,
+          activeItems: updatedActiveItems
+        };
+      });
+    } catch (e) { console.error('Failed to delete', e); }
+  },
 
-  addItem: (item) => set((state) => ({
-    menuItems: [...state.menuItems, item],
-    activeItems: { ...state.activeItems, [item.id]: true }
-  })),
+  addItem: async (item) => {
+    try {
+      const api = await import('../api');
+      const created = await api.createProduct(item);
+      const categoryStr = created.category?.name || created.category?.id || item.category;
+      // Map it back to the format the UI expects
+      const finalItem = { ...item, ...created, category: categoryStr, image: created.imageUrl || created.image || item.image };
+      set((state) => ({
+        menuItems: [...state.menuItems, finalItem],
+        activeItems: { ...state.activeItems, [finalItem.id]: true }
+      }));
+    } catch (e: any) { 
+      console.error('Failed to add', e);
+      alert(`Failed to add item: ${e.response?.data?.message || e.message || 'Unknown error'}`);
+    }
+  },
 
-  updateItem: (updatedItem) => set((state) => ({
-    menuItems: state.menuItems.map(item => item.id === updatedItem.id ? updatedItem : item)
-  }))
+  updateItem: async (updatedItem) => {
+    try {
+      const api = await import('../api');
+      const updated = await api.updateProduct(updatedItem);
+      const categoryStr = updated.category?.name || updated.category?.id || updatedItem.category;
+      // Map it back to the format the UI expects
+      const finalItem = { ...updatedItem, ...updated, category: categoryStr, image: updated.imageUrl || updated.image || updatedItem.image };
+      set((state) => ({
+        menuItems: state.menuItems.map(item => item.id === finalItem.id ? finalItem : item)
+      }));
+    } catch (e) { console.error('Failed to update', e); }
+  }
 }));

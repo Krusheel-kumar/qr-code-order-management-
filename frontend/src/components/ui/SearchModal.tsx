@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, ChevronRight } from 'lucide-react';
-import { MENU } from '../../data/menu';
+import { useMenuStore } from '../../store/useMenuStore';
 import type { MenuItem } from '../../data/menu';
 
 interface SearchModalProps {
@@ -13,6 +13,7 @@ interface SearchModalProps {
 export default function SearchModal({ isOpen, onClose, onSelectProduct }: SearchModalProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<MenuItem[]>([]);
+  const { menuItems: MENU } = useMenuStore();
 
   useEffect(() => {
     if (!isOpen) {
