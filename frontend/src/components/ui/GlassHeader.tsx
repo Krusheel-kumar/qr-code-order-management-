@@ -42,8 +42,8 @@ export default function GlassHeader({ onOpenProfile, onOpenSearch, onOpenAuth }:
         {/* Header Row */}
         <div className="flex justify-between items-center mb-4">
           {/* Logo Section */}
-          <div className="flex items-center h-12">
-            <img src="/assets/horizontal_logo.png" alt="Pop O Bob Logo" className="h-full w-auto object-contain drop-shadow-sm" />
+          <div className="flex items-center h-16 ml-[-4px]">
+            <img src="/assets/horizontal_logo.png" alt="Pop O Bob Logo" className="h-full w-auto object-contain drop-shadow-sm scale-[1.15] origin-left" />
           </div>
 
           {/* Actions */}
