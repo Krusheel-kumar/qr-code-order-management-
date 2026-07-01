@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, MapPin, Clock, Info, Navigation } from 'lucide-react';
+import { ChevronDown, MapPin, Clock, Info } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCartStore } from '../../store/useCartStore';
 import { STORES } from '../../data/stores';

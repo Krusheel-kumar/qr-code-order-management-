@@ -1,24 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Star, Search, User, Share2 } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 import { shareContent } from '../../utils/shareUtils';
 import ShareModal from '../../components/ui/ShareModal';
 
 import { useMenuStore } from '../../store/useMenuStore';
 import type { MenuItem } from '../../data/menu';
-import type { Campaign, Story, Offer, Combo } from '../../data/models';
+import type { Offer, Combo } from '../../data/models';
 import StoryModal from '../../components/feed/StoryModal';
 import CustomizerSheet from '../../components/CustomizerSheet';
 import SearchModal from '../../components/ui/SearchModal';
 import AuthModal from '../../components/ui/AuthModal';
 import ProfileSheet from '../../components/ui/ProfileSheet';
 import GlassHeader from '../../components/ui/GlassHeader';
-import { STORES } from '../../data/stores';
+
 import { useCartStore } from '../../store/useCartStore';
 import { useAuthStore } from '../../store/useAuthStore';
-import { getCampaigns, getStories, getDiscoverySections } from '../../api';
-import type { DiscoverySection } from '../../data/models';
+
 
 export default function DiscoveryHome() {
   const navigate = useNavigate();
@@ -34,15 +33,11 @@ export default function DiscoveryHome() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const hasHandledDeepLink = useRef(false);
-  const { user } = useAuthStore();
+  const { } = useAuthStore();
   const { menuItems: MENU, getFeaturedProducts, campaigns, stories, discoverySections, isLoading } = useMenuStore();
   const featuredProduct = getFeaturedProducts()[0] || MENU[0];
   
-  // Mock data for offers and combos until they are fully integrated
-  const offers: Offer[] = [
-    { id: 'o1', title: '10% OFF', description: 'On orders above ₹599', image: '', code: 'POPOBOB10', validUntil: 'Valid until Sunday', ctaText: 'Apply' },
-    { id: 'o2', title: 'Welcome Bonus', description: 'Get 500 loyalty points', image: '', code: 'NEWUSER', validUntil: 'Valid on sign up', ctaText: 'Claim' }
-  ];
+
   const combos: Combo[] = [];
   useEffect(() => {
     // Handle deep links after data loads

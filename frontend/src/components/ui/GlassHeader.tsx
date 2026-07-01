@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, ChevronRight, Store, Home, Clock, User } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
