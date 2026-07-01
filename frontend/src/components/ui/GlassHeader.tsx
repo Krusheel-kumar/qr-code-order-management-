@@ -103,7 +103,7 @@ export default function GlassHeader({ onOpenProfile, onOpenSearch, onOpenAuth }:
             </div>
             <div className="flex flex-col items-start min-w-0 flex-1 pr-2">
               <h3 className="text-[12.5px] font-extrabold text-gray-900 mb-[1px] truncate w-full text-left leading-tight">
-                {orderType === 'DINE_IN' ? 'Dine In' : (currentStore ? `POP O'BOB® | ${currentStore.name}` : 'Select a Store')}
+                {orderType === 'DINE_IN' ? 'Dine In' : (currentStore ? currentStore.name : 'Select a Store')}
               </h3>
               {orderType === 'DINE_IN' ? (
                 <div className="flex items-center text-[10px] text-gray-500 font-medium">

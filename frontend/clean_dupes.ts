@@ -1,9 +1,9 @@
-import http from 'http';
+import https from 'https';
 import { MENU } from './src/data/menu';
 
 const validIds = new Set(MENU.map(m => m.id));
 
-http.get('http://localhost:8080/api/menu/admin/products', (res) => {
+https.get('https://qr-code-order-management-production.up.railway.app/api/menu/admin/products', (res) => {
   let data = '';
   res.on('data', c => data += c);
   res.on('end', () => {
@@ -24,7 +24,7 @@ http.get('http://localhost:8080/api/menu/admin/products', (res) => {
           return;
         }
         const p = invalidProds[index];
-        const req = http.request(`http://localhost:8080/api/menu/products/${p.id}`, { method: 'DELETE' }, (r) => {
+        const req = https.request(`https://qr-code-order-management-production.up.railway.app/api/menu/products/${p.id}`, { method: 'DELETE' }, (r) => {
           r.on('data', () => {});
           r.on('end', () => {
             console.log(`Deleted ${p.id} (${index + 1}/${invalidProds.length})`);
