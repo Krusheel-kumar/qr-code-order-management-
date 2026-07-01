@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Download, QrCode, Link2, Copy, CheckCircle2 } from 'lucide-react';
+import { Download, QrCode, Link2, CheckCircle2 } from 'lucide-react';
 import { STORES } from '../../data/stores';
 
 export default function QRGenerator() {
