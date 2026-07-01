@@ -95,12 +95,13 @@ export const useAdminStore = create<AdminState>((set) => ({
 
   initializeStore: async () => {
     try {
-      const [storeSettings, products, campaigns, stories, discoverySections] = await Promise.all([
+      const [storeSettings, products, campaigns, stories, discoverySections, categories] = await Promise.all([
         import('../api').then(m => m.getStoreSettings()),
         import('../api').then(m => m.getProducts()),
         import('../api').then(m => m.getCampaigns()),
         import('../api').then(m => m.getStories()),
         import('../api').then(m => m.getDiscoverySections()),
+        import('../api').then(m => m.getCategories()),
       ]);
       
       const newActiveItems = { ...useAdminStore.getState().activeItems };
@@ -114,6 +115,7 @@ export const useAdminStore = create<AdminState>((set) => ({
         storeSettings,
         isStoreActive: storeSettings.isStoreActive !== false, // default to true
         menuItems: products.length > 0 ? products : state.menuItems, // Fallback to mock if DB empty
+        categories: categories.length > 0 ? categories.map((c: any) => c.name) : state.categories,
         activeItems: newActiveItems,
         campaigns,
         stories,

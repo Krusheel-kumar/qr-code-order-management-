@@ -41,7 +41,18 @@ export const menuApi = axios.create({
   },
 });
 
-export const getCategories = async () => [];
+let cachedCategories: any[] = [];
+
+export const getCategories = async () => {
+  try {
+    const { data } = await menuApi.get('/categories');
+    cachedCategories = data;
+    return data;
+  } catch (e) {
+    return [];
+  }
+};
+
 export const getProducts = async () => {
   const { data } = await menuApi.get('/admin/products', { params: { t: new Date().getTime() } });
   return data.map((item: any) => ({
@@ -50,24 +61,34 @@ export const getProducts = async () => {
     image: item.image || item.imageUrl || ''
   }));
 };
+
+const resolveCategory = (catStr: any) => {
+  if (typeof catStr !== 'string') return catStr;
+  const found = cachedCategories.find(c => c.name === catStr || c.name.startsWith(catStr + ' -'));
+  if (found) return { id: found.id };
+  return { id: catStr.toLowerCase().replace(/\s+/g, '-') };
+};
+
 export const createProduct = async (product: any) => {
   const payload = {
     ...product,
     imageUrl: product.image || product.imageUrl,
-    category: typeof product.category === 'string' ? { id: product.category.toLowerCase().replace(/\s+/g, '-') } : product.category
+    category: resolveCategory(product.category)
   };
   const data = (await menuApi.post('/products', payload)).data;
   return { ...data, image: data.image || data.imageUrl || '' };
 };
+
 export const updateProduct = async (product: any) => {
   const payload = {
     ...product,
     imageUrl: product.image || product.imageUrl,
-    category: typeof product.category === 'string' ? { id: product.category.toLowerCase().replace(/\s+/g, '-') } : product.category
+    category: resolveCategory(product.category)
   };
   const data = (await menuApi.post('/products', payload)).data;
   return { ...data, image: data.image || data.imageUrl || '' };
 };
+
 export const deleteProduct = async (id: string) => (await menuApi.delete(`/products/${id}`)).data;
 
 export const ordersApi = axios.create({
