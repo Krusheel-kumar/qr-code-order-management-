@@ -6,16 +6,13 @@ export default function QRGenerator() {
   const [tableNumber, setTableNumber] = useState('');
   const [selectedStore, setSelectedStore] = useState(STORES[0].id);
   const [copied, setCopied] = useState(false);
+  const [frontendUrl, setFrontendUrl] = useState(() => localStorage.getItem('qr_frontend_url') || 'https://popobob.com');
 
   const getUrl = () => {
     if (!tableNumber) return '';
-    // Use the origin url. E.g. https://customer-app-domain.com/?table=1&storeId=1
-    // For admin preview purposes, we'll construct the hypothetical frontend URL
-    let baseUrl = window.location.origin;
-    if (baseUrl.includes('localhost:') || baseUrl.includes('127.0.0.1:')) {
-      // In local dev, admin is usually on 5174 or 5175, frontend on 5173
-      baseUrl = baseUrl.replace(/5174|5175|3001/, '5173');
-    }
+    let baseUrl = frontendUrl;
+    if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+    if (!baseUrl.startsWith('http')) baseUrl = 'https://' + baseUrl;
     return `${baseUrl}/?table=${encodeURIComponent(tableNumber)}&storeId=${encodeURIComponent(selectedStore)}`;
   };
 
@@ -69,6 +66,21 @@ export default function QRGenerator() {
             <h2 className="text-lg font-bold text-gray-900">Table Settings</h2>
           </div>
           <div className="p-6 space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Live Customer App URL</label>
+              <input 
+                type="text" 
+                placeholder="e.g. https://popobob.com" 
+                value={frontendUrl}
+                onChange={(e) => {
+                  setFrontendUrl(e.target.value);
+                  localStorage.setItem('qr_frontend_url', e.target.value);
+                }}
+                className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <p className="text-xs text-gray-500 mt-1">The generated QR code will redirect users to this domain.</p>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Store Location</label>
               <select 
