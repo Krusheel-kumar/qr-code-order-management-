@@ -1,6 +1,6 @@
-package com.POP O'BOB®.service;
+package com.popobob.service;
 
-import com.POP O'BOB®.dto.AiResponse;
+import com.popobob.dto.AiResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;

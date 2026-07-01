@@ -1,4 +1,4 @@
-package com.POP O'BOB®.config;
+package com.popobob.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

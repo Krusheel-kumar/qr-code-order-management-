@@ -1,6 +1,6 @@
-package com.POP O'BOB®.repository;
+package com.popobob.repository;
 
-import com.POP O'BOB®.model.Story;
+import com.popobob.model.Story;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

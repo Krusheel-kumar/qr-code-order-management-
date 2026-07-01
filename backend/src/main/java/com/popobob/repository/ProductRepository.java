@@ -1,6 +1,6 @@
-package com.POP O'BOB®.repository;
+package com.popobob.repository;
 
-import com.POP O'BOB®.model.Product;
+import com.popobob.model.Product;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;

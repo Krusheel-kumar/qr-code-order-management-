@@ -1,14 +1,14 @@
-package com.POP O'BOB®.service;
+package com.popobob.service;
 
-import com.POP O'BOB®.dto.OrderItemDto;
-import com.POP O'BOB®.dto.OrderRequestDto;
-import com.POP O'BOB®.model.Order;
-import com.POP O'BOB®.model.OrderItem;
-import com.POP O'BOB®.model.Product;
-import com.POP O'BOB®.model.OrderSequence;
-import com.POP O'BOB®.repository.OrderSequenceRepository;
-import com.POP O'BOB®.repository.OrderRepository;
-import com.POP O'BOB®.repository.ProductRepository;
+import com.popobob.dto.OrderItemDto;
+import com.popobob.dto.OrderRequestDto;
+import com.popobob.model.Order;
+import com.popobob.model.OrderItem;
+import com.popobob.model.Product;
+import com.popobob.model.OrderSequence;
+import com.popobob.repository.OrderSequenceRepository;
+import com.popobob.repository.OrderRepository;
+import com.popobob.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.POP O'BOB®.model.User;
-import com.POP O'BOB®.repository.UserRepository;
+import com.popobob.model.User;
+import com.popobob.repository.UserRepository;
 
 @Service
 @RequiredArgsConstructor

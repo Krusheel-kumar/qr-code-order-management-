@@ -1,4 +1,4 @@
-package com.POP O'BOB®.dto;
+package com.popobob.dto;
 
 import lombok.Data;
 import java.math.BigDecimal;

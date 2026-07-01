@@ -1,4 +1,4 @@
-package com.POP O'BOB®.dto;
+package com.popobob.dto;
 
 public class AiResponse {
     private String productId;

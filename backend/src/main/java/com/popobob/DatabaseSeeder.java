@@ -1,9 +1,9 @@
-package com.POP O'BOB®;
+package com.popobob;
 
-import com.POP O'BOB®.model.Category;
-import com.POP O'BOB®.model.Product;
-import com.POP O'BOB®.repository.CategoryRepository;
-import com.POP O'BOB®.repository.ProductRepository;
+import com.popobob.model.Category;
+import com.popobob.model.Product;
+import com.popobob.repository.CategoryRepository;
+import com.popobob.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

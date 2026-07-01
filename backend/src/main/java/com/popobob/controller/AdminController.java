@@ -1,7 +1,7 @@
-package com.POP O'BOB®.controller;
+package com.popobob.controller;
 
-import com.POP O'BOB®.model.*;
-import com.POP O'BOB®.repository.*;
+import com.popobob.model.*;
+import com.popobob.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,8 +1,8 @@
-package com.POP O'BOB®.controller;
+package com.popobob.controller;
 
-import com.POP O'BOB®.model.Category;
-import com.POP O'BOB®.model.Product;
-import com.POP O'BOB®.service.MenuService;
+import com.popobob.model.Category;
+import com.popobob.model.Product;
+import com.popobob.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -1,4 +1,4 @@
-package com.POP O'BOB®.service;
+package com.popobob.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

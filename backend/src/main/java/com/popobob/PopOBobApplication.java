@@ -1,4 +1,4 @@
-package com.POP O'BOB®;
+package com.popobob;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

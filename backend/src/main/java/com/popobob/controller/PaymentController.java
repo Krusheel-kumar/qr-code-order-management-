@@ -1,4 +1,4 @@
-package com.POP O'BOB®.controller;
+package com.popobob.controller;
 
 import com.razorpay.Order;
 import com.razorpay.RazorpayClient;

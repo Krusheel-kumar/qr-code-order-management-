@@ -1,4 +1,4 @@
-package com.POP O'BOB®.config;
+package com.popobob.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
