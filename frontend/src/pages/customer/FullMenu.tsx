@@ -14,7 +14,6 @@ export default function FullMenu() {
   const initialCategory = location.state?.mainCategory || CATEGORIES[0];
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [mainCategory, setMainCategory] = useState(initialCategory);
   const [activeCategory, setActiveCategory] = useState('');
   
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
@@ -22,6 +21,19 @@ export default function FullMenu() {
   
   const cartStore = useCartStore();
   const { menuItems: MENU } = useMenuStore();
+
+  const DYNAMIC_CATEGORIES = useMemo(() => {
+    const cats = new Set(MENU.map(item => item.category).filter(Boolean));
+    const result = CATEGORIES.filter(c => cats.has(c));
+    for (const c of Array.from(cats)) {
+      if (!result.includes(c)) result.push(c);
+    }
+    return result.length > 0 ? result : CATEGORIES;
+  }, [MENU]);
+
+  const [mainCategory, setMainCategory] = useState(() => {
+    return location.state?.mainCategory || DYNAMIC_CATEGORIES[0] || 'Milk Teas';
+  });
 
   const containerRef = useRef<HTMLDivElement>(null);
   const categoryRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
@@ -177,7 +189,7 @@ export default function FullMenu() {
 
         {/* Main Category Switcher */}
         <div className="flex bg-gray-100 p-1 rounded-xl mb-4 overflow-x-auto hide-scrollbar">
-          {CATEGORIES.map(cat => (
+          {DYNAMIC_CATEGORIES.map(cat => (
             <button
               key={cat}
               onClick={() => {
