@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import jakarta.annotation.PostConstruct;
 
 @SpringBootApplication
-public class POP O'BOB®Application {
+public class PopOBobApplication {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -28,6 +28,6 @@ public class POP O'BOB®Application {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(POP O'BOB®Application.class, args);
+        SpringApplication.run(PopOBobApplication.class, args);
     }
 }
