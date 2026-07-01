@@ -1,4 +1,4 @@
-package com.popobob.dto;
+package com.POP O'BOB®.dto;
 
 public class AiRequest {
     private String craving;

@@ -34,7 +34,7 @@ export default function AIChatScreen() {
     {
       id: 'msg-welcome',
       sender: 'ai',
-      text: "👋 Welcome to Pop O Bob! I'm POB AI, your personal bubble tea assistant.\n\nHave you tried bubble tea before?",
+      text: "👋 Welcome to POP O'BOB®! I'm POB AI, your personal bubble tea assistant.\n\nHave you tried bubble tea before?",
       options: ["Yes, I know what I want", "No, it's my first time"]
     }
   ]);

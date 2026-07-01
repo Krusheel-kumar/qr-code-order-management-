@@ -1,9 +1,9 @@
-package com.popobob.controller;
+package com.POP O'BOB®.controller;
 
-import com.popobob.model.Order;
-import com.popobob.model.User;
-import com.popobob.repository.OrderRepository;
-import com.popobob.repository.UserRepository;
+import com.POP O'BOB®.model.Order;
+import com.POP O'BOB®.model.User;
+import com.POP O'BOB®.repository.OrderRepository;
+import com.POP O'BOB®.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

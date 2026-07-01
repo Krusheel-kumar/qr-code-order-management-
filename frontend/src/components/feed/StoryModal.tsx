@@ -126,7 +126,7 @@ export default function StoryModal({ storyId, onClose }: StoryModalProps) {
     const shareUrl = `${window.location.origin}/?story=${story.id}`;
     shareContent(
       {
-        title: `Check out this amazing story from Pop O Bob! ✨`,
+        title: `Check out this amazing story from POP O'BOB®! ✨`,
         text: `"${story.title}"\nI thought you might want to see this.`,
         url: shareUrl,
         imageUrl: story.image,
@@ -134,7 +134,7 @@ export default function StoryModal({ storyId, onClose }: StoryModalProps) {
       () => {
         setShareModal({
           isOpen: true,
-          title: `Check out ${story.title} at Pop O Bob!`,
+          title: `Check out ${story.title} at POP O'BOB®!`,
           url: shareUrl
         });
       }

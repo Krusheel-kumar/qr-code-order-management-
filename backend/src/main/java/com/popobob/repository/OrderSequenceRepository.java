@@ -1,6 +1,6 @@
-package com.popobob.repository;
+package com.POP O'BOB®.repository;
 
-import com.popobob.model.OrderSequence;
+import com.POP O'BOB®.model.OrderSequence;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;

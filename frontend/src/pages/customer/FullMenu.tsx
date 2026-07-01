@@ -141,7 +141,7 @@ export default function FullMenu() {
     const shareUrl = `${window.location.origin}/menu?p=${product.id}`;
     shareContent(
       {
-        title: `Hey! You have to try ${product.name} at Pop O Bob! 🧋`,
+        title: `Hey! You have to try ${product.name} at POP O'BOB®! 🧋`,
         text: product.story ? `"${product.story}"` : `It's absolutely delicious and I thought you'd love it.`,
         url: shareUrl,
         imageUrl: product.image,
@@ -150,7 +150,7 @@ export default function FullMenu() {
         // Fallback
         setShareModal({
           isOpen: true,
-          title: `Check out ${product.name} at Pop O Bob!`,
+          title: `Check out ${product.name} at POP O'BOB®!`,
           url: shareUrl
         });
       }
@@ -250,7 +250,7 @@ export default function FullMenu() {
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-50 to-primary/10 text-primary/40">
                         <ShoppingBag size={32} className="mb-2 opacity-50" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest opacity-50">Pop O Bob</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest opacity-50">POP O'BOB®</span>
                       </div>
                     )}
                   </div>

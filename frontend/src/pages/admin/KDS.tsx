@@ -3,7 +3,7 @@ import axios from 'axios';
 import { ChefHat, CheckCircle2, Clock } from 'lucide-react';
 
 // Using the same API_URL configured in index.ts
-const API_URL = import.meta.env.VITE_API_URL || 'https://popobob-backend-production.up.railway.app/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://POP O'BOB®-backend-production.up.railway.app/api';
 
 export default function KDS() {
   const [orders, setOrders] = useState<any[]>([]);

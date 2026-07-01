@@ -1,6 +1,6 @@
-package com.popobob.repository;
+package com.POP O'BOB®.repository;
 
-import com.popobob.model.Order;
+import com.POP O'BOB®.model.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.UUID;

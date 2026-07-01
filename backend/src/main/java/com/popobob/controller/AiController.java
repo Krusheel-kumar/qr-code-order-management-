@@ -1,8 +1,8 @@
-package com.popobob.controller;
+package com.POP O'BOB®.controller;
 
-import com.popobob.dto.AiRequest;
-import com.popobob.dto.AiResponse;
-import com.popobob.service.AiService;
+import com.POP O'BOB®.dto.AiRequest;
+import com.POP O'BOB®.dto.AiResponse;
+import com.POP O'BOB®.service.AiService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

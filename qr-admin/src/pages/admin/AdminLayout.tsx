@@ -70,7 +70,7 @@ export default function AdminLayout() {
             {/* Simple Store Toggle */}
             <div className="flex items-center gap-3 border-r border-gray-200 pr-6">
               <div className="flex flex-col text-right">
-                <span className="text-sm font-bold text-gray-900">Pop O'Bob</span>
+                <span className="text-sm font-bold text-gray-900">POP O'BOB®</span>
                 <span className={`text-xs font-medium ${isStoreActive ? 'text-green-600' : 'text-red-500'}`}>
                   {isStoreActive ? 'Accepting Orders' : 'Store Offline'}
                 </span>

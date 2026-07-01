@@ -77,7 +77,7 @@ export default function InvoiceView({ order, onClose }: { order: InvoiceOrder; o
           {/* Header */}
           <div className="flex justify-between items-start border-b-2 border-gray-100 pb-8 mb-8">
             <div>
-              <h1 className="text-4xl font-black text-gray-900 tracking-tight">Pop O'Bob</h1>
+              <h1 className="text-4xl font-black text-gray-900 tracking-tight">POP O'BOB®</h1>
               <p className="text-gray-500 mt-1 text-sm font-medium">Smart Cafe & Boba</p>
               <p className="text-gray-400 text-sm mt-1">123 Cafe Street, Food City</p>
               <p className="text-gray-400 text-sm">Phone: +91 98765 43210</p>
@@ -153,7 +153,7 @@ export default function InvoiceView({ order, onClose }: { order: InvoiceOrder; o
 
           {/* Footer */}
           <div className="mt-16 pt-8 border-t border-gray-100 text-center text-sm text-gray-500">
-            <p className="font-bold text-gray-800 mb-1">Thank you for dining with Pop O'Bob!</p>
+            <p className="font-bold text-gray-800 mb-1">Thank you for dining with POP O'BOB®!</p>
             <p>Payment Status: <span className={`font-bold ${order.paymentStatus === 'PAID' ? 'text-green-600' : 'text-orange-500'}`}>{order.paymentStatus}</span></p>
             {order.paymentReference && <p className="text-xs text-gray-400 mt-1 font-mono">{order.paymentReference}</p>}
           </div>

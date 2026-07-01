@@ -225,7 +225,7 @@ export default function DiscoveryHome() {
                     const shareUrl = `${window.location.origin}/?campaign=${campaign.id}`;
                     shareContent(
                       {
-                        title: `Wow! Check out this special offer at Pop O Bob! 🎉`,
+                        title: `Wow! Check out this special offer at POP O'BOB®! 🎉`,
                         text: `I just found this amazing promotion. Don't miss out on it!`,
                         url: shareUrl,
                         imageUrl: campaign.image,
@@ -233,7 +233,7 @@ export default function DiscoveryHome() {
                       () => {
                         setShareModal({
                           isOpen: true,
-                          title: `Check out this promotion at Pop O Bob!`,
+                          title: `Check out this promotion at POP O'BOB®!`,
                           url: shareUrl
                         });
                       }

@@ -1,4 +1,4 @@
-package com.popobob;
+package com.POP O'BOB®;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import jakarta.annotation.PostConstruct;
 
 @SpringBootApplication
-public class PopOBobApplication {
+public class POP O'BOB®Application {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -28,6 +28,6 @@ public class PopOBobApplication {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(PopOBobApplication.class, args);
+        SpringApplication.run(POP O'BOB®Application.class, args);
     }
 }

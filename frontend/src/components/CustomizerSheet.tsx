@@ -89,7 +89,7 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
     const shareUrl = `${window.location.origin}/menu?p=${product.id}`;
     shareContent(
       {
-        title: `Hey! You have to try ${product.name} at Pop O Bob! 🧋`,
+        title: `Hey! You have to try ${product.name} at POP O'BOB®! 🧋`,
         text: product.story ? `"${product.story}"` : `It's absolutely delicious and I thought you'd love it.`,
         url: shareUrl,
         imageUrl: product.image,
@@ -97,7 +97,7 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
       () => {
         setShareModal({
           isOpen: true,
-          title: `Check out ${product.name} at Pop O Bob!`,
+          title: `Check out ${product.name} at POP O'BOB®!`,
           url: shareUrl
         });
       }

@@ -112,7 +112,7 @@ export default function OrderTracking() {
                 <MapPin size={20} className="text-gray-500" />
               </div>
               <div className="flex-1">
-                <h4 className="font-bold text-sm">{storeInfo?.name || 'Pop O Bob'}</h4>
+                <h4 className="font-bold text-sm">{storeInfo?.name || 'POP O'BOB®'}</h4>
                 <p className="text-xs text-gray-500 mb-3">{storeInfo?.address || 'Store Location'}</p>
                 <a href={`tel:${storeInfo?.phone || ''}`} className="inline-flex items-center gap-2 text-xs font-bold text-black border border-gray-200 rounded-full px-4 py-2 hover:bg-gray-50 transition-colors">
                   <Phone size={12} /> Call Store

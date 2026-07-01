@@ -1,9 +1,9 @@
-package com.popobob.service;
+package com.POP O'BOB®.service;
 
-import com.popobob.model.Category;
-import com.popobob.model.Product;
-import com.popobob.repository.CategoryRepository;
-import com.popobob.repository.ProductRepository;
+import com.POP O'BOB®.model.Category;
+import com.POP O'BOB®.model.Product;
+import com.POP O'BOB®.repository.CategoryRepository;
+import com.POP O'BOB®.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

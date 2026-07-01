@@ -1,4 +1,4 @@
-package com.popobob.model;
+package com.POP O'BOB®.model;
 
 import jakarta.persistence.Embeddable;
 import lombok.Data;

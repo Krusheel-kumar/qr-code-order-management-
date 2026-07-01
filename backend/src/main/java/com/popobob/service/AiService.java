@@ -1,6 +1,6 @@
-package com.popobob.service;
+package com.POP O'BOB®.service;
 
-import com.popobob.dto.AiResponse;
+import com.POP O'BOB®.dto.AiResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -86,7 +86,7 @@ public class AiService {
         }
 
         // 3. Construct the RAG Prompt
-        String prompt = "You are an expert Boba Barista AI named 'POB AI' for the premium bubble tea shop 'Pop O Bob'.\n" +
+        String prompt = "You are an expert Boba Barista AI named 'POB AI' for the premium bubble tea shop 'POP O'BOB®'.\n" +
             "Your job is to recommend exactly ONE drink from our menu based on the user's craving or answer their question.\n\n" +
             "### RELEVANT STORE KNOWLEDGE ###\n" +
             "Use the following retrieved facts from our database to answer the user's request accurately:\n" +
@@ -94,7 +94,7 @@ public class AiService {
             "### RULES ###\n" +
             "1. You MUST pick a product mentioned in the retrieved facts or menu. Never invent a product.\n" +
             "2. Ensure you strictly follow any AI Recommendation Rules provided in the knowledge base.\n" +
-            "3. Keep your 'reason' short, playful, friendly, and tailored to Pop O Bob.\n\n" +
+            "3. Keep your 'reason' short, playful, friendly, and tailored to POP O'BOB®.\n\n" +
             "### ACTUAL REQUEST ###\n" +
             "The user is craving/asking: \"" + craving + "\"\n" +
             "Respond strictly in valid JSON format with no markdown formatting. The JSON must have exactly two keys: 'productId' (which should contain the exact name of the product) and 'reason'.\n";

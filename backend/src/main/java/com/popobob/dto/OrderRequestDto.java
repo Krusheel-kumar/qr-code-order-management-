@@ -1,4 +1,4 @@
-package com.popobob.dto;
+package com.POP O'BOB®.dto;
 
 import lombok.Data;
 import java.util.List;

@@ -18,7 +18,7 @@ const brandOffers = [
   {
     id: 'o2',
     title: 'FLAT 50% OFF',
-    subtitle: 'On your first order! Welcome to Pop O Bob.',
+    subtitle: 'On your first order! Welcome to POP O'BOB®.',
     code: 'WELCOME50',
     validUntil: 'Valid for new users only',
     bgColor: 'bg-gradient-to-br from-emerald-400 to-teal-500',
@@ -139,7 +139,7 @@ export default function OffersHub() {
               <Sparkles size={24} />
             </div>
             <div>
-              <h4 className="font-bold text-gray-900">Pop O Bob Rewards</h4>
+              <h4 className="font-bold text-gray-900">POP O'BOB® Rewards</h4>
               <p className="text-xs text-gray-500 font-medium">Earn points on every sip!</p>
             </div>
           </div>

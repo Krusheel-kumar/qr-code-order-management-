@@ -1,8 +1,8 @@
-package com.popobob.controller;
+package com.POP O'BOB®.controller;
 
-import com.popobob.dto.OrderRequestDto;
-import com.popobob.model.Order;
-import com.popobob.service.OrderService;
+import com.POP O'BOB®.dto.OrderRequestDto;
+import com.POP O'BOB®.model.Order;
+import com.POP O'BOB®.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

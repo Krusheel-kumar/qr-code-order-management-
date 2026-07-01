@@ -1,4 +1,4 @@
-package com.popobob.exception;
+package com.POP O'BOB®.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

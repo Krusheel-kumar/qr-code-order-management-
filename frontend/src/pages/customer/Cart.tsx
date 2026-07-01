@@ -275,7 +275,7 @@ export default function Cart() {
                         key: 'rzp_test_T4aQ5u6TRc7G0O',
                         amount: rzpOrder.amount,
                         currency: rzpOrder.currency,
-                        name: 'Pop O Bob',
+                        name: 'POP O'BOB®',
                         description: 'Premium Pickup Order',
                         order_id: rzpOrder.id,
                         handler: async function (response: any) {

@@ -103,7 +103,7 @@ export default function ManageOrders() {
     // If the tab is in the background, trigger an OS-level notification
     if (document.hidden && "Notification" in window && Notification.permission === "granted") {
       new Notification("New Order Received!", {
-        body: "A new order just arrived at Pop O Bob. Please check the Admin Panel.",
+        body: "A new order just arrived at POP O'BOB®. Please check the Admin Panel.",
       });
     }
   };

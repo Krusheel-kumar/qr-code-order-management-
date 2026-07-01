@@ -40,7 +40,7 @@ export default function SocialWidgets() {
           <h3 className="font-black text-4xl text-[#1A0B05] mb-3 tracking-tighter leading-[1.1]">
             Join the <br/>
             <span className="relative inline-block">
-              <span className="relative z-10 italic pr-2">PopOBob</span>
+              <span className="relative z-10 italic pr-2">POP O'BOB®</span>
               <span className="absolute bottom-2 left-0 w-full h-3 bg-[#FFC461]/40 -z-10 rounded-full transform -rotate-1"></span>
             </span>
             Fam
@@ -57,7 +57,7 @@ export default function SocialWidgets() {
             <motion.button 
               whileHover={{ scale: 1.03, y: -5 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => window.open('https://www.instagram.com/popobobofficial?igsh=MWQ0a2trdmwycDdjMg==', '_blank')}
+              onClick={() => window.open('https://www.instagram.com/POP O'BOB®official?igsh=MWQ0a2trdmwycDdjMg==', '_blank')}
               className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.06)] flex flex-col p-5 group bg-white/50 backdrop-blur-3xl border-2 border-white/80"
             >
               {/* Instagram Gradient Blob */}
@@ -70,7 +70,7 @@ export default function SocialWidgets() {
                 
                 <div className="w-full">
                   <span className="text-gray-500 text-[11px] font-black uppercase tracking-[0.25em] block mb-1">Follow Us</span>
-                  <span className="text-[#1A0B05] font-black text-[22px] leading-none tracking-tighter block">@PopOBob</span>
+                  <span className="text-[#1A0B05] font-black text-[22px] leading-none tracking-tighter block">@POP O'BOB®</span>
                 </div>
               </div>
             </motion.button>
@@ -79,7 +79,7 @@ export default function SocialWidgets() {
             <motion.button 
               whileHover={{ scale: 1.03, y: -5 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => window.open('https://wa.me/1234567890?text=Hi%20PopOBob!', '_blank')}
+              onClick={() => window.open('https://wa.me/1234567890?text=Hi%20POP O'BOB®!', '_blank')}
               className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.06)] flex flex-col p-5 group bg-white/50 backdrop-blur-3xl border-2 border-white/80"
             >
               {/* WhatsApp Gradient Blob */}
@@ -159,12 +159,12 @@ export default function SocialWidgets() {
         {/* Ultra-Modern Footer */}
         <footer className="mt-8 pt-8 pb-16 w-full flex flex-col items-center justify-center relative z-10">
           <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-6 border border-white shadow-[0_10px_30px_rgba(255,152,0,0.15)] overflow-hidden">
-            <img src="/assets/logo 2.png" alt="PopOBob Logo" className="w-full h-full object-cover scale-110" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }} />
+            <img src="/assets/logo 2.png" alt="POP O'BOB® Logo" className="w-full h-full object-cover scale-110" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }} />
             {/* Fallback to favicon if logo 2 doesn't load nicely */}
-            <img src="/favicon.svg" alt="PopOBob Logo" className="w-10 h-10 object-contain hidden" />
+            <img src="/favicon.svg" alt="POP O'BOB® Logo" className="w-10 h-10 object-contain hidden" />
           </div>
           
-          <h2 className="text-2xl font-black tracking-tighter mb-8 text-[#1A0B05] uppercase">POP O BOB</h2>
+          <h2 className="text-2xl font-black tracking-tighter mb-8 text-[#1A0B05] uppercase">POP O'BOB®</h2>
           
           <div className="flex items-center gap-6 mb-12 bg-white/60 backdrop-blur-xl px-6 py-3 rounded-full border border-white shadow-sm">
             <button onClick={() => navigate('/menu')} className="text-[10px] font-black text-gray-600 hover:text-[#FF9800] transition-colors uppercase tracking-[0.15em] active:scale-95">Menu</button>
@@ -176,7 +176,7 @@ export default function SocialWidgets() {
           
           <div className="flex flex-col items-center gap-2 opacity-80">
             <p className="text-[10px] font-black tracking-[0.2em] uppercase text-gray-500">
-              ALL RIGHTS RESERVED PopOBob@2026
+              ALL RIGHTS RESERVED POP O'BOB®@2026
             </p>
             <p className="text-[11px] font-black tracking-[0.25em] uppercase text-gray-600 flex items-center gap-1.5 mt-1">
               DESIGNED WITH <span className="text-[#FF512F] drop-shadow-[0_0_8px_rgba(255,81,47,0.8)] animate-pulse text-[14px]">🧡</span>
