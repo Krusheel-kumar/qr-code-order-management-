@@ -42,21 +42,8 @@ export default function GlassHeader({ onOpenProfile, onOpenSearch, onOpenAuth }:
         {/* Header Row */}
         <div className="flex justify-between items-center mb-4">
           {/* Logo Section */}
-          <div className="flex items-center gap-2.5">
-            <div className="w-11 h-11 rounded-full overflow-hidden bg-white shadow-sm flex items-center justify-center shrink-0 border border-gray-100">
-              <img src="/assets/logo 2.png" alt="Logo" className="w-[95%] h-[95%] object-contain" />
-            </div>
-            <div className="flex flex-col items-start pt-0.5">
-              <div className="flex items-start">
-                <h1 className="font-extrabold text-[24px] tracking-tight leading-none text-[#1A1A1A] flex">
-                  <span>pop</span>
-                  <span className="text-[#FFC461]">o</span>
-                  <span>bob</span>
-                </h1>
-                <span className="text-[9px] font-extrabold ml-0.5 mt-0 text-[#1A1A1A]/80">&reg;</span>
-              </div>
-              <span className="text-[8px] font-bold uppercase tracking-[0.25em] text-[#785E3B] mt-1">Specialty Bubble Tea</span>
-            </div>
+          <div className="flex items-center h-12">
+            <img src="/assets/horizontal_logo.png" alt="Pop O Bob Logo" className="h-full w-auto object-contain drop-shadow-sm" />
           </div>
 
           {/* Actions */}
