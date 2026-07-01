@@ -18,6 +18,7 @@ public class Product {
     private BigDecimal price;
     @com.fasterxml.jackson.annotation.JsonProperty("isAvailable")
     private Boolean isAvailable = true;
+    @com.fasterxml.jackson.annotation.JsonProperty("image")
     @Column(columnDefinition = "TEXT")
     private String imageUrl;
     
