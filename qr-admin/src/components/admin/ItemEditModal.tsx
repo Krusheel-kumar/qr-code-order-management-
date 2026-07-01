@@ -10,16 +10,8 @@ interface ItemEditModalProps {
   item: MenuItem | null; // null implies we're adding a new item
 }
 
-const SUBCATEGORIES: Record<string, string[]> = {
-  'Milk Teas': ['Classics', 'Fruit Series', 'Chocolate', 'Coffee', 'Signatures'],
-  'Boba Iced Tea': ['Classic', 'Signature'],
-  'Milk Shakes': ['All Time Milkshakes', 'Signature Milkshakes'],
-  'Cold Coffees': ['All Time Cold Coffees', 'Signature Cold Coffees'],
-  'Chillers': ['Lemonades', 'Virgin Mojitos']
-};
-
 export default function ItemEditModal({ isOpen, onClose, item }: ItemEditModalProps) {
-  const { addItem, updateItem, categories } = useAdminStore();
+  const { addItem, updateItem, categories, categoryDetails } = useAdminStore();
   const [formData, setFormData] = useState<Partial<MenuItem>>({
     name: '',
     price: 0,
@@ -126,21 +118,27 @@ export default function ItemEditModal({ isOpen, onClose, item }: ItemEditModalPr
                 </select>
               </div>
 
-              {SUBCATEGORIES[formData.category as string] && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
-                  <select 
-                    value={formData.subcategory || ''}
-                    onChange={(e) => setFormData({...formData, subcategory: e.target.value})}
-                    className="w-full border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                  >
-                    <option value="">Select Subcategory</option>
-                    {SUBCATEGORIES[formData.category as string].map(sub => (
-                      <option key={sub} value={sub}>{sub}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
+              {(() => {
+                const selectedCatObj = categoryDetails?.find((c: any) => c.name === formData.category);
+                const dynamicSubcategories = selectedCatObj?.subcategories || [];
+                if (dynamicSubcategories.length === 0) return null;
+                
+                return (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
+                    <select 
+                      value={formData.subcategory || ''}
+                      onChange={(e) => setFormData({...formData, subcategory: e.target.value})}
+                      className="w-full border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                    >
+                      <option value="">Select Subcategory</option>
+                      {dynamicSubcategories.map((sub: string) => (
+                        <option key={sub} value={sub}>{sub}</option>
+                      ))}
+                    </select>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Image Section */}

@@ -21,6 +21,7 @@ export interface Category {
   id: string;
   name: string;
   icon: string; // Since we don't have images yet, we can use lucide icons or emojis
+  subcategories?: string[];
 }
 
 export interface DiscoverySection {

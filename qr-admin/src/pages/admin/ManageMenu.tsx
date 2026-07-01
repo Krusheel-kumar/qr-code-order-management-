@@ -3,6 +3,7 @@ import { useAdminStore } from '../../store/useAdminStore';
 import type { MenuItem } from '../../data/menu';
 import { Search, Plus, Edit2, Trash2 } from 'lucide-react';
 import ItemEditModal from '../../components/admin/ItemEditModal';
+import CategoryEditModal from '../../components/admin/CategoryEditModal';
 import type { Addon } from '../../data/models'; 
 
 export default function ManageMenu() {
@@ -27,6 +28,7 @@ export default function ManageMenu() {
   
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null); // We'll just use any for local type safety ease
 
   // Addon form state
@@ -118,7 +120,12 @@ export default function ManageMenu() {
             <div className="w-64 border-r border-gray-200 bg-gray-50 flex flex-col">
               <div className="p-4 border-b border-gray-200 bg-gray-100 flex justify-between items-center">
                 <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Categories</h3>
-                <button className="text-blue-600 hover:text-blue-800"><Plus className="w-4 h-4" /></button>
+                <button 
+                  onClick={() => setIsCategoryModalOpen(true)}
+                  className="text-blue-600 hover:text-blue-800"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
               </div>
               <div className="flex-1 overflow-y-auto p-2">
                 {categories.map((category) => {
@@ -357,6 +364,12 @@ export default function ManageMenu() {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         item={editingItem}
+      />
+
+      {/* Category Edit Modal */}
+      <CategoryEditModal
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
       />
     </div>
   );

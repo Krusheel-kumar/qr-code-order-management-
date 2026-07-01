@@ -53,6 +53,11 @@ export const getCategories = async () => {
   }
 };
 
+export const addCategory = async (category: any) => {
+  const { data } = await menuApi.post('/categories', category);
+  return data;
+};
+
 export const getProducts = async () => {
   const { data } = await menuApi.get('/admin/products', { params: { t: new Date().getTime() } });
   return data.map((item: any) => ({

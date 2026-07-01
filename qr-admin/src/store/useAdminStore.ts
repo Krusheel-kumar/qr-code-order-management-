@@ -10,6 +10,8 @@ interface AdminState {
   
   menuItems: MenuItem[];
   categories: string[];
+  categoryDetails: any[];
+  addCategory: (category: any) => void;
   
   // Settings
   featuredItems: string[];
@@ -85,6 +87,23 @@ export const useAdminStore = create<AdminState>((set) => ({
   
   menuItems: MENU,
   categories: CATEGORIES,
+  categoryDetails: [],
+  
+  addCategory: async (category: any) => {
+    try {
+      const addedCategory = await import('../api').then(m => m.addCategory(category));
+      set((state) => ({
+        categoryDetails: [...state.categoryDetails, addedCategory],
+        categories: [...state.categories, addedCategory.name],
+        activeCategories: {
+          ...state.activeCategories,
+          [addedCategory.name]: true
+        }
+      }));
+    } catch (e) {
+      console.error('Failed to add category', e);
+    }
+  },
   
   featuredItems: ['m-01', 'm-03'], // Pre-selected some featured items
   toggleFeaturedItem: (id) => set((state) => ({
@@ -116,6 +135,7 @@ export const useAdminStore = create<AdminState>((set) => ({
         isStoreActive: storeSettings.isStoreActive !== false, // default to true
         menuItems: products.length > 0 ? products : state.menuItems, // Fallback to mock if DB empty
         categories: categories.length > 0 ? categories.map((c: any) => c.name) : state.categories,
+        categoryDetails: categories.length > 0 ? categories : [],
         activeItems: newActiveItems,
         campaigns,
         stories,
