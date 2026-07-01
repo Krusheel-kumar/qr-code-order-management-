@@ -22,8 +22,8 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // The old database had ~53 mock products. We want to wipe them and inject our 65 products.
-        if (productRepository.count() < 60) {
+        // Only seed if the database is completely empty to prevent overwriting user data
+        if (productRepository.count() == 0) {
             System.out.println("Seeding database with full default menu...");
             
             productRepository.deleteAll();
