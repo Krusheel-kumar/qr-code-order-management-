@@ -7,7 +7,7 @@ export const campaigns: Campaign[] = [
     id: 'c1',
     title: 'NEW DESSERTS',
     subtitle: 'Newly Introduced Desserts',
-    image: '/assets/herobanner1.jpeg',
+    image: '/assets/herobanner1.png',
     ctaText: 'Order Now',
     link: '/menu?category=dessert',
   },

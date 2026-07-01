@@ -58,3 +58,11 @@ export interface Combo {
   originalPrice: number;
   image: string;
 }
+
+export interface DiscoverySection {
+  id: string;
+  title: string;
+  displayOrder: number;
+  isActive: boolean;
+  products?: any[];
+}

@@ -48,6 +48,8 @@ public class OrderService {
         order.setCustomerName(request.getCustomerName());
         order.setCustomerPhone(request.getCustomerPhone());
         order.setTableNumber(request.getTableNumber());
+        order.setOrderType(request.getOrderType());
+        order.setStoreId(request.getStoreId());
         order.setPaymentReference(request.getPaymentReference());
         order.setPaymentStatus(request.getPaymentReference() != null ? "PAID" : "PENDING");
         

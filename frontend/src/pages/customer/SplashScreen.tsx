@@ -2,172 +2,121 @@ import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
+const Sparkle = ({ delay, top, left, size }: { delay: number; top: string; left: string; size: number }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0 }}
+    animate={{ opacity: [0, 0.8, 0], scale: [0, 1, 0] }}
+    transition={{ duration: 3, delay, repeat: Infinity, ease: "easeInOut" }}
+    className="absolute bg-white rounded-full shadow-[0_0_10px_2px_rgba(255,255,255,0.8)]"
+    style={{ top, left, width: size, height: size }}
+  />
+);
 
 export default function SplashScreen() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Total animation is 3.0s, hold for 1.2s before routing
     const timer = setTimeout(() => {
       navigate('/home');
-    }, 4200);
+    }, 4500); // Shorter duration for minimalist screen
     return () => clearTimeout(timer);
   }, [navigate]);
 
-  const getDelayForDot = (index: number) => {
-    switch (index) {
-      case 4: return 0.1;
-      case 1:
-      case 7: return 0.5;
-      case 0:
-      case 2: return 1.1;
-      case 3:
-      case 5:
-      case 6:
-      case 8: return 1.7;
-      default: return 0;
-    }
-  };
-
-  const getDotContent = (index: number) => {
-    if (index === 0 || index === 2) {
-      return <div className="absolute -bottom-1 -right-1 w-[65%] h-[65%] bg-white rounded-full shadow-[inset_1px_1px_2px_rgba(0,0,0,0.1)]" />;
-    }
-    if (index === 6 || index === 8) {
-      return <div className="absolute -top-1 -right-1 w-[65%] h-[65%] bg-white rounded-full shadow-[inset_1px_-1px_2px_rgba(0,0,0,0.1)]" />;
-    }
-    return null;
-  };
-
-  const getDotStyle = (index: number) => {
-    const isWhite = index === 3 || index === 5;
-    return isWhite 
-      ? 'bg-white shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.05)]' 
-      : 'bg-gradient-to-br from-[#FFC107] to-[#FF8F00] shadow-[inset_-2px_-2px_4px_rgba(0,0,0,0.15)]'; 
-  };
-
   return (
-    <div className="min-h-[100dvh] bg-[#FFFBF2] flex flex-col items-center justify-center relative overflow-hidden font-sans selection:bg-transparent">
+    <div className="min-h-[100dvh] bg-[#FFF6ED] flex flex-col items-center justify-center relative overflow-hidden font-poppins selection:bg-transparent">
       
-      {/* Ambient Premium Lighting & Texture */}
+      {/* Background Sparkles & Ambient Glow */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#FFD54F] opacity-[0.03] blur-[100px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#FF8F00] opacity-[0.03] blur-[100px] rounded-full" />
+        <div className="absolute top-[20%] left-[20%] w-[40%] h-[40%] bg-white blur-[80px] opacity-40 rounded-full" />
+        <div className="absolute bottom-[20%] right-[20%] w-[40%] h-[40%] bg-[#FFE5C1] blur-[80px] opacity-30 rounded-full" />
+        
+        {/* Subtle twinkling stars */}
+        <Sparkle delay={0.2} top="15%" left="30%" size={3} />
+        <Sparkle delay={1.5} top="25%" left="70%" size={4} />
+        <Sparkle delay={0.8} top="65%" left="20%" size={3} />
+        <Sparkle delay={2.2} top="75%" left="80%" size={4} />
+        <Sparkle delay={1.1} top="40%" left="85%" size={2} />
+        <Sparkle delay={0.5} top="50%" left="10%" size={3} />
       </div>
 
-      {/* Floating Boba Pearls Background */}
-      {[...Array(8)].map((_, i) => (
-        <motion.div
-          key={i}
-          initial={{ y: "100vh", opacity: 0 }}
-          animate={{ y: "-20vh", opacity: [0, 0.15, 0] }}
-          transition={{
-            duration: 8 + Math.random() * 5,
-            repeat: Infinity,
-            delay: i * 0.8,
-            ease: "linear"
-          }}
-          className="absolute rounded-full bg-[#1A0B05] blur-[1px] z-0"
-          style={{
-            width: `${Math.random() * 20 + 15}px`,
-            height: `${Math.random() * 20 + 15}px`,
-            left: `${Math.random() * 80 + 10}%`,
-          }}
-        />
-      ))}
-
-      <div className="relative flex flex-col items-center justify-center z-10 scale-[1.05]">
-        
-        {/* Stage 05: Circle Reveal (CSS) */}
-        <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: [1, 1, 0] }}
-          transition={{ 
-            delay: 2.2, 
-            duration: 0.8, 
-            times: [0, 0.5, 1],
-            ease: "easeInOut"
-          }}
-          className="absolute w-[180px] h-[180px] bg-[#111] rounded-full z-0 shadow-[0_20px_40px_rgba(0,0,0,0.15)]"
-        />
-
-        {/* 3x3 Dot Grid (CSS Animation) */}
-        <motion.div 
-          animate={{ opacity: [1, 1, 0], scale: [1, 1, 0.95] }}
-          transition={{ delay: 2.6, duration: 0.4 }}
-          className="grid grid-cols-3 gap-2.5 relative z-10 p-6"
-        >
-          {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-            <motion.div
-              key={i}
-              initial={{ scale: 0, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{
-                delay: getDelayForDot(i),
-                duration: 0.5,
-                ease: [0.34, 1.56, 0.64, 1] 
-              }}
-              className={`w-[32px] h-[32px] rounded-full ${getDotStyle(i)} relative overflow-hidden`}
-            >
-              {getDotContent(i)}
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Ripple Shockwave */}
-        <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1.8, opacity: [0, 0.8, 0] }}
-          transition={{ delay: 2.6, duration: 1.2, ease: "easeOut" }}
-          className="absolute w-[140px] h-[140px] rounded-full border-[3px] border-[#FFB300] z-10"
-        />
-        
-        {/* Second Ripple */}
-        <motion.div
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 2.2, opacity: [0, 0.4, 0] }}
-          transition={{ delay: 2.75, duration: 1.5, ease: "easeOut" }}
-          className="absolute w-[140px] h-[140px] rounded-full border-[2px] border-[#FFD54F] z-10"
-        />
-
-        {/* The EXACT Official Logo Image */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5, rotate: -10 }}
-            animate={{ 
-              opacity: 1, 
-              scale: 1, 
-              rotate: 0,
-              y: [0, -6, 0] // Continuous floating up and down
-            }}
-            transition={{ 
-              opacity: { delay: 2.6, duration: 0.4 },
-              scale: { delay: 2.6, duration: 0.6, type: "spring", stiffness: 200, damping: 12 },
-              rotate: { delay: 2.6, duration: 0.6, type: "spring", stiffness: 200, damping: 12 },
-              y: { delay: 3.2, duration: 3, repeat: Infinity, ease: "easeInOut" } // Floats endlessly after landing
-            }}
-            className="w-[140px] h-[140px] rounded-full overflow-hidden flex items-center justify-center drop-shadow-[0_16px_32px_rgba(255,179,0,0.25)]"
-          >
-            <img src="/assets/logo 2.png" alt="Exact Logo" className="w-[125%] h-[125%] object-cover" />
-          </motion.div>
+      {/* Main Content Reveal */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+        className="z-20 flex flex-col items-center mt-[-5vh]"
+      >
+        {/* Exact Logo Image */}
+        <div className="w-[120px] h-[120px] mb-6 rounded-full overflow-hidden drop-shadow-2xl flex items-center justify-center bg-[#1A1A1A]">
+          <img src="/assets/logo 2.png" alt="POB Logo" className="w-[140%] h-[140%] object-cover" />
         </div>
-
-        {/* Stage 06: Brand Lockup Text (CSS version fades out, wait, logoImg has no text?) */}
-        {/* We keep the CSS text but make it extremely premium */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2.7, duration: 0.6, ease: "easeOut" }}
-          className="absolute top-[100%] mt-4 w-full flex flex-col items-center whitespace-nowrap"
-        >
-          <h1 className="font-heading font-black text-[42px] tracking-tighter lowercase flex items-center leading-none text-[#1A0B05] drop-shadow-sm">
-            popobob<span className="text-[12px] font-extrabold ml-1 -mt-5 text-[#FFB300]">&reg;</span>
-          </h1>
-          <span className="text-[10px] font-extrabold uppercase tracking-[0.3em] text-[#8D6E63] mt-2 opacity-80">Specialty Bubble Tea</span>
-        </motion.div>
         
-      </div>
-      
+        {/* Brand Text */}
+        <div className="flex items-start">
+          <h1 className="font-extrabold text-[48px] text-[#1A1A1A] tracking-tight leading-none drop-shadow-sm flex">
+            <span>pop</span>
+            <span className="text-[#FFC461]">o</span>
+            <span>bob</span>
+          </h1>
+          <span className="text-[#1A1A1A] text-sm font-extrabold ml-1 -mt-1 opacity-80">®</span>
+        </div>
+        
+        {/* Tagline */}
+        <h2 className="font-bold text-[12px] tracking-[0.4em] text-[#1A1A1A] mt-4 opacity-80 pl-1 uppercase">
+          SPECIALTY BUBBLE TEA
+        </h2>
+
+        {/* Glowing Orange Floor Shadow */}
+        <motion.div
+          initial={{ opacity: 0, width: 0 }}
+          animate={{ opacity: 1, width: "120px" }}
+          transition={{ delay: 0.8, duration: 1.5, ease: "easeOut" }}
+          className="h-1 bg-[#FFC461] mt-6 rounded-full blur-[4px] shadow-[0_0_15px_6px_rgba(255,196,97,0.6)]"
+        />
+
+        {/* The "good times. on repeat." Tagline */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.2, duration: 0.8, ease: "easeOut" }}
+          className="mt-6 flex flex-col items-center relative"
+        >
+          <p className="italic font-medium text-[#FFC461] text-[20px] leading-tight drop-shadow-sm">good times.</p>
+          <div className="relative">
+            <p className="italic font-medium text-[#FFC461] text-[20px] -mt-1.5 leading-tight drop-shadow-sm">on repeat.</p>
+            {/* Animated Swoosh */}
+            <motion.svg 
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ delay: 1.6, duration: 0.6 }}
+              className="absolute -bottom-1 left-0 w-full h-2 overflow-visible" 
+              viewBox="0 0 100 10" 
+              fill="none"
+            >
+              <path d="M5 8 Q 50 -2 95 8" stroke="#FFC461" strokeWidth="2" strokeLinecap="round" />
+            </motion.svg>
+          </div>
+        </motion.div>
+
+      </motion.div>
+
+      {/* Loading Progress Bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.5, duration: 0.8, ease: "easeOut" }}
+        className="absolute bottom-16 w-[240px] flex flex-col items-center z-20"
+      >
+        <div className="w-full h-1 bg-[#E8DCCB] rounded-full overflow-hidden shadow-inner">
+          <motion.div
+            initial={{ width: "0%" }}
+            animate={{ width: "100%" }}
+            transition={{ delay: 1.5, duration: 2.5, ease: "easeInOut" }}
+            className="h-full bg-gradient-to-r from-[#FFC461] to-[#FF9800] rounded-full shadow-[0_0_8px_rgba(255,196,97,0.8)]"
+          />
+        </div>
+      </motion.div>
+
     </div>
   );
 }

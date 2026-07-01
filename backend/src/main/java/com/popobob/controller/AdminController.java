@@ -17,6 +17,23 @@ public class AdminController {
     private final StoreSettingsRepository storeSettingsRepository;
     private final CouponRepository couponRepository;
     private final AddonRepository addonRepository;
+    private final DiscoverySectionRepository discoverySectionRepository;
+
+    // Discovery Sections
+    @GetMapping("/discovery-sections")
+    public List<DiscoverySection> getDiscoverySections() {
+        return discoverySectionRepository.findAllByOrderByDisplayOrderAsc();
+    }
+
+    @PostMapping("/discovery-sections")
+    public DiscoverySection saveDiscoverySection(@RequestBody DiscoverySection section) {
+        return discoverySectionRepository.save(section);
+    }
+
+    @DeleteMapping("/discovery-sections/{id}")
+    public void deleteDiscoverySection(@PathVariable String id) {
+        discoverySectionRepository.deleteById(id);
+    }
 
     // Campaigns
     @GetMapping("/campaigns")

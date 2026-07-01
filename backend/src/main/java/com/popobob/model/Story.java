@@ -11,6 +11,8 @@ public class Story {
     private String id;
     
     private String title;
+    
+    @Column(columnDefinition = "TEXT")
     private String image;
     private String badge;
 }

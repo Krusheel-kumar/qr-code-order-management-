@@ -10,8 +10,9 @@ export const adminApi = axios.create({
 });
 
 export const getStoreSettings = async () => (await adminApi.get('/settings', { params: { t: new Date().getTime() } })).data;
-export const getCampaigns = async () => (await adminApi.get('/campaigns')).data;
-export const getStories = async () => (await adminApi.get('/stories')).data;
+export const getCampaigns = async () => (await axios.get(`${API_URL}/discovery/campaigns`)).data;
+export const getStories = async () => (await axios.get(`${API_URL}/discovery/stories`)).data;
+export const getDiscoverySections = async () => (await axios.get(`${API_URL}/discovery/sections`)).data;
 export const getCoupons = async () => (await adminApi.get('/coupons')).data;
 export const getAddons = async () => (await adminApi.get('/addons')).data;
 

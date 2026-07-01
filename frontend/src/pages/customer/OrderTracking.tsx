@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, MapPin, Phone } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { STORES } from '../../data/stores';
 
 const STAGES = [
   { id: 'PLACED', label: 'Order Confirmed' },
@@ -36,6 +37,8 @@ export default function OrderTracking() {
     const interval = setInterval(fetchStatus, 3000);
     return () => clearInterval(interval);
   }, [id]);
+
+  const storeInfo = orderData?.storeId ? STORES.find(s => s.id === orderData.storeId?.toString()) : STORES[0];
 
   return (
     <div className="min-h-screen bg-[var(--color-background)] font-sans flex flex-col pb-6">
@@ -101,21 +104,23 @@ export default function OrderTracking() {
         </div>
 
         {/* Store Info */}
-        <div className="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-sm">
-          <h3 className="font-bold text-sm mb-4">Pickup Location</h3>
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center shrink-0">
-              <MapPin size={20} className="text-gray-500" />
-            </div>
-            <div className="flex-1">
-              <h4 className="font-bold text-sm">Pop O Bob - Downtown</h4>
-              <p className="text-xs text-gray-500 mb-3">123 Main Street, Suite 400<br/>New York, NY 10001</p>
-              <button className="flex items-center gap-2 text-xs font-bold text-black border border-gray-200 rounded-full px-4 py-2 hover:bg-gray-50 transition-colors">
-                <Phone size={12} /> Call Store
-              </button>
+        {orderData?.orderType !== 'DINE_IN' && (
+          <div className="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-sm">
+            <h3 className="font-bold text-sm mb-4">Pickup Location</h3>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center shrink-0">
+                <MapPin size={20} className="text-gray-500" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-bold text-sm">{storeInfo?.name || 'Pop O Bob'}</h4>
+                <p className="text-xs text-gray-500 mb-3">{storeInfo?.address || 'Store Location'}</p>
+                <a href={`tel:${storeInfo?.phone || ''}`} className="inline-flex items-center gap-2 text-xs font-bold text-black border border-gray-200 rounded-full px-4 py-2 hover:bg-gray-50 transition-colors">
+                  <Phone size={12} /> Call Store
+                </a>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
       </main>
 

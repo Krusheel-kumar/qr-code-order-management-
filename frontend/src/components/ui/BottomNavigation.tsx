@@ -13,7 +13,7 @@ export default function BottomNavigation() {
   const navItems = [
     { path: '/home', icon: Home, label: 'Home' },
     { path: '/menu', icon: Grid, label: 'Menu' },
-    { path: '/categories', icon: Gift, label: 'Offers' },
+    { path: '/offers', icon: Gift, label: 'Offers' },
     { path: '/cart', icon: ShoppingCart, label: 'Cart' },
     { path: '/profile', icon: User, label: 'Account' },
   ];

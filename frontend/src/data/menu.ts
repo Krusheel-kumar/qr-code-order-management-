@@ -32,12 +32,10 @@ export interface MenuItem {
 
 export const CATEGORIES = [
   'Milk Teas',
-  'Boba Shakes',
-  'Cold Coffee',
-  'Chillers',
-  'Quick Bites',
-  'Bake House',
-  'Barista'
+  'Boba Iced Tea',
+  'Milk Shakes',
+  'Cold Coffees',
+  'Chillers'
 ];
 
 export const MENU: MenuItem[] = [

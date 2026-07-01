@@ -90,7 +90,7 @@ export default function Menu() {
             </div>
 
             {/* Quick Add */}
-            <button className="w-10 h-10 rounded-full bg-[var(--color-foreground)] text-white flex items-center justify-center shrink-0 mr-1 pb-0.5 text-xl font-light hover:bg-primary hover:text-black transition-colors">
+            <button className="w-10 h-10 rounded-full bg-primary text-black flex items-center justify-center shrink-0 mr-1 pb-0.5 text-xl font-bold hover:bg-[#FF9800] hover:text-white transition-colors shadow-sm">
               +
             </button>
           </div>

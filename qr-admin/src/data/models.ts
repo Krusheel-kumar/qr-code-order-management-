@@ -23,6 +23,14 @@ export interface Category {
   icon: string; // Since we don't have images yet, we can use lucide icons or emojis
 }
 
+export interface DiscoverySection {
+  id: string;
+  title: string;
+  displayOrder: number;
+  isActive: boolean;
+  products?: Product[];
+}
+
 export interface Product {
   id: string;
   name: string;

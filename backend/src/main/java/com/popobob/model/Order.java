@@ -26,6 +26,9 @@ public class Order {
     private String customerPhone;
     private String tableNumber;
     
+    private Long storeId;
+    private String orderType; // "DINE_IN" or "PICKUP"
+    
     private String paymentReference;
     private String paymentStatus;
     

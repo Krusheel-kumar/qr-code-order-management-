@@ -13,14 +13,18 @@ export const adminApi = axios.create({
 export const getStoreSettings = async () => (await adminApi.get('/settings', { params: { t: new Date().getTime() } })).data;
 export const updateStoreSettings = async (settings: any) => (await adminApi.post('/settings', settings)).data;
 
-// --- Mocked out functions to prevent UI errors while rebuilding ---
-export const getCampaigns = async () => [];
-export const createCampaign = async (campaign: any) => ({ ...campaign, id: Date.now().toString() });
-export const deleteCampaign = async (_id: string) => {};
+// --- Discovery Sections API ---
+export const getDiscoverySections = async () => (await adminApi.get('/discovery-sections')).data;
+export const createDiscoverySection = async (section: any) => (await adminApi.post('/discovery-sections', section)).data;
+export const deleteDiscoverySection = async (id: string) => await adminApi.delete(`/discovery-sections/${id}`);
 
-export const getStories = async () => [];
-export const createStory = async (story: any) => ({ ...story, id: Date.now().toString() });
-export const deleteStory = async (_id: string) => {};
+export const getCampaigns = async () => (await adminApi.get('/campaigns')).data;
+export const createCampaign = async (campaign: any) => (await adminApi.post('/campaigns', campaign)).data;
+export const deleteCampaign = async (id: string) => await adminApi.delete(`/campaigns/${id}`);
+
+export const getStories = async () => (await adminApi.get('/stories')).data;
+export const createStory = async (story: any) => (await adminApi.post('/stories', story)).data;
+export const deleteStory = async (id: string) => await adminApi.delete(`/stories/${id}`);
 
 export const getCoupons = async () => [];
 export const createCoupon = async (coupon: any) => ({ ...coupon, id: Date.now().toString() });
@@ -52,7 +56,8 @@ export const createProduct = async (product: any) => {
     imageUrl: product.image || product.imageUrl,
     category: typeof product.category === 'string' ? { id: product.category.toLowerCase().replace(/\s+/g, '-') } : product.category
   };
-  return (await menuApi.post('/products', payload)).data;
+  const data = (await menuApi.post('/products', payload)).data;
+  return { ...data, image: data.image || data.imageUrl || '' };
 };
 export const updateProduct = async (product: any) => {
   const payload = {
@@ -60,7 +65,8 @@ export const updateProduct = async (product: any) => {
     imageUrl: product.image || product.imageUrl,
     category: typeof product.category === 'string' ? { id: product.category.toLowerCase().replace(/\s+/g, '-') } : product.category
   };
-  return (await menuApi.post('/products', payload)).data;
+  const data = (await menuApi.post('/products', payload)).data;
+  return { ...data, image: data.image || data.imageUrl || '' };
 };
 export const deleteProduct = async (id: string) => (await menuApi.delete(`/products/${id}`)).data;
 

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { MENU, CATEGORIES } from '../data/menu';
 import type { MenuItem } from '../data/menu';
-import type { Campaign, Story, Addon, Coupon, StoreSettings } from '../data/models';
+import type { Campaign, Story, Addon, Coupon, StoreSettings, DiscoverySection } from '../data/models';
 
 interface AdminState {
   isStoreActive: boolean;
@@ -41,6 +41,11 @@ interface AdminState {
   stories: Story[];
   addStory: (story: Story) => void;
   deleteStory: (id: string) => void;
+
+  discoverySections: DiscoverySection[];
+  addDiscoverySection: (section: DiscoverySection) => void;
+  deleteDiscoverySection: (id: string) => void;
+  updateDiscoverySection: (section: DiscoverySection) => void;
 
   // Track active/inactive state of items by ID
   activeItems: Record<string, boolean>;
@@ -90,9 +95,12 @@ export const useAdminStore = create<AdminState>((set) => ({
 
   initializeStore: async () => {
     try {
-      const [storeSettings, products] = await Promise.all([
+      const [storeSettings, products, campaigns, stories, discoverySections] = await Promise.all([
         import('../api').then(m => m.getStoreSettings()),
-        import('../api').then(m => m.getProducts())
+        import('../api').then(m => m.getProducts()),
+        import('../api').then(m => m.getCampaigns()),
+        import('../api').then(m => m.getStories()),
+        import('../api').then(m => m.getDiscoverySections()),
       ]);
       
       const newActiveItems = { ...useAdminStore.getState().activeItems };
@@ -106,7 +114,10 @@ export const useAdminStore = create<AdminState>((set) => ({
         storeSettings,
         isStoreActive: storeSettings.isStoreActive !== false, // default to true
         menuItems: products.length > 0 ? products : state.menuItems, // Fallback to mock if DB empty
-        activeItems: newActiveItems
+        activeItems: newActiveItems,
+        campaigns,
+        stories,
+        discoverySections
       }));
     } catch (e) {
       console.error('Failed to initialize admin store from API', e);
@@ -203,6 +214,23 @@ export const useAdminStore = create<AdminState>((set) => ({
     const api = await import('../api');
     await api.deleteStory(id);
     set((state) => ({ stories: state.stories.filter(s => s.id !== id) }));
+  },
+
+  discoverySections: [],
+  addDiscoverySection: async (section) => {
+    const api = await import('../api');
+    const created = await api.createDiscoverySection(section);
+    set((state) => ({ discoverySections: [...state.discoverySections, created] }));
+  },
+  updateDiscoverySection: async (section) => {
+    const api = await import('../api');
+    const updated = await api.createDiscoverySection(section);
+    set((state) => ({ discoverySections: state.discoverySections.map(s => s.id === updated.id ? updated : s) }));
+  },
+  deleteDiscoverySection: async (id) => {
+    const api = await import('../api');
+    await api.deleteDiscoverySection(id);
+    set((state) => ({ discoverySections: state.discoverySections.filter(s => s.id !== id) }));
   },
   
   activeItems: initialActiveItems,

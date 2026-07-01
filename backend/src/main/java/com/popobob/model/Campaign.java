@@ -12,6 +12,8 @@ public class Campaign {
     
     private String title;
     private String subtitle;
+    
+    @Column(columnDefinition = "TEXT")
     private String image;
     private String badge;
     private String ctaText;

@@ -13,11 +13,12 @@ import CustomizerSheet from '../../components/CustomizerSheet';
 import SearchModal from '../../components/ui/SearchModal';
 import AuthModal from '../../components/ui/AuthModal';
 import ProfileSheet from '../../components/ui/ProfileSheet';
+import GlassHeader from '../../components/ui/GlassHeader';
+import { STORES } from '../../data/stores';
 import { useCartStore } from '../../store/useCartStore';
 import { useAuthStore } from '../../store/useAuthStore';
-import { getCampaigns, getStories } from '../../api';
-
-import { campaigns as initialCampaigns, stories as initialStories } from '../../data/mockData';
+import { getCampaigns, getStories, getDiscoverySections } from '../../api';
+import type { DiscoverySection } from '../../data/models';
 
 export default function DiscoveryHome() {
   const navigate = useNavigate();
@@ -32,37 +33,33 @@ export default function DiscoveryHome() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const hasHandledDeepLink = useRef(false);
   const { user } = useAuthStore();
-  const { menuItems: MENU, getFeaturedProducts, getBestSellers, getNewLaunches, getBakeHouseItems, getBaristaItems } = useMenuStore();
+  const { menuItems: MENU, getFeaturedProducts, campaigns, stories, discoverySections, isLoading } = useMenuStore();
   const featuredProduct = getFeaturedProducts()[0] || MENU[0];
-
-  // Dynamic CMS State
-  const [campaigns, setCampaigns] = useState<Campaign[]>(initialCampaigns);
-  const [stories, setStories] = useState<Story[]>(initialStories);
   
   // Mock data for offers and combos until they are fully integrated
-  const offers: Offer[] = [{ id: 'o1', title: 'Special Discount', description: '20% OFF', image: '', code: 'DISC20', validUntil: 'Valid until Sunday', ctaText: 'Order Now' }];
+  const offers: Offer[] = [
+    { id: 'o1', title: '10% OFF', description: 'On orders above ₹599', image: '', code: 'POPOBOB10', validUntil: 'Valid until Sunday', ctaText: 'Apply' },
+    { id: 'o2', title: 'Welcome Bonus', description: 'Get 500 loyalty points', image: '', code: 'NEWUSER', validUntil: 'Valid on sign up', ctaText: 'Claim' }
+  ];
   const combos: Combo[] = [];
-
   useEffect(() => {
-    getCampaigns().then(data => {
-      if (data && data.length > 0) setCampaigns(data);
-    }).catch(console.error);
-    
-    getStories().then(data => {
-      if (data && data.length > 0) {
-        setStories(data);
-        // Handle deep links after data loads
-        const params = new URLSearchParams(window.location.search);
-        const storyParam = params.get('story');
-        if (storyParam) {
-          setTimeout(() => setSelectedStory(storyParam), 100);
-        }
-        
-        // const campaignParam = params.get('campaign');
+    // Handle deep links after data loads
+    const params = new URLSearchParams(window.location.search);
+    const campaignId = params.get('campaign');
+    if (campaignId && campaigns.length > 0 && !hasHandledDeepLink.current) {
+      const targetCampaign = campaigns.find(c => c.id === campaignId);
+      if (targetCampaign) {
+        setShareModal({
+          isOpen: true,
+          title: `Check out this promotion!`,
+          url: window.location.href,
+        });
       }
-    }).catch(console.error);
-  }, []);
+      hasHandledDeepLink.current = true;
+    }
+  }, [campaigns]);
 
   // Handle campaign deep links
   useEffect(() => {
@@ -148,7 +145,7 @@ export default function DiscoveryHome() {
         
         <div className="flex justify-between items-center mt-auto">
           <span className="font-extrabold text-[17px] text-black tracking-tight">₹{product.price}</span>
-          <button className="bg-[var(--color-premium-dark)] text-white hover:bg-primary hover:text-black w-8 h-8 rounded-full flex items-center justify-center text-lg font-light leading-none pb-0.5 transition-colors shadow-sm">
+          <button className="bg-primary text-black hover:bg-[#FF9800] hover:text-white w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold leading-none pb-0.5 transition-colors shadow-sm">
             +
           </button>
         </div>
@@ -157,68 +154,74 @@ export default function DiscoveryHome() {
   );
 
   return (
-    <div className="min-h-[100dvh] pb-24 bg-[var(--color-background)] font-sans">
+    <div className="min-h-[100dvh] bg-[var(--color-background)] font-sans">
       
-      {/* Ultra-Modern Non-Sticky Header */}
-      <div className="relative z-50 w-full mb-6">
-        {/* Subtle top gradient to ensure readability */}
-        <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-[#FFFBF2] to-transparent pointer-events-none z-0"></div>
-        
-        <header className="relative pt-6 px-5 pb-3 flex justify-between items-center z-10">
-          
-          {/* Logo Section */}
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full overflow-hidden bg-white/60 backdrop-blur-md border border-white/80 shadow-[0_4px_16px_rgba(0,0,0,0.03)] flex items-center justify-center shrink-0">
-              <img src="/assets/logo 2.png" alt="Logo" className="w-[110%] h-[110%] object-cover" />
+      {/* Glassmorphism Header Trial */}
+      <GlassHeader 
+        onOpenProfile={() => setIsProfileOpen(true)} 
+        onOpenSearch={() => setIsSearchOpen(true)} 
+        onOpenAuth={() => setIsAuthOpen(true)} 
+      />
+
+      {/* Skeletons while loading empty initial state */}
+      {isLoading && campaigns.length === 0 && stories.length === 0 && discoverySections.length === 0 && (
+        <div className="animate-in fade-in duration-500">
+          <section className="mb-8 mt-1 px-4">
+            <div className="w-[85vw] aspect-[16/9] sm:aspect-[21/9] bg-gray-200 animate-pulse rounded-[1.25rem] shadow-sm" />
+          </section>
+
+          <section className="mb-8 pl-4">
+            <div className="w-1/3 h-5 bg-gray-200 animate-pulse rounded mb-4" />
+            <div className="flex gap-4 overflow-x-hidden">
+              {[1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="flex flex-col items-center gap-1.5 shrink-0">
+                  <div className="w-[72px] h-[72px] bg-gray-200 animate-pulse rounded-full" />
+                  <div className="w-12 h-2.5 bg-gray-200 animate-pulse rounded" />
+                </div>
+              ))}
             </div>
-            <div className="flex flex-col items-start pt-0.5">
-              <div className="flex items-start">
-                <h1 className="font-heading font-black text-[26px] tracking-tight lowercase leading-none text-gray-900 drop-shadow-sm">
-                  pop<span className="text-[#FFB300] drop-shadow-sm">o</span>bob
-                </h1>
-                <span className="text-[9px] font-extrabold ml-0.5 mt-0.5 text-[#FFB300]">&reg;</span>
-              </div>
-              <span className="text-[8px] font-extrabold uppercase tracking-[0.25em] text-gray-500 mt-1 opacity-90">Specialty Bubble Tea</span>
+          </section>
+
+          <section className="mb-10 pl-4">
+            <div className="w-1/2 h-6 bg-gray-200 animate-pulse rounded mb-4" />
+            <div className="flex gap-4 overflow-hidden">
+              {[1, 2].map(i => (
+                <div key={i} className="w-[280px] h-[120px] bg-gray-200 animate-pulse rounded-2xl shrink-0" />
+              ))}
             </div>
-          </div>
-          
-          {/* Action Buttons: Account & Search */}
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => user ? setIsProfileOpen(true) : setIsAuthOpen(true)} 
-              className={`w-9 h-9 rounded-full flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.03)] active:scale-95 transition-all relative border border-white/80 ${user ? 'bg-[#FFB300] text-white hover:bg-[#FF8F00]' : 'bg-white/60 backdrop-blur-md text-gray-700 hover:bg-white/90'}`}
-            >
-              {user ? (
-                <span className="font-heading font-black text-sm">{user?.username?.charAt(0)?.toUpperCase() || 'U'}</span>
-              ) : (
-                <User size={18} strokeWidth={2.5} />
-              )}
-            </button>
-            <button onClick={() => setIsSearchOpen(true)} className="w-9 h-9 rounded-full bg-white/60 backdrop-blur-md flex items-center justify-center text-gray-700 shadow-[0_4px_16px_rgba(0,0,0,0.03)] active:scale-95 transition-all relative border border-white/80 hover:bg-white/90">
-              <Search size={18} strokeWidth={2.5} />
-            </button>
-          </div>
-        </header>
-      </div>
+          </section>
+        </div>
+      )}
 
       {/* Screen 02: Hero Campaign Carousel */}
-      <section className="mb-8 mt-1">
-        <div ref={carouselRef} className="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory gap-4 px-4 pb-2 scroll-smooth">
+      {campaigns.length > 0 && (
+        <section className="mb-8 mt-1">
+          <div ref={carouselRef} className="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory gap-4 px-4 pb-2 scroll-smooth">
           {campaigns.map((campaign, idx) => {
-            let targetCategory = 'All';
-            if (campaign.image.includes('herobanner1')) targetCategory = 'Barista';
-            if (campaign.image.includes('herobanner2')) targetCategory = 'All';
-            if (campaign.image.includes('herobanner3')) targetCategory = 'Bake House';
-
             return (
               <div 
                 key={idx}
-                className="relative shrink-0 snap-center w-full aspect-square rounded-[1.5rem] overflow-hidden shadow-sm bg-gray-100 cursor-pointer transition-transform"
+                className="relative shrink-0 snap-center w-[85vw] aspect-[16/9] sm:aspect-[21/9] rounded-[1.25rem] overflow-hidden shadow-sm bg-gray-100 cursor-pointer transition-transform"
               >
                 <img 
                   src={campaign.image} 
                   className="w-full h-full object-cover active:scale-[0.98]" 
-                  onClick={() => navigate('/menu', { state: { mainCategory: targetCategory } })}
+                  onClick={() => {
+                    if (campaign.link) {
+                      // Support internal routing and query params like /menu?category=Barista
+                      if (campaign.link.startsWith('/')) {
+                        const [path, query] = campaign.link.split('?');
+                        const state: any = {};
+                        if (query) {
+                          const params = new URLSearchParams(query);
+                          if (params.get('category')) state.mainCategory = params.get('category');
+                        }
+                        navigate(path, { state });
+                      } else {
+                        window.open(campaign.link, '_blank');
+                      }
+                    }
+                  }}
                 />
                 
                 <button 
@@ -249,158 +252,189 @@ export default function DiscoveryHome() {
             );
           })}
         </div>
-      </section>
+        </section>
+      )}
 
       {/* Screen 03: Stories / Highlights */}
-      <section className="mb-10 pl-4">
-        <div className="flex justify-between items-center pr-4 mb-4">
-          <h3 className="font-bold text-sm tracking-widest uppercase text-gray-500">Stories</h3>
-          <span className="text-xs font-bold text-gray-400">See all &gt;</span>
+      {stories.length > 0 && (
+        <section className="mb-8 pl-4">
+          <div className="flex justify-between items-end pr-4 mb-3">
+          <h3 className="font-extrabold text-[20px] font-heading tracking-tight text-gray-900 leading-none">Highlights</h3>
+          <span className="text-xs font-bold text-[#FF9800] mb-0.5 active:scale-95 transition-transform">See all &gt;</span>
         </div>
         <div className="flex gap-4 overflow-x-auto hide-scrollbar snap-x pb-2 pr-4">
           {stories.map(story => (
-            <button key={story.id} onClick={() => setSelectedStory(story.id)} className="flex flex-col items-center gap-2 snap-start shrink-0 relative">
-              <div className="w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-primary to-orange-400">
-                <div className="w-full h-full rounded-full border-2 border-[var(--color-background)] overflow-hidden">
+            <button key={story.id} onClick={() => setSelectedStory(story.id)} className="flex flex-col items-center gap-1.5 snap-start shrink-0 relative group">
+              <div className="w-[72px] h-[72px] rounded-full p-[3px] bg-gradient-to-tr from-[#FF9800] via-[#FF5722] to-[#FFC461] shadow-sm group-active:scale-95 transition-transform">
+                <div className="w-full h-full rounded-full border-2 border-white overflow-hidden bg-gray-100">
                   <img src={story.image} className="w-full h-full object-cover" />
                 </div>
               </div>
               {story.badge && (
-                <span className="absolute bottom-6 bg-red-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full border-2 border-[var(--color-background)]">
+                <span className="absolute bottom-[22px] bg-red-500 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full border-2 border-white shadow-sm">
                   {story.badge}
                 </span>
               )}
-              <span className="text-xs font-medium">{story.title}</span>
+              <span className="text-[11px] font-bold text-gray-800 tracking-tight">{story.title}</span>
             </button>
           ))}
         </div>
       </section>
+      )}
 
-      {/* Screen 04: Trending This Week */}
-      <section className="mb-10">
-        <div className="flex justify-between items-end px-4 mb-3">
-          <h3 className="font-extrabold text-[22px] font-heading tracking-tight text-gray-900 leading-none">Trending This Week</h3>
-          <span className="text-xs font-bold text-gray-400 mb-0.5">See all &gt;</span>
-        </div>
-        <div className="flex gap-4 overflow-x-auto hide-scrollbar snap-x px-4 pb-4">
-          {getBestSellers().map((product, i) => renderProductCard(product, i, 'TRENDING'))}
-        </div>
-      </section>
+      {/* Dynamic Discovery Sections */}
+      {discoverySections.map((section) => {
+        // Find products from MENU that have this section's ID in their discoverySections array
+        // (Since backend returns products in discoverySection, we could use that, but we have full MENU loaded locally, so we can just use the products provided in section.products)
+        // Note: We need to map the section.products to our full MenuItem so we get all local fields (like icons, etc.)
+        const sectionProducts = (section.products || [])
+          .map((sp: any) => {
+            const localProduct = MENU.find(m => m.id === sp.id);
+            if (localProduct) return localProduct;
+            return {
+              id: sp.id,
+              name: sp.name,
+              price: sp.price,
+              category: typeof sp.category === 'string' ? sp.category : (sp.category?.name || 'Unknown'),
+              image: sp.imageUrl || sp.image || '',
+            } as MenuItem;
+          })
+          .filter(Boolean) as MenuItem[];
+          
+        if (sectionProducts.length === 0) return null;
+        
+        return (
+          <section key={section.id} className="mb-10">
+            <div className="flex justify-between items-end px-4 mb-3">
+              <h3 className="font-extrabold text-[22px] font-heading tracking-tight text-gray-900 leading-none">{section.title}</h3>
+              <span className="text-xs font-bold text-gray-400 mb-0.5">See all &gt;</span>
+            </div>
+            <div className="flex gap-4 overflow-x-auto hide-scrollbar snap-x px-4 pb-4">
+              {sectionProducts.map((product, i) => renderProductCard(product, i))}
+            </div>
+          </section>
+        );
+      })}
 
-      {/* Screen 05: New Arrivals */}
-      <section className="mb-10">
-        <div className="flex justify-between items-end px-4 mb-3">
-          <h3 className="font-extrabold text-[22px] font-heading tracking-tight text-gray-900 leading-none">New Arrivals</h3>
-          <span className="text-xs font-bold text-gray-400 mb-0.5">See all &gt;</span>
-        </div>
-        <div className="flex gap-4 overflow-x-auto hide-scrollbar snap-x px-4 pb-4">
-          {getNewLaunches().map((product, i) => renderProductCard(product, i, 'NEW'))}
-        </div>
-      </section>
 
-      {/* Pop O Bob Bake House */}
-      <section className="mb-10">
-        <div className="flex justify-between items-end px-4 mb-3">
-          <h3 className="font-extrabold text-[22px] font-heading tracking-tight text-gray-900 leading-none">Pop O Bob Bake House</h3>
-          <span className="text-xs font-bold text-gray-400 mb-0.5">See all &gt;</span>
-        </div>
-        <div className="flex gap-4 overflow-x-auto hide-scrollbar snap-x px-4 pb-4">
-          {getBakeHouseItems().map((product, i) => renderProductCard(product, i))}
-        </div>
-      </section>
-
-      {/* Pop O Bob Barista */}
-      <section className="mb-10">
-        <div className="flex justify-between items-end px-4 mb-3">
-          <h3 className="font-extrabold text-[22px] font-heading tracking-tight text-gray-900 leading-none">Pop O Bob Barista</h3>
-          <span className="text-xs font-bold text-gray-400 mb-0.5">See all &gt;</span>
-        </div>
-        <div className="flex gap-4 overflow-x-auto hide-scrollbar snap-x px-4 pb-4">
-          {getBaristaItems().map((product, i) => renderProductCard(product, i))}
-        </div>
-      </section>
-
-      {/* Screen 06: Offers Snippet */}
-      <section className="px-4 mb-10">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-lg font-heading uppercase tracking-wider text-[var(--color-foreground)]">Offers</h3>
-          <span className="text-xs font-bold text-gray-400">See all &gt;</span>
-        </div>
-        <div className="bg-[#FFF5F5] rounded-3xl p-6 relative overflow-hidden">
-          <div className="absolute right-[-20px] top-[-20px] w-32 h-32 opacity-20 rotate-12">
-             {/* Using an emoji placeholder since we have no complex vector art */}
-             <span className="text-[120px]">🎁</span>
-          </div>
-          <div className="relative z-10 w-2/3">
-            <h4 className="font-extrabold text-xl mb-1">{offers[0].title}</h4>
-            <p className="text-xs font-bold text-red-500 mb-2">{offers[0].description}</p>
-            <p className="text-[12px] text-gray-500 mb-4">{offers[0].validUntil}</p>
-            <button className="bg-primary text-primary-foreground text-xs font-bold px-5 py-2.5 rounded-full flex items-center gap-1 shadow-md">
-              Order Now <span className="text-[12px]">&rarr;</span>
-            </button>
-          </div>
-        </div>
-      </section>
 
       {/* Screen 07: Drink Of The Week */}
-      <section className="px-4 mb-10">
+      <section className="px-4 mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-bold text-lg font-heading uppercase tracking-wider text-[var(--color-foreground)]">Drink Of The Week</h3>
+          <h3 className="font-black text-2xl tracking-tighter text-[#1A0B05]">
+            Drink Of The <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF9800] to-[#FFC461]">Week</span>
+          </h3>
         </div>
-        <div className="bg-[var(--color-foreground)] rounded-[1.5rem] p-5 text-white relative overflow-hidden flex flex-col justify-between aspect-[4/3]">
-          <div className="relative z-10">
-            <h4 className="font-extrabold text-2xl font-heading mb-1">{featuredProduct?.name.split(' ')[0]}<br/>{featuredProduct?.name.split(' ').slice(1).join(' ')}</h4>
-            <p className="text-white/60 text-[13px] w-[55%] line-clamp-3 mb-2">{featuredProduct?.story}</p>
-            <div className="flex items-center gap-1 text-primary text-[13px] font-bold mb-3">
-              <Star size={10} className="fill-primary" /> {featuredProduct?.rating} ({featuredProduct?.ordersToday || '1.2k'} reviews)
+        
+        <div className="bg-white rounded-[2rem] shadow-[0_12px_40px_rgba(0,0,0,0.06)] border border-gray-100 relative overflow-hidden flex flex-col">
+          {/* Big Image Top Half - Fixed Cropping */}
+          <div className="w-full relative h-72 bg-gray-100 overflow-hidden flex items-center justify-center">
+             {/* Blurred Background Layer for Context */}
+             <img 
+               src={featuredProduct?.image || 'https://images.unsplash.com/photo-1558857563-b37102e95cb4?auto=format&fit=crop&q=80&w=800'} 
+               className="absolute inset-0 w-full h-full object-cover blur-[20px] opacity-40 scale-110" 
+             />
+             {/* Actual Uncropped Image */}
+             <img 
+               src={featuredProduct?.image || 'https://images.unsplash.com/photo-1558857563-b37102e95cb4?auto=format&fit=crop&q=80&w=800'} 
+               className="relative w-full h-full object-contain p-4 hover:scale-105 transition-transform duration-500 z-10 drop-shadow-2xl" 
+             />
+             <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md text-[#FF9800] text-[10px] font-black uppercase tracking-[0.15em] px-3 py-1.5 rounded-full shadow-md z-20">
+                Spotlight
+             </div>
+          </div>
+          
+          {/* Content Bottom Half */}
+          <div className="w-full p-5 flex flex-col bg-white relative z-20 -mt-6 rounded-t-[2rem]">
+            <div className="flex justify-between items-start mb-2">
+              <h4 className="font-black text-xl leading-tight tracking-tight text-[#1A0B05] max-w-[70%]">
+                {featuredProduct?.name}
+              </h4>
+              <span className="font-black text-xl text-[#FF9800]">₹{featuredProduct?.price}</span>
             </div>
-            <p className="font-bold text-lg mb-3">₹{featuredProduct?.price}</p>
-            <button onClick={() => featuredProduct && setSelectedProduct(featuredProduct)} className="bg-primary text-[var(--color-primary-foreground)] text-[13px] font-bold px-5 py-2.5 rounded-full flex items-center gap-1 w-max">
-              Order Now <span className="text-[12px]">&rarr;</span>
+            
+            <div className="flex items-center gap-1.5 text-[#FF9800] text-[12px] font-bold mb-3">
+              <span>★</span> {featuredProduct?.rating} 
+              <span className="text-gray-400 font-medium">({featuredProduct?.ordersToday || '1.2k'} reviews)</span>
+            </div>
+            
+            <p className="text-gray-500 text-[13px] line-clamp-2 mb-5 font-medium leading-relaxed">
+              {featuredProduct?.story}
+            </p>
+            
+            <button 
+              onClick={() => featuredProduct && setSelectedProduct(featuredProduct)} 
+              className="bg-[#1A0B05] text-white w-full py-3.5 rounded-[1rem] flex items-center justify-center gap-2 font-black text-[14px] shadow-md hover:bg-[#FF9800] hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+            >
+              Order Now <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </button>
           </div>
-          <img src={featuredProduct?.image || 'https://images.unsplash.com/photo-1558857563-b37102e95cb4?auto=format&fit=crop&q=80&w=800'} className="absolute right-0 top-0 w-[55%] h-full object-cover" style={{ maskImage: 'linear-gradient(to right, transparent, black 25%)', WebkitMaskImage: 'linear-gradient(to right, transparent, black 25%)' }} />
         </div>
       </section>
 
       {/* Screen 08: Best Combos */}
-      <section className="mb-10">
-        <div className="flex justify-between items-center px-4 mb-4">
-          <h3 className="font-bold text-lg font-heading">Best Combos</h3>
-        </div>
-        <div className="flex flex-col gap-4 px-4">
-          {combos.map((combo) => (
-            <div key={combo.id} className="bg-white p-3 rounded-3xl flex items-center gap-4 border border-gray-100 shadow-sm">
-               <img src={combo.image} className="w-20 h-20 rounded-2xl object-cover" />
-               <div className="flex-1 py-1">
-                 <h4 className="font-bold text-sm leading-tight mb-1">{combo.title}</h4>
-                 <p className="text-xs text-gray-500 mb-2">Combo</p>
-                 <span className="font-bold text-sm">${combo.price}</span>
-               </div>
-               <button className="bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold shrink-0 transition-colors">
-                  +
-               </button>
-            </div>
-          ))}
-        </div>
-      </section>
-      
-      {/* AI Recommender Intercept */}
-      <section className="px-4 mb-10">
-        <div className="relative rounded-[2rem] p-[1px] bg-gradient-to-br from-primary/40 via-white to-gray-50 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-primary/10">
-          <div className="bg-gradient-to-br from-white/90 to-white/50 backdrop-blur-xl rounded-[2rem] p-6 flex items-center gap-4 relative z-10">
-            <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center bg-white border border-primary/10 shadow-[0_4px_20px_rgba(0,0,0,0.05)] shrink-0">
-              <span className="text-2xl">✨</span>
-            </div>
-            <div className="flex-1">
-              <h4 className="font-extrabold text-[13px] mb-1 tracking-widest uppercase bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">New Here?</h4>
-              <p className="text-xs text-gray-500 font-medium line-clamp-2 leading-relaxed">Ask our POB AI to find your perfect match!</p>
-            </div>
-            <button onClick={() => navigate('/quiz')} className="bg-[var(--color-premium-dark)] text-white text-[13px] font-extrabold px-4 py-2.5 rounded-full shrink-0 flex items-center gap-1.5 shadow-[0_4px_15px_rgba(0,0,0,0.1)] hover:bg-gray-800 hover:scale-105 transition-all uppercase tracking-wider">
-              POB AI <span className="text-primary text-sm">✦</span>
-            </button>
+      {combos.length > 0 && (
+        <section className="mb-10">
+          <div className="flex justify-between items-center px-4 mb-4">
+            <h3 className="font-bold text-lg font-heading">Best Combos</h3>
           </div>
-        </div>
+          <div className="flex flex-col gap-4 px-4">
+            {combos.map((combo) => (
+              <div key={combo.id} className="bg-white p-3 rounded-3xl flex items-center gap-4 border border-gray-100 shadow-sm">
+                 <img src={combo.image} className="w-20 h-20 rounded-2xl object-cover" />
+                 <div className="flex-1 py-1">
+                   <h4 className="font-bold text-sm leading-tight mb-1">{combo.title}</h4>
+                   <p className="text-xs text-gray-500 mb-2">Combo</p>
+                   <span className="font-bold text-sm">${combo.price}</span>
+                 </div>
+                 <button className="bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold shrink-0 transition-colors">
+                    +
+                 </button>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+      
+      {/* AI Recommender Intercept - Gen Z Vibrant Holographic */}
+      <section className="px-4 mb-4">
+        <motion.div 
+          whileHover={{ scale: 1.02, y: -2 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => navigate('/quiz')}
+          className="relative rounded-[2rem] p-5 overflow-hidden shadow-[0_15px_40px_rgba(255,152,0,0.2)] cursor-pointer group flex flex-col gap-3"
+        >
+          {/* Vibrant Holographic Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#FF9800] via-[#FF512F] to-[#F09819] z-0"></div>
+          {/* Animated Mesh Blobs */}
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#FFD700] rounded-full mix-blend-overlay filter blur-[30px] opacity-80 animate-pulse z-0"></div>
+          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[#FF007F] rounded-full mix-blend-overlay filter blur-[30px] opacity-60 z-0"></div>
+          
+          <div className="relative z-10 flex items-center justify-between">
+            <div className="bg-white/20 backdrop-blur-md border border-white/40 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+              <span className="text-[14px]">🤖</span>
+              <span className="text-white text-[10px] font-black tracking-[0.15em] uppercase">POB AI Assistant</span>
+            </div>
+            
+            <div className="w-8 h-8 bg-white text-[#FF512F] rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
+               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </div>
+          </div>
+
+          <div className="relative z-10 mt-1">
+            <h4 className="font-black text-[22px] leading-[1.1] tracking-tighter text-white drop-shadow-md">
+              First timer? <br/>
+              <span className="text-[#FFD700]">Not sure what to order?</span> 🧋✨
+            </h4>
+            <p className="text-white/90 text-[13px] font-bold mt-2 flex items-center gap-2">
+              Let AI build your perfect cup <span className="inline-block animate-bounce">👇</span>
+            </p>
+          </div>
+          
+          {/* Floating Elements for Gen Z Vibe */}
+          <span className="absolute bottom-4 right-4 text-3xl opacity-20 transform rotate-12 z-0 group-hover:scale-125 transition-transform duration-500">🪄</span>
+          <span className="absolute top-1/2 right-12 text-2xl opacity-20 transform -rotate-12 z-0 group-hover:scale-125 transition-transform duration-500 delay-100">🔮</span>
+        </motion.div>
       </section>
 
       {/* Fullscreen Story Modal (Screen 03 details) */}

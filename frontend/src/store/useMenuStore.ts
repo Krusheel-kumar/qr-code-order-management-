@@ -1,10 +1,15 @@
 import { create } from 'zustand';
-import { getProducts } from '../api';
+import { persist } from 'zustand/middleware';
+import { getProducts, getCampaigns, getStories, getDiscoverySections } from '../api';
 import type { MenuItem } from '../data/menu';
+import type { Campaign, Story, DiscoverySection } from '../data/models';
 import { MENU as fallbackMenu } from '../data/menu';
 
 interface MenuState {
   menuItems: MenuItem[];
+  campaigns: Campaign[];
+  stories: Story[];
+  discoverySections: DiscoverySection[];
   isLoading: boolean;
   pollingInterval: ReturnType<typeof setInterval> | null;
   initializeMenu: () => Promise<void>;
@@ -21,20 +26,33 @@ interface MenuState {
   getBaristaItems: () => MenuItem[];
 }
 
-export const useMenuStore = create<MenuState>((set, get) => ({
+export const useMenuStore = create<MenuState>()(
+  persist(
+    (set, get) => ({
   // Initialize with fallback to avoid blank screen before load
   menuItems: fallbackMenu,
+  campaigns: [],
+  stories: [],
+  discoverySections: [],
   isLoading: true,
   pollingInterval: null,
   
   initializeMenu: async () => {
     try {
-      const products = await getProducts();
-      if (products && products.length > 0) {
-        set({ menuItems: products, isLoading: false });
-      } else {
-        set({ isLoading: false });
-      }
+      const [products, fetchedCampaigns, fetchedStories, fetchedSections] = await Promise.all([
+        getProducts().catch(() => []),
+        getCampaigns().catch(() => []),
+        getStories().catch(() => []),
+        getDiscoverySections().catch(() => [])
+      ]);
+      
+      set({ 
+        menuItems: products && products.length > 0 ? products : get().menuItems, 
+        campaigns: fetchedCampaigns || [],
+        stories: fetchedStories || [],
+        discoverySections: fetchedSections || [],
+        isLoading: false 
+      });
     } catch (error) {
       console.error('Failed to fetch menu from backend', error);
       set({ isLoading: false });
@@ -45,9 +63,19 @@ export const useMenuStore = create<MenuState>((set, get) => ({
     if (get().pollingInterval) return;
     const interval = setInterval(async () => {
       try {
-        const products = await getProducts();
+        const [products, fetchedCampaigns, fetchedStories, fetchedSections] = await Promise.all([
+          getProducts().catch(() => []),
+          getCampaigns().catch(() => []),
+          getStories().catch(() => []),
+          getDiscoverySections().catch(() => [])
+        ]);
         if (products && products.length > 0) {
-          set({ menuItems: products });
+          set({ 
+            menuItems: products,
+            campaigns: fetchedCampaigns || [],
+            stories: fetchedStories || [],
+            discoverySections: fetchedSections || []
+          });
         }
       } catch (error) {
         console.error('Polling failed', error);
@@ -71,4 +99,15 @@ export const useMenuStore = create<MenuState>((set, get) => ({
   getPairings: () => get().menuItems.filter(p => p.pairings?.length > 0).slice(0, 4),
   getBakeHouseItems: () => get().menuItems.filter(p => p.category === "Bake House"),
   getBaristaItems: () => get().menuItems.filter(p => p.category === "Barista")
-}));
+    }
+  ),
+  {
+    name: 'pop-o-bob-menu-cache',
+    partialize: (state) => ({
+      menuItems: state.menuItems,
+      campaigns: state.campaigns,
+      stories: state.stories,
+      discoverySections: state.discoverySections
+    })
+  }
+));

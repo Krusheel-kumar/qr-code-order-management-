@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAdminStore } from '../../store/useAdminStore';
 import type { MenuItem } from '../../data/menu';
 import { X, UploadCloud } from 'lucide-react';
+import { compressImage } from '../../utils/imageUtils';
 
 interface ItemEditModalProps {
   isOpen: boolean;
@@ -11,7 +12,9 @@ interface ItemEditModalProps {
 
 const SUBCATEGORIES: Record<string, string[]> = {
   'Milk Teas': ['Classics', 'Fruit Series', 'Chocolate', 'Coffee', 'Signatures'],
-  'Boba Shakes': ['All Time Boba Milkshakes', 'Signature Boba Milkshakes'],
+  'Boba Iced Tea': ['Classic', 'Signature'],
+  'Milk Shakes': ['All Time Milkshakes', 'Signature Milkshakes'],
+  'Cold Coffees': ['All Time Cold Coffees', 'Signature Cold Coffees'],
   'Chillers': ['Lemonades', 'Virgin Mojitos']
 };
 
@@ -162,12 +165,15 @@ export default function ItemEditModal({ isOpen, onClose, item }: ItemEditModalPr
                     <div className="flex text-sm text-gray-600 justify-center">
                       <label className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
                         <span>Upload a file</span>
-                        <input type="file" className="sr-only" accept="image/*" onChange={(e) => {
+                        <input type="file" className="sr-only" accept="image/*" onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () => setFormData({...formData, image: reader.result as string});
-                            reader.readAsDataURL(file);
+                            try {
+                              const compressedBase64 = await compressImage(file, 800, 0.7);
+                              setFormData({...formData, image: compressedBase64});
+                            } catch (err) {
+                              console.error("Compression failed", err);
+                            }
                           }
                         }} />
                       </label>
@@ -189,47 +195,39 @@ export default function ItemEditModal({ isOpen, onClose, item }: ItemEditModalPr
             </div>
           </div>
 
-          {/* Display Flags Section */}
+          {/* Dynamic Discovery Sections Section */}
           <div className="pt-4 border-t border-gray-100">
-            <h3 className="text-sm font-bold text-gray-900 mb-3">Discovery App Display Flags</h3>
+            <h3 className="text-sm font-bold text-gray-900 mb-3">Discovery App Sections</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer transition-colors border-gray-200 hover:bg-gray-50">
-                <input 
-                  type="checkbox" 
-                  className="w-4 h-4 text-blue-600 rounded border-gray-300"
-                  checked={formData.isFeatured || false}
-                  onChange={(e) => setFormData({...formData, isFeatured: e.target.checked})}
-                />
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-gray-900">Feature on Discovery Home</span>
-                  <span className="text-xs text-gray-500">Shows up as the giant banner</span>
-                </div>
-              </label>
-              <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer transition-colors border-gray-200 hover:bg-gray-50">
-                <input 
-                  type="checkbox" 
-                  className="w-4 h-4 text-blue-600 rounded border-gray-300"
-                  checked={formData.isBestseller || false}
-                  onChange={(e) => setFormData({...formData, isBestseller: e.target.checked})}
-                />
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-gray-900">Mark as Bestseller</span>
-                  <span className="text-xs text-gray-500">Shows up in 'Best Sellers' list</span>
-                </div>
-              </label>
-              <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer transition-colors border-gray-200 hover:bg-gray-50">
-                <input 
-                  type="checkbox" 
-                  className="w-4 h-4 text-blue-600 rounded border-gray-300"
-                  checked={formData.isNewLaunch || false}
-                  onChange={(e) => setFormData({...formData, isNewLaunch: e.target.checked})}
-                />
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-gray-900">Mark as New Launch</span>
-                  <span className="text-xs text-gray-500">Shows up in 'New Launches' list</span>
-                </div>
-              </label>
+              {useAdminStore.getState().discoverySections.map(section => {
+                const isSelected = formData.discoverySections?.some(s => s.id === section.id) || false;
+                return (
+                  <label key={section.id} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer transition-colors border-gray-200 hover:bg-gray-50">
+                    <input 
+                      type="checkbox" 
+                      className="w-4 h-4 text-blue-600 rounded border-gray-300"
+                      checked={isSelected}
+                      onChange={(e) => {
+                        const current = formData.discoverySections || [];
+                        setFormData({
+                          ...formData,
+                          discoverySections: e.target.checked
+                            ? [...current, section]
+                            : current.filter(s => s.id !== section.id)
+                        });
+                      }}
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-gray-900">{section.title}</span>
+                      <span className="text-xs text-gray-500">Adds item to this list on the home tab</span>
+                    </div>
+                  </label>
+                );
+              })}
             </div>
+            {useAdminStore.getState().discoverySections.length === 0 && (
+              <p className="text-sm text-gray-500 italic mt-2">No sections available. Create them in the Discovery tab.</p>
+            )}
           </div>
 
           <div>

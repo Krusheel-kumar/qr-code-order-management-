@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import alarmSound from '../../assets/alarm.mp3';
 import { getActiveOrders, updateOrderStatus } from '../../api';
 import { ChefHat, CheckCircle2, Clock, Volume2, VolumeX } from 'lucide-react';
+import { STORES } from '../../data/stores';
 
 interface OrderItem {
   id: string;
@@ -18,7 +19,10 @@ interface Order {
   id: string;
   orderNumber?: string;
   customerName: string;
+  customerPhone?: string;
   tableNumber: string;
+  orderType?: string;
+  storeId?: number;
   status: string;
   totalAmount: number;
   createdAt: string;
@@ -143,11 +147,26 @@ export default function ManageOrders() {
           <h3 className="font-bold text-lg">{order.orderNumber || `#${order.id.substring(0, 8).toUpperCase()}`}</h3>
           <p className="text-sm text-gray-500">{new Date(order.createdAt).toLocaleTimeString()}</p>
         </div>
-        <div className={`px-2 py-1 rounded-lg text-xs font-bold ${colorClass}`}>
-          Table {order.tableNumber || '?'}
+        <div className={`px-2 py-1 rounded-lg text-xs font-bold ${order.orderType === 'PICKUP' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700'}`}>
+          {order.orderType === 'PICKUP' ? 'PICKUP' : 'DINE-IN'}
         </div>
       </div>
-      <p className="font-semibold text-gray-800 mb-2">{order.customerName}</p>
+      
+      <div className="flex justify-between items-center mb-2">
+        <p className="font-semibold text-gray-800">{order.customerName}</p>
+        <div className={`px-2 py-1 rounded-lg text-xs font-bold flex flex-col items-end ${colorClass}`}>
+          {order.orderType === 'PICKUP' ? (
+            <>
+              <span>{order.customerPhone || 'No Phone'}</span>
+              {order.storeId && (
+                <span className="text-[10px] opacity-90 mt-0.5">
+                  {STORES.find(s => s.id === order.storeId?.toString())?.name || `Store ${order.storeId}`}
+                </span>
+              )}
+            </>
+          ) : `Table ${order.tableNumber || '?'}`}
+        </div>
+      </div>
       
       <div className="flex-1 space-y-2 mb-4">
         {order.items?.map(item => (

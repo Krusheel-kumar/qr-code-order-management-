@@ -1,10 +1,15 @@
 package com.popobob.repository;
 
 import com.popobob.model.Product;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
-import java.util.UUID;
 
 public interface ProductRepository extends JpaRepository<Product, String> {
+    
+    @EntityGraph(attributePaths = {"category"})
     List<Product> findByIsAvailableTrue();
+    
+    @EntityGraph(attributePaths = {"category"})
+    List<Product> findAll();
 }

@@ -42,6 +42,15 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @ManyToMany
+    @JoinTable(
+        name = "discovery_section_products",
+        joinColumns = @JoinColumn(name = "product_id"),
+        inverseJoinColumns = @JoinColumn(name = "section_id")
+    )
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("products")
+    private List<DiscoverySection> discoverySections;
+
     @ElementCollection
     @BatchSize(size = 50)
     @CollectionTable(name = "product_eligible_addons", joinColumns = @JoinColumn(name = "product_id"))

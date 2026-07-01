@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { X, Share2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { stories } from '../../data/mockData';
+import { useMenuStore } from '../../store/useMenuStore';
 import { shareContent } from '../../utils/shareUtils';
 import ShareModal from '../ui/ShareModal';
 
@@ -13,6 +13,7 @@ interface StoryModalProps {
 
 export default function StoryModal({ storyId, onClose }: StoryModalProps) {
   const navigate = useNavigate();
+  const { stories } = useMenuStore();
   const initialStoryIndex = stories.findIndex(s => s.id === storyId);
   const [currentStoryIndex, setCurrentStoryIndex] = useState(initialStoryIndex !== -1 ? initialStoryIndex : 0);
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
@@ -21,7 +22,7 @@ export default function StoryModal({ storyId, onClose }: StoryModalProps) {
   const [shareModal, setShareModal] = useState<{isOpen: boolean, title: string, url: string}>({isOpen: false, title: '', url: ''});
 
   const story = stories[currentStoryIndex];
-  const slides = story.slides && story.slides.length > 0 ? story.slides : [story.image];
+  const slides = story?.slides && story.slides.length > 0 ? story.slides : [story?.image];
 
   const onCloseRef = useRef(onClose);
   const isPausedRef = useRef(isPaused);

@@ -19,6 +19,7 @@ export default function AdminLayout() {
     { name: 'AI Settings', path: '/admin/ai-settings', icon: Bot },
     { name: 'Coupons', path: '/admin/coupons', icon: Ticket },
     { name: 'Store Settings', path: '/admin/store-settings', icon: Settings },
+    { name: 'QR & Tables', path: '/admin/qr-generator', icon: Store },
     { name: 'Profile', path: '/admin/profile', icon: User },
   ];
 

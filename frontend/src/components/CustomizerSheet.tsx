@@ -22,20 +22,24 @@ interface CustomizerSheetProps {
 export default function CustomizerSheet({ product, isOpen, onClose }: CustomizerSheetProps) {
   const cartStore = useCartStore();
 
+  const [step, setStep] = useState<'details' | 'customize'>('details');
   const [size, setSize] = useState('Regular');
   const [milk, setMilk] = useState(MILK_OPTIONS[0]);
   const [freeTopping, setFreeTopping] = useState('');
   const [extraToppings, setExtraToppings] = useState<string[]>([]);
+  const [showError, setShowError] = useState(false);
   
   const [shareModal, setShareModal] = useState<{isOpen: boolean, title: string, url: string}>({isOpen: false, title: '', url: ''});
 
   // Reset state when product changes
   useEffect(() => {
     if (product) {
+      setStep('details');
       setSize('Regular');
       setMilk(MILK_OPTIONS[0]);
       setFreeTopping('');
       setExtraToppings([]);
+      setShowError(false);
     }
   }, [product]);
 
@@ -46,6 +50,15 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
   totalPrice += (extraToppings.length * 60);
 
   const handleAddToCart = () => {
+    if (!freeTopping) {
+      setShowError(true);
+      const element = document.getElementById('free-topping-section');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return;
+    }
+
     let customizations = [];
     customizations.push(size);
     if (product.category === 'Milk Teas') customizations.push(milk);
@@ -97,6 +110,7 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
         <>
           {/* Backdrop */}
           <motion.div 
+            key="backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -105,51 +119,95 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
           />
           
           <motion.div
+            key="modal"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed bottom-0 left-0 right-0 max-h-[90vh] bg-white rounded-t-[2rem] z-[100001] flex flex-col shadow-[0_-10px_40px_rgba(0,0,0,0.1)]"
+            className="fixed top-0 left-0 w-full h-[100dvh] bg-white z-[100001] flex flex-col overflow-hidden"
           >
-            {/* Header */}
-            <div className="bg-white/95 backdrop-blur-xl px-6 py-4 flex items-center gap-4 border-b border-gray-100 z-20 shrink-0 rounded-t-[2rem]">
-              {product.image ? (
-                <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border-2 border-gray-100 shadow-sm">
-                  <img src={product.image} className="w-full h-full object-cover" />
-                </div>
-              ) : (
-                <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border-2 border-gray-100 shadow-sm bg-orange-50 text-orange-300 flex items-center justify-center">
-                  <ShoppingBag size={20}/>
-                </div>
-              )}
-              
-              <div className="flex-1">
-                <h3 className="font-heading font-extrabold text-xl text-foreground line-clamp-1">{product.name}</h3>
-                <span className="font-bold text-primary">₹{product.price}</span>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <button 
-                  onClick={handleShare}
-                  className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-foreground/50 hover:bg-gray-200 active:scale-95 transition-all shrink-0"
-                >
-                  <Share2 size={16} />
-                </button>
-                <button 
-                  onClick={onClose}
-                  className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-foreground/50 hover:bg-gray-200 active:scale-95 transition-all shrink-0"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-            </div>
             {/* Scrollable Content */}
-            <div className="flex-1 min-h-0 overflow-y-auto hide-scrollbar relative flex flex-col">
-              <div className="p-6 space-y-8 flex-1">
-                
-                {/* Story */}
-                <p className="text-base text-gray-500 leading-relaxed bg-gray-50 p-4 rounded-2xl italic border border-gray-100">
-                  "{product.story}"
-                </p>
+            <div className="flex-1 min-h-0 overflow-y-auto hide-scrollbar relative flex flex-col bg-white">
+              
+              {step === 'details' ? (
+                <>
+                  {/* Floating Header Buttons */}
+                  <div className="absolute top-0 w-full z-50 flex justify-end p-5 pointer-events-none">
+                    <div className="flex items-center gap-3 pointer-events-auto">
+                      <button 
+                        onClick={handleShare}
+                        className="w-11 h-11 bg-white/90 backdrop-blur-xl rounded-full flex items-center justify-center text-gray-800 shadow-lg hover:bg-white active:scale-95 transition-all shrink-0 border border-white/20"
+                      >
+                        <Share2 size={18} />
+                      </button>
+                      <button 
+                        onClick={onClose}
+                        className="w-11 h-11 bg-white/90 backdrop-blur-xl rounded-full flex items-center justify-center text-gray-800 shadow-lg hover:bg-white active:scale-95 transition-all shrink-0 border border-white/20"
+                      >
+                        <X size={20} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Full Width Hero Image */}
+                  {product.image ? (
+                    <div className="w-full h-[50vh] bg-gray-100 shrink-0 relative">
+                      <img src={product.image} className="w-full h-full object-cover" alt={product.name} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                    </div>
+                  ) : (
+                    <div className="w-full h-[50vh] bg-orange-50 text-orange-300 flex items-center justify-center shrink-0">
+                      <ShoppingBag size={64}/>
+                    </div>
+                  )}
+
+                  <div className="p-6 space-y-6 flex-1 bg-white relative -mt-8 rounded-t-[2rem] z-20 shadow-[0_-8px_30px_rgba(0,0,0,0.1)]">
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="flex-1">
+                        <h3 className="font-heading font-extrabold text-3xl text-[#1A0B05] leading-tight mb-1 tracking-tight">{product.name}</h3>
+                        <span className="font-black text-2xl text-[#FF9800]">₹{product.price}</span>
+                      </div>
+                      <button 
+                        onClick={() => setStep('customize')}
+                        className="shrink-0 bg-[var(--color-premium-dark)] text-white px-5 py-3 rounded-full font-bold text-sm shadow-[0_8px_20px_rgba(0,0,0,0.15)] hover:scale-105 active:scale-95 transition-all mt-1"
+                      >
+                        Customize
+                      </button>
+                    </div>
+                    <p className="text-base text-gray-500 leading-relaxed bg-gray-50 p-4 rounded-2xl italic border border-gray-100">
+                      "{product.story}"
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col flex-1">
+                  {/* Header with Small Image */}
+                  <div className="sticky top-0 bg-white/95 backdrop-blur-xl px-6 py-4 flex items-center gap-4 border-b border-gray-100 z-50 shrink-0">
+                    {product.image ? (
+                      <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border-2 border-gray-100 shadow-sm">
+                        <img src={product.image} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border-2 border-gray-100 shadow-sm bg-orange-50 text-orange-300 flex items-center justify-center">
+                        <ShoppingBag size={20}/>
+                      </div>
+                    )}
+                    
+                    <div className="flex-1">
+                      <h3 className="font-heading font-extrabold text-xl text-foreground line-clamp-1">{product.name}</h3>
+                      <span className="font-bold text-primary">₹{product.price}</span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button 
+                        onClick={() => setStep('details')}
+                        className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-foreground/70 hover:bg-gray-200 active:scale-95 transition-all shrink-0 font-bold"
+                      >
+                        <span className="transform -scale-x-100 block">➔</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="p-6 space-y-8 flex-1">
 
                 {/* Size */}
                 <div>
@@ -190,9 +248,11 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
                 )}
 
                 {/* Choice of Free Topping */}
-                <div>
-                  <h4 className="font-bold text-foreground mb-1 uppercase tracking-widest text-gray-500 text-sm">Choice of Free Topping</h4>
-                  <p className="text-[12px] text-gray-400 mb-3">(Choose 1) • Included</p>
+                <div id="free-topping-section" className={`p-4 -mx-4 rounded-2xl transition-all duration-300 ${showError ? 'bg-red-50 border border-red-200 shadow-inner' : ''}`}>
+                  <h4 className={`font-bold mb-1 uppercase tracking-widest text-sm ${showError ? 'text-red-500' : 'text-gray-500'}`}>Choice of Free Topping <span className="text-red-500">*</span></h4>
+                  <p className={`text-[12px] mb-3 ${showError ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
+                    {showError ? 'Please select 1 free topping to continue' : '(Choose 1) • Included'}
+                  </p>
                   <div className="flex flex-col gap-2">
                      {ALL_TOPPINGS.map(t => {
                         const isSelected = freeTopping === t;
@@ -203,10 +263,11 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
                             onClick={() => {
                                 if (isExtra) setExtraToppings(extraToppings.filter(item => item !== t));
                                 setFreeTopping(isSelected ? '' : t);
+                                if (!isSelected) setShowError(false);
                             }}
-                            className={`w-full py-3.5 px-5 rounded-2xl border text-base font-bold transition-all flex justify-between items-center ${isSelected ? 'border-primary bg-primary/10 text-primary-foreground shadow-sm' : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-white'}`}
+                            className={`w-full py-3.5 px-5 rounded-2xl border text-base font-bold transition-all flex justify-between items-center ${isSelected ? 'border-primary bg-primary/10 text-primary-foreground shadow-sm' : showError ? 'border-red-200 bg-white hover:border-red-300' : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-white'}`}
                           >
-                            <span>{t}</span>
+                            <span className={showError && !isSelected ? 'text-red-700' : ''}>{t}</span>
                             {isSelected && <Check size={18} className="text-primary" />}
                           </button>
                         )
@@ -239,18 +300,22 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
                   </div>
                 </div>
               </div>
-            </div>
+              </div>
+            )}
+          </div>
 
             {/* Footer */}
-            <div className="shrink-0 p-4 bg-white/95 backdrop-blur-xl border-t border-gray-100 z-50">
-              <button
-                onClick={handleAddToCart}
-                className="w-full bg-[var(--color-premium-dark)] text-white py-4 rounded-2xl font-bold text-lg shadow-[0_8px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.2)] hover:bg-[var(--color-premium-dark)] hover:scale-[1.02] active:scale-95 transition-all flex justify-between items-center px-6 border border-black/10"
-              >
-                <span className="uppercase tracking-widest text-sm">Add to Cart</span>
-                <span className="opacity-90 text-[17px] tracking-tight font-extrabold text-primary">₹{totalPrice}</span>
-              </button>
-            </div>
+            {step === 'customize' && (
+              <div className="shrink-0 p-4 bg-white/95 backdrop-blur-xl border-t border-gray-100 z-50">
+                <button
+                  onClick={handleAddToCart}
+                  className={`w-full text-white py-4 rounded-2xl font-bold text-lg shadow-[0_8px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.2)] hover:scale-[1.02] active:scale-95 transition-all flex justify-between items-center px-6 border border-black/10 ${showError ? 'bg-red-500 hover:bg-red-600 animate-pulse' : 'bg-[var(--color-premium-dark)] hover:bg-[var(--color-premium-dark)]'}`}
+                >
+                  <span className="uppercase tracking-widest text-sm">{showError ? 'Select a Topping' : 'Add to Cart'}</span>
+                  {!showError && <span className="opacity-90 text-[17px] tracking-tight font-extrabold text-primary">₹{totalPrice}</span>}
+                </button>
+              </div>
+            )}
 
           </motion.div>
         </>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getOrderHistory } from '../../api';
+import { STORES } from '../../data/stores';
 import { Search, ChevronDown, ChevronUp, Calendar, Filter, FileText } from 'lucide-react';
 
 import InvoiceView from './InvoiceView';
@@ -21,6 +22,8 @@ interface Order {
   customerName: string;
   customerPhone: string;
   tableNumber: string;
+  orderType?: string;
+  storeId?: number;
   paymentReference: string;
   paymentStatus: string;
   status: string;
@@ -150,7 +153,16 @@ export default function OrderHistory() {
                       
                       <div className="col-span-2 flex flex-col items-start gap-1.5">
                         <span className="text-xs font-semibold bg-gray-100 text-gray-700 px-2 py-0.5 rounded-md border border-gray-200">
-                          Table {order.tableNumber || '?'}
+                          {order.orderType === 'PICKUP' ? (
+                            <span className="flex flex-col">
+                              <span>PICKUP</span>
+                              {order.storeId && (
+                                <span className="text-[10px] font-bold text-indigo-600">
+                                  {STORES.find(s => s.id === order.storeId?.toString())?.name || `Store ${order.storeId}`}
+                                </span>
+                              )}
+                            </span>
+                          ) : `Table ${order.tableNumber || '?'}`}
                         </span>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border uppercase tracking-wider ${getStatusColor(order.status)}`}>
                           {order.status}

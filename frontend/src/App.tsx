@@ -6,7 +6,10 @@ import { useMenuStore } from './store/useMenuStore';
 // Screens
 import SplashScreen from './pages/customer/SplashScreen';
 import DiscoveryHome from './pages/customer/DiscoveryHome';
+import PickupLocations from './pages/customer/PickupLocations';
+import DeliveryOptions from './pages/customer/DeliveryOptions';
 import CategoryHub from './pages/customer/CategoryHub';
+import OffersHub from './pages/customer/OffersHub';
 import FullMenu from './pages/customer/FullMenu';
 import Cart from './pages/customer/Cart';
 import OrderTracking from './pages/customer/OrderTracking';
@@ -17,11 +20,13 @@ import AIChatScreen from './pages/customer/chat/AIChatScreen';
 import BottomNavigation from './components/ui/BottomNavigation';
 import FloatingCartButton from './components/ui/FloatingCartButton';
 import FloatingAIButton from './components/ui/FloatingAIButton';
+import SocialWidgets from './components/ui/SocialWidgets';
 
 // Layout with Bottom Navigation
 const MainLayout = () => (
   <div className="min-h-[100dvh] bg-[var(--color-background)] font-sans relative pb-[80px]">
     <Outlet />
+    <SocialWidgets />
     <FloatingCartButton />
     <FloatingAIButton />
     <BottomNavigation />
@@ -46,11 +51,30 @@ function App() {
   const [isStoreActive, setIsStoreActive] = useState(true);
 
   useEffect(() => {
-    // Detect table number from QR code URL (e.g. ?table=5)
+    // Detect table number from QR code URL (e.g. ?table=5&storeId=2)
     const params = new URLSearchParams(window.location.search);
     const tableParam = params.get('table');
+    const storeParam = params.get('storeId');
     if (tableParam) {
-      import('./store/useCartStore').then(m => m.useCartStore.getState().setTableNumber(tableParam));
+      import('./store/useCartStore').then(m => {
+        const state = m.useCartStore.getState();
+        state.setTableNumber(tableParam);
+        state.setOrderType('DINE_IN');
+        if (storeParam) state.setStoreId(storeParam);
+      });
+    } else {
+      import('./store/useCartStore').then(m => {
+        // Clear it immediately and also wait for hydration to complete to avoid being overwritten
+        const clearDineIn = () => {
+          const state = m.useCartStore.getState();
+          state.setTableNumber(''); // ALWAYS clear ghost table numbers if we aren't scanning a QR code!
+          if (!state.orderType || state.orderType === 'DINE_IN') {
+             state.setOrderType('PICKUP');
+          }
+        };
+        clearDineIn();
+        setTimeout(clearDineIn, 500); // Failsafe for hydration
+      });
     }
 
     useMenuStore.getState().initializeMenu();
@@ -82,6 +106,8 @@ function App() {
         <Routes>
           {/* Screen 01 */}
           <Route path="/" element={<SplashScreen />} />
+          <Route path="/pickup-locations" element={<PickupLocations />} />
+          <Route path="/delivery-options" element={<DeliveryOptions />} />
           
           {/* Screens with Bottom Nav */}
           <Route element={<MainLayout />}>
@@ -90,6 +116,7 @@ function App() {
             
             {/* Screen 09 */}
             <Route path="/categories" element={<CategoryHub />} />
+            <Route path="/offers" element={<OffersHub />} />
             
             {/* Screen 10 */}
             <Route path="/menu" element={<FullMenu />} />

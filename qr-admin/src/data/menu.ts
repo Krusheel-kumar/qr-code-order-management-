@@ -29,16 +29,15 @@ export interface MenuItem {
   isNewLaunch?: boolean;
   pairings: string[]; // IDs of paired items
   recommendedToppings?: string[];
+  discoverySections?: any[];
 }
 
 export const CATEGORIES = [
   'Milk Teas',
-  'Boba Shakes',
-  'Cold Coffee',
-  'Chillers',
-  'Quick Bites',
-  'Bake House',
-  'Barista'
+  'Boba Iced Tea',
+  'Milk Shakes',
+  'Cold Coffees',
+  'Chillers'
 ];
 
 export const MENU: MenuItem[] = [
@@ -46,6 +45,7 @@ export const MENU: MenuItem[] = [
   id: 'p-authentic-milk-tea',
   name: 'Authentic Milk Tea',
   category: 'Milk Teas',
+  subcategory: 'Classics',
   price: 249,
   largePriceAddOn: 69,
   image: '/assets/authentic.png',
@@ -65,8 +65,7 @@ export const MENU: MenuItem[] = [
     refreshment: 2,
     energy: 3
   },
-  pairings: [],
-  subcategory: 'Classics'
+  pairings: []
 },
 {
   id: 'p-hong-kong-milk-tea',

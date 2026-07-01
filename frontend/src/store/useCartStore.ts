@@ -20,9 +20,13 @@ interface CartStore {
   tableNumber: string;
   customerName: string;
   customerPhone: string;
+  orderType: 'DINE_IN' | 'PICKUP' | null;
+  storeId: string | null;
   setTableNumber: (table: string) => void;
   setCustomerName: (name: string) => void;
   setCustomerPhone: (phone: string) => void;
+  setOrderType: (type: 'DINE_IN' | 'PICKUP' | null) => void;
+  setStoreId: (id: string | null) => void;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -32,9 +36,13 @@ export const useCartStore = create<CartStore>()(
       tableNumber: '',
       customerName: '',
       customerPhone: '',
+      orderType: 'PICKUP',
+      storeId: null,
       setTableNumber: (table) => set({ tableNumber: table }),
       setCustomerName: (name) => set({ customerName: name }),
       setCustomerPhone: (phone) => set({ customerPhone: phone }),
+      setOrderType: (type) => set({ orderType: type }),
+      setStoreId: (id) => set({ storeId: id }),
       addItem: (item) => set((state) => {
         // Check if identical item already exists (same product and exact same customization)
         const existingItemIndex = state.items.findIndex(
@@ -68,6 +76,13 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: 'popobob-cart',
+      partialize: (state) => ({
+        ...state,
+        items: state.items.map(item => ({
+          ...item,
+          product: { ...item.product, image: '' }
+        }))
+      }),
     }
   )
 );
