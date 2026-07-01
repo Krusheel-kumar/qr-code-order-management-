@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { MENU, CATEGORIES } from './src/data/menu.js';
 
-const API_URL = 'https://popobob-backend-production.up.railway.app/api';
+const API_URL = 'https://qr-code-order-management-production.up.railway.app/api';
 
 async function seed() {
   console.log('Fetching existing products...');

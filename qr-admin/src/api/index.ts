@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Changed to local backend for testing
-const API_URL = import.meta.env.VITE_API_URL?.includes('localhost') ? `http://${window.location.hostname}:8080/api` : import.meta.env.VITE_API_URL || `http://${window.location.hostname}:8080/api`;
+const API_URL = import.meta.env.VITE_API_URL?.includes('localhost') ? `http://${window.location.hostname}:8080/api` : import.meta.env.VITE_API_URL || 'https://qr-code-order-management-production.up.railway.app/api';
 
 export const adminApi = axios.create({
   baseURL: `${API_URL}/admin`,
