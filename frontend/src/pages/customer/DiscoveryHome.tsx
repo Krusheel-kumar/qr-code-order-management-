@@ -7,7 +7,7 @@ import ShareModal from '../../components/ui/ShareModal';
 
 import { useMenuStore } from '../../store/useMenuStore';
 import type { MenuItem } from '../../data/menu';
-import type { Offer, Combo } from '../../data/models';
+import type { Combo } from '../../data/models';
 import StoryModal from '../../components/feed/StoryModal';
 import CustomizerSheet from '../../components/CustomizerSheet';
 import SearchModal from '../../components/ui/SearchModal';
