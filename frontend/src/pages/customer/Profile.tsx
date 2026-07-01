@@ -56,7 +56,7 @@ export default function Profile() {
     return (
       <div className="min-h-screen bg-[#FFFBF2] p-6 pb-28 pt-12 flex flex-col">
         <h2 className="font-heading font-black text-3xl text-gray-900 mb-2">
-          {isLogin ? 'Welcome Back' : 'Join POP O'BOB®'}
+          {isLogin ? 'Welcome Back' : "Join POP O'BOB®"}
         </h2>
         <p className="text-sm text-gray-500 mb-8">
           {isLogin ? 'Log in to earn points and reorder favorites.' : 'Sign up to earn Boba points on every order!'}

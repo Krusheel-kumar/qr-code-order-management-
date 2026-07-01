@@ -18,7 +18,7 @@ const brandOffers = [
   {
     id: 'o2',
     title: 'FLAT 50% OFF',
-    subtitle: 'On your first order! Welcome to POP O'BOB®.',
+    subtitle: "On your first order! Welcome to POP O'BOB®.",
     code: 'WELCOME50',
     validUntil: 'Valid for new users only',
     bgColor: 'bg-gradient-to-br from-emerald-400 to-teal-500',

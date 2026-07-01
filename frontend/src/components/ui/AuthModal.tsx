@@ -62,7 +62,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           >
             <div className="flex justify-between items-center p-6 pb-2">
               <h2 className="font-heading font-black text-2xl text-gray-900">
-                {isLogin ? 'Welcome Back' : 'Join POP O'BOB®'}
+                {isLogin ? 'Welcome Back' : "Join POP O'BOB®"}
               </h2>
               <button onClick={onClose} className="p-2 bg-gray-100 rounded-full text-gray-500">
                 <X size={20} />

@@ -57,7 +57,7 @@ export default function SocialWidgets() {
             <motion.button 
               whileHover={{ scale: 1.03, y: -5 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => window.open('https://www.instagram.com/POP O'BOB®official?igsh=MWQ0a2trdmwycDdjMg==', '_blank')}
+              onClick={() => window.open('https://www.instagram.com/popobobofficial?igsh=MWQ0a2trdmwycDdjMg==', '_blank')}
               className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.06)] flex flex-col p-5 group bg-white/50 backdrop-blur-3xl border-2 border-white/80"
             >
               {/* Instagram Gradient Blob */}
@@ -79,7 +79,7 @@ export default function SocialWidgets() {
             <motion.button 
               whileHover={{ scale: 1.03, y: -5 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => window.open('https://wa.me/1234567890?text=Hi%20POP O'BOB®!', '_blank')}
+              onClick={() => window.open('https://wa.me/1234567890?text=Hi%20POP%20O%20BOB!', '_blank')}
               className="relative aspect-[4/5] rounded-[2rem] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.06)] flex flex-col p-5 group bg-white/50 backdrop-blur-3xl border-2 border-white/80"
             >
               {/* WhatsApp Gradient Blob */}
