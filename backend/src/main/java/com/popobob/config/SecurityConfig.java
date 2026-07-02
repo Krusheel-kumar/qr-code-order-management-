@@ -34,7 +34,7 @@ public class SecurityConfig {
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/api/menu/**", "/api/discovery/**", "/ws/**", "/api/debug/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/menu/**", "/api/discovery/**", "/ws/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
             )
