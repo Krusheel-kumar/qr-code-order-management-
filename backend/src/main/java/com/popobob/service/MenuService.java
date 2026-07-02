@@ -14,6 +14,7 @@ import java.util.List;
 public class MenuService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final CloudinaryService cloudinaryService;
 
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
@@ -36,6 +37,9 @@ public class MenuService {
     }
 
     public Product saveProduct(Product product) {
+        if (product.getImageUrl() != null && product.getImageUrl().startsWith("data:image")) {
+            product.setImageUrl(cloudinaryService.uploadBase64Image(product.getImageUrl()));
+        }
         return productRepository.save(product);
     }
 

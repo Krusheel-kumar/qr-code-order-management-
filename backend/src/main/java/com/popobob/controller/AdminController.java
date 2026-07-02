@@ -18,6 +18,7 @@ public class AdminController {
     private final CouponRepository couponRepository;
     private final AddonRepository addonRepository;
     private final DiscoverySectionRepository discoverySectionRepository;
+    private final com.popobob.service.CloudinaryService cloudinaryService;
 
     // Discovery Sections
     @GetMapping("/discovery-sections")
@@ -43,6 +44,9 @@ public class AdminController {
 
     @PostMapping("/campaigns")
     public Campaign saveCampaign(@RequestBody Campaign campaign) {
+        if (campaign.getImage() != null && campaign.getImage().startsWith("data:image")) {
+            campaign.setImage(cloudinaryService.uploadBase64Image(campaign.getImage()));
+        }
         return campaignRepository.save(campaign);
     }
 
@@ -59,6 +63,9 @@ public class AdminController {
 
     @PostMapping("/stories")
     public Story saveStory(@RequestBody Story story) {
+        if (story.getImage() != null && story.getImage().startsWith("data:image")) {
+            story.setImage(cloudinaryService.uploadBase64Image(story.getImage()));
+        }
         return storyRepository.save(story);
     }
 

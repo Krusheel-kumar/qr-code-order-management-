@@ -17,6 +17,9 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private com.popobob.security.JwtUtil jwtUtil;
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
         String name = body.get("name");
@@ -38,7 +41,9 @@ public class AuthController {
 
         userRepository.save(user);
 
-        return ResponseEntity.ok(user);
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+
+        return ResponseEntity.ok(Map.of("user", user, "token", token));
     }
 
     @PostMapping("/login")
@@ -51,7 +56,8 @@ public class AuthController {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             if (user.getPasswordHash().equals(password)) {
-                return ResponseEntity.ok(user);
+                String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
+                return ResponseEntity.ok(Map.of("user", user, "token", token));
             }
         }
         
