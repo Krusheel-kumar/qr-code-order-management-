@@ -80,18 +80,21 @@ function App() {
     useMenuStore.getState().initializeMenu();
     useMenuStore.getState().startPolling();
 
-    // Poll or fetch once. For now, fetch once on load and every 2s.
+    // Fetch store status dynamically
     const fetchStatus = () => {
       getStoreSettings().then(settings => {
-        if (settings && settings.isStoreActive === false) {
-          setIsStoreActive(false);
+        // Evaluate the boolean cleanly from the response
+        if (settings && typeof settings.storeActive === 'boolean') {
+          setIsStoreActive(settings.storeActive);
         } else {
-          setIsStoreActive(true);
+          // Default to true if undefined, null, or missing
+          setIsStoreActive(true); 
         }
       }).catch(console.error);
     };
 
     fetchStatus();
+    // Poll every 15 seconds
     const interval = setInterval(fetchStatus, 15000);
     return () => {
       clearInterval(interval);

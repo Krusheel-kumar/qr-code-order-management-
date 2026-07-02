@@ -1,25 +1,30 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Search, ArrowLeft, Star, ShoppingBag } from 'lucide-react';
-import { products, categories } from '../../data/mockData';
+import { useMenuStore } from '../../store/useMenuStore';
 
 const TABS = ['Popular', 'New', 'Seasonal', 'All'];
 
 export default function Menu() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const categoryId = searchParams.get('category') || 'cat_fruit'; // default to Fruit Tea for example
+  const categoryId = searchParams.get('category') || '';
   
   const [activeTab, setActiveTab] = useState('All');
   const [searchQuery] = useState('');
 
-  const category = categories.find(c => c.id === categoryId) || categories[1];
+  const { menuItems: products, categories } = useMenuStore();
+
+  const category = categories.find(c => c.id === categoryId) || { id: categoryId, name: categoryId || 'Menu' };
   
   // Filter products
-  let filteredProducts = products.filter(p => p.category === category.id);
+  let filteredProducts = products;
+  if (categoryId) {
+    filteredProducts = products.filter(p => p.category === category.id || p.category === category.name);
+  }
   
-  if (activeTab === 'Popular') filteredProducts = filteredProducts.filter(p => p.rating >= 4.8);
-  if (activeTab === 'New') filteredProducts = filteredProducts.filter(p => p.isNew);
+  if (activeTab === 'Popular') filteredProducts = filteredProducts.filter(p => p.rating && p.rating >= 4.8);
+  if (activeTab === 'New') filteredProducts = filteredProducts.filter(p => p.isNewLaunch || p.badge === 'New');
   if (searchQuery) filteredProducts = filteredProducts.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
@@ -65,7 +70,7 @@ export default function Menu() {
           >
             {/* Image */}
             <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gray-50 relative shrink-0">
-              {product.isNew && (
+              {(product.isNewLaunch || product.badge === 'New') && (
                 <div className="absolute top-1 left-1 z-10 bg-primary text-[var(--color-primary-foreground)] text-[8px] font-bold px-1.5 py-0.5 rounded-md">
                   NEW
                 </div>

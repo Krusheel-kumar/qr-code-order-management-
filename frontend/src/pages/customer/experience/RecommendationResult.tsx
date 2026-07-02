@@ -1,19 +1,20 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles } from 'lucide-react';
-import { products } from '../../../data/mockData';
+import { useMenuStore } from '../../../store/useMenuStore';
 
 export default function RecommendationResult() {
   const navigate = useNavigate();
   const { state } = useLocation();
   const aiResult = state?.aiResult;
+  const { menuItems: products } = useMenuStore();
 
-  // Find the recommended product, fallback to Mango Fruit Tea if something goes wrong
-  const topMatch = products.find(p => p.id === aiResult?.productId) || products[3];
+  // Find the recommended product, fallback to first available if something goes wrong
+  const topMatch = products.find(p => p.id === aiResult?.productId) || products[0];
   
   // Use AI reason if available, else fallback
   const reasonText = aiResult?.reason || "Based on your preferences, this is the perfect drink for you!";
 
-  const additionalMatches = [products[5], products[7]]; // Keeping static additional matches for now
+  const additionalMatches = products.length > 2 ? [products[1], products[2]] : [];
 
   return (
     <div className="min-h-screen bg-[#111111] text-white flex flex-col font-sans">
@@ -63,7 +64,7 @@ export default function RecommendationResult() {
                <div className="flex-1">
                  <h4 className="font-bold text-sm mb-1">{match.name}</h4>
                  <div className="flex gap-2 flex-wrap">
-                   {match.tags?.slice(0, 2).map((tag: string) => (
+                   {(match as any).tags?.slice(0, 2).map((tag: string) => (
                      <span key={tag} className="text-[10px] text-white/60 bg-white/10 px-2.5 py-0.5 rounded-full border border-white/5">{tag}</span>
                    ))}
                  </div>

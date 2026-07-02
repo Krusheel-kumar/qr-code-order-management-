@@ -5,13 +5,27 @@ import { X, Plus, Trash2 } from 'lucide-react';
 interface CategoryEditModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialData?: any;
 }
 
-export default function CategoryEditModal({ isOpen, onClose }: CategoryEditModalProps) {
-  const { addCategory } = useAdminStore();
+export default function CategoryEditModal({ isOpen, onClose, initialData }: CategoryEditModalProps) {
+  const { addCategory, updateCategory } = useAdminStore();
   const [name, setName] = useState('');
   const [subcategories, setSubcategories] = useState<string[]>([]);
   const [newSubcategory, setNewSubcategory] = useState('');
+
+  React.useEffect(() => {
+    if (isOpen) {
+      if (initialData) {
+        setName(initialData.name || '');
+        setSubcategories(initialData.subcategories || []);
+      } else {
+        setName('');
+        setSubcategories([]);
+      }
+      setNewSubcategory('');
+    }
+  }, [isOpen, initialData]);
 
   if (!isOpen) return null;
 
@@ -30,15 +44,20 @@ export default function CategoryEditModal({ isOpen, onClose }: CategoryEditModal
     e.preventDefault();
     if (!name.trim()) return;
 
+    const trimmedName = name.trim();
     const newCategory = {
-      id: name.toLowerCase().replace(/\s+/g, '-'),
-      name: name.trim(),
+      id: trimmedName.toLowerCase().replace(/\s+/g, '-'),
+      name: trimmedName,
       icon: 'Tag', // Default icon
       description: '',
       subcategories: subcategories
     };
 
-    await addCategory(newCategory);
+    if (initialData) {
+      await updateCategory(initialData.id, newCategory);
+    } else {
+      await addCategory(newCategory);
+    }
     
     // Reset form
     setName('');
@@ -51,7 +70,7 @@ export default function CategoryEditModal({ isOpen, onClose }: CategoryEditModal
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/80">
-          <h2 className="text-xl font-bold text-gray-800">Add New Category</h2>
+          <h2 className="text-xl font-bold text-gray-800">{initialData ? 'Edit Category' : 'Add New Category'}</h2>
           <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
             <X className="w-5 h-5 text-gray-500" />
           </button>
@@ -123,7 +142,7 @@ export default function CategoryEditModal({ isOpen, onClose }: CategoryEditModal
               type="submit"
               className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-sm shadow-blue-200"
             >
-              Create Category
+              {initialData ? 'Save Changes' : 'Create Category'}
             </button>
           </div>
         </form>

@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import { categories } from '../../data/mockData';
+import { useMenuStore } from '../../store/useMenuStore';
 
 export default function CategoryHub() {
   const navigate = useNavigate();
+  const { categories } = useMenuStore();
 
   return (
     <div className="min-h-screen pb-24 bg-[var(--color-background)] font-sans">
@@ -25,7 +26,7 @@ export default function CategoryHub() {
             className="bg-white rounded-[2rem] p-6 flex flex-col items-center justify-center gap-4 border border-gray-100 shadow-sm hover:shadow-md hover:border-primary/30 transition-all aspect-square group"
           >
             <div className="w-16 h-16 rounded-full bg-[var(--color-cream)] flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
-              {category.icon}
+              {category.icon || '🍵'}
             </div>
             <span className="font-bold text-sm text-[var(--color-foreground)]">{category.name}</span>
           </button>

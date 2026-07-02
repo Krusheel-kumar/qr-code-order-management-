@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Changed to local backend for testing
-const API_URL = import.meta.env.VITE_API_URL?.includes('localhost') ? `http://${window.location.hostname}:8080/api` : import.meta.env.VITE_API_URL || 'https://qr-code-order-management-production.up.railway.app/api';
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const API_URL = isLocalhost ? `http://${window.location.hostname}:8080/api` : import.meta.env.VITE_API_URL || 'https://qr-code-order-management-production.up.railway.app/api';
 
 export const adminApi = axios.create({
   baseURL: `${API_URL}/admin`,
@@ -55,7 +55,20 @@ export const getCategories = async () => {
 
 export const addCategory = async (category: any) => {
   const { data } = await menuApi.post('/categories', category);
+  cachedCategories.push(data);
   return data;
+};
+
+export const updateCategory = async (id: string, category: any) => {
+  const { data } = await menuApi.put(`/categories/${id}`, category);
+  const index = cachedCategories.findIndex(c => c.id === id);
+  if (index !== -1) cachedCategories[index] = data;
+  return data;
+};
+
+export const deleteCategory = async (id: string) => {
+  await menuApi.delete(`/categories/${id}`);
+  cachedCategories = cachedCategories.filter(c => c.id !== id);
 };
 
 export const getProducts = async () => {

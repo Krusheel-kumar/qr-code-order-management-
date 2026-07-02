@@ -1,5 +1,17 @@
 import { create } from 'zustand';
 import { MENU, CATEGORIES } from '../data/menu';
+import { 
+  getStoreSettings, 
+  updateStoreSettings, 
+  addCategory, 
+  updateCategory, 
+  deleteCategory, 
+  getProducts, 
+  getCampaigns, 
+  getStories, 
+  getDiscoverySections, 
+  getCategories 
+} from '../api';
 import type { MenuItem } from '../data/menu';
 import type { Campaign, Story, Addon, Coupon, StoreSettings, DiscoverySection } from '../data/models';
 
@@ -12,6 +24,8 @@ interface AdminState {
   categories: string[];
   categoryDetails: any[];
   addCategory: (category: any) => void;
+  updateCategory: (id: string, category: any) => void;
+  deleteCategory: (id: string) => void;
   
   // Settings
   featuredItems: string[];
@@ -77,16 +91,23 @@ export const useAdminStore = create<AdminState>((set) => ({
   isStoreActive: true,
   toggleStoreActive: async () => {
     set((state) => {
+      // 1. Flip the active state
       const newState = !state.isStoreActive;
-      // Also update backend
-      const newSettings = { ...state.storeSettings, isStoreActive: newState };
-      import('../api').then(api => api.updateStoreSettings(newSettings));
+      
+      // 2. Prepare the payload exactly as the backend expects it
+      const newSettings = { ...state.storeSettings, storeActive: newState };
+      
+      // 3. Update the backend asynchronously
+      updateStoreSettings(newSettings)
+        .catch(err => console.error("Failed to update store status:", err));
+        
+      // 4. Update the frontend UI optimistically
       return { isStoreActive: newState, storeSettings: newSettings };
     });
   },
   
-  menuItems: MENU,
-  categories: CATEGORIES,
+  menuItems: [],
+  categories: [],
   categoryDetails: [],
   
   addCategory: async (category: any) => {
@@ -105,6 +126,59 @@ export const useAdminStore = create<AdminState>((set) => ({
     }
   },
   
+  updateCategory: async (id: string, category: any) => {
+    try {
+      const updatedCategory = await import('../api').then(m => m.updateCategory(id, category));
+      set((state) => {
+        const oldCategory = state.categoryDetails.find(c => c.id === id);
+        const oldName = oldCategory ? oldCategory.name : '';
+        const newCategoryDetails = state.categoryDetails.map(c => c.id === id ? updatedCategory : c);
+        const newCategories = newCategoryDetails.map(c => c.name);
+        
+        // Handle renaming in activeCategories if name changed
+        const newActiveCategories = { ...state.activeCategories };
+        if (oldName && oldName !== updatedCategory.name) {
+          newActiveCategories[updatedCategory.name] = newActiveCategories[oldName];
+          delete newActiveCategories[oldName];
+        }
+
+        return {
+          categoryDetails: newCategoryDetails,
+          categories: newCategories,
+          activeCategories: newActiveCategories
+        };
+      });
+    } catch (e) {
+      console.error("Failed to update category", e);
+    }
+  },
+
+  deleteCategory: async (id: string) => {
+    try {
+      await import('../api').then(m => m.deleteCategory(id));
+      set((state) => {
+        const categoryToDelete = state.categoryDetails.find(c => c.id === id);
+        const nameToDelete = categoryToDelete ? categoryToDelete.name : '';
+        
+        const newCategoryDetails = state.categoryDetails.filter(c => c.id !== id);
+        const newCategories = newCategoryDetails.map(c => c.name);
+        
+        const newActiveCategories = { ...state.activeCategories };
+        if (nameToDelete) {
+          delete newActiveCategories[nameToDelete];
+        }
+
+        return {
+          categoryDetails: newCategoryDetails,
+          categories: newCategories,
+          activeCategories: newActiveCategories
+        };
+      });
+    } catch (e) {
+      console.error("Failed to delete category", e);
+    }
+  },
+  
   featuredItems: ['m-01', 'm-03'], // Pre-selected some featured items
   toggleFeaturedItem: (id) => set((state) => ({
     featuredItems: state.featuredItems.includes(id) 
@@ -115,12 +189,12 @@ export const useAdminStore = create<AdminState>((set) => ({
   initializeStore: async () => {
     try {
       const [storeSettings, products, campaigns, stories, discoverySections, categories] = await Promise.all([
-        import('../api').then(m => m.getStoreSettings()),
-        import('../api').then(m => m.getProducts()),
-        import('../api').then(m => m.getCampaigns()),
-        import('../api').then(m => m.getStories()),
-        import('../api').then(m => m.getDiscoverySections()),
-        import('../api').then(m => m.getCategories()),
+        getStoreSettings(),
+        getProducts(),
+        getCampaigns(),
+        getStories(),
+        getDiscoverySections(),
+        getCategories()
       ]);
       
       const newActiveItems = { ...useAdminStore.getState().activeItems };
@@ -130,12 +204,12 @@ export const useAdminStore = create<AdminState>((set) => ({
         });
       }
 
-      set((state) => ({ 
+      set(() => ({ 
         storeSettings,
-        isStoreActive: storeSettings.isStoreActive !== false, // default to true
-        menuItems: products.length > 0 ? products : state.menuItems, // Fallback to mock if DB empty
-        categories: categories.length > 0 ? categories.map((c: any) => c.name) : state.categories,
-        categoryDetails: categories.length > 0 ? categories : [],
+        isStoreActive: storeSettings.storeActive !== false, // default to true
+        menuItems: products, // No fallback to mock
+        categories: categories.map((c: any) => c.name),
+        categoryDetails: categories,
         activeItems: newActiveItems,
         campaigns,
         stories,

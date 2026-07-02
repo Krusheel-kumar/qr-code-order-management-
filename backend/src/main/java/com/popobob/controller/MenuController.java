@@ -38,6 +38,12 @@ public class MenuController {
     public Category saveCategory(@org.springframework.web.bind.annotation.RequestBody Category category) {
         return menuService.saveCategory(category);
     }
+    
+    @org.springframework.web.bind.annotation.PutMapping("/categories/{id}")
+    public Category updateCategory(@org.springframework.web.bind.annotation.PathVariable String id, @org.springframework.web.bind.annotation.RequestBody Category category) {
+        category.setId(id);
+        return menuService.saveCategory(category);
+    }
 
     @org.springframework.web.bind.annotation.DeleteMapping("/categories/{id}")
     public void deleteCategory(@org.springframework.web.bind.annotation.PathVariable String id) {

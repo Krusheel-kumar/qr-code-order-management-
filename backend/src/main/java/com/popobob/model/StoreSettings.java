@@ -8,12 +8,14 @@ import lombok.Data;
 @Table(name = "store_settings")
 public class StoreSettings {
     @Id
-    private Long id = 1L; // Single row table
+    private Long id = 1L;
     
     private Double taxRate;
     private Double deliveryFee;
     private Double packingCharge;
     private Integer prepTime;
-    @com.fasterxml.jackson.annotation.JsonProperty("isStoreActive")
-    private Boolean isStoreActive = true;
+    
+    @com.fasterxml.jackson.annotation.JsonProperty("storeActive")
+    @Column(name = "store_active")
+    private Boolean storeActive = true;
 }

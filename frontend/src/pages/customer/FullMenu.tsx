@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Search, ShoppingBag, Share2 } from 'lucide-react';
-import { CATEGORIES } from '../../data/menu';
+
 import type { MenuItem } from '../../data/menu';
 import { useCartStore } from '../../store/useCartStore';
 import { useMenuStore } from '../../store/useMenuStore';
@@ -11,7 +11,6 @@ import ShareModal from '../../components/ui/ShareModal';
 
 export default function FullMenu() {
   const location = useLocation();
-  const initialCategory = location.state?.mainCategory || CATEGORIES[0];
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('');
@@ -24,11 +23,11 @@ export default function FullMenu() {
 
   const DYNAMIC_CATEGORIES = useMemo(() => {
     const cats = new Set(MENU.map(item => item.category).filter(Boolean));
-    const result = CATEGORIES.filter(c => cats.has(c));
+    const result: string[] = [];
     for (const c of Array.from(cats)) {
-      if (!result.includes(c)) result.push(c);
+      result.push(c as string);
     }
-    return result.length > 0 ? result : CATEGORIES;
+    return result;
   }, [MENU]);
 
   const [mainCategory, setMainCategory] = useState(() => {

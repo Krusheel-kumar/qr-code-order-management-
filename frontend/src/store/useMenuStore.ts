@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { getProducts, getCampaigns, getStories, getDiscoverySections } from '../api';
+import { getProducts, getCategories, getCampaigns, getStories, getDiscoverySections } from '../api';
 import type { MenuItem } from '../data/menu';
-import type { Campaign, Story, DiscoverySection } from '../data/models';
-import { MENU as fallbackMenu } from '../data/menu';
+import type { Campaign, Story, DiscoverySection, Category } from '../data/models';
+
 
 interface MenuState {
   menuItems: MenuItem[];
+  categories: Category[];
   campaigns: Campaign[];
   stories: Story[];
   discoverySections: DiscoverySection[];
@@ -29,8 +30,9 @@ interface MenuState {
 export const useMenuStore = create<MenuState>()(
   persist(
     (set, get) => ({
-  // Initialize with fallback to avoid blank screen before load
-  menuItems: fallbackMenu,
+  // Initialize empty
+  menuItems: [],
+  categories: [],
   campaigns: [],
   stories: [],
   discoverySections: [],
@@ -39,15 +41,17 @@ export const useMenuStore = create<MenuState>()(
   
   initializeMenu: async () => {
     try {
-      const [products, fetchedCampaigns, fetchedStories, fetchedSections] = await Promise.all([
+      const [products, fetchedCategories, fetchedCampaigns, fetchedStories, fetchedSections] = await Promise.all([
         getProducts().catch(() => []),
+        getCategories().catch(() => []),
         getCampaigns().catch(() => []),
         getStories().catch(() => []),
         getDiscoverySections().catch(() => [])
       ]);
       
       set({ 
-        menuItems: products && products.length > 0 ? products : get().menuItems, 
+        menuItems: products || [], 
+        categories: fetchedCategories || [],
         campaigns: fetchedCampaigns || [],
         stories: fetchedStories || [],
         discoverySections: fetchedSections || [],
@@ -63,15 +67,17 @@ export const useMenuStore = create<MenuState>()(
     if (get().pollingInterval) return;
     const interval = setInterval(async () => {
       try {
-        const [products, fetchedCampaigns, fetchedStories, fetchedSections] = await Promise.all([
+        const [products, fetchedCategories, fetchedCampaigns, fetchedStories, fetchedSections] = await Promise.all([
           getProducts().catch(() => []),
+          getCategories().catch(() => []),
           getCampaigns().catch(() => []),
           getStories().catch(() => []),
           getDiscoverySections().catch(() => [])
         ]);
-        if (products && products.length > 0) {
+        if (products) {
           set({ 
             menuItems: products,
+            categories: fetchedCategories || [],
             campaigns: fetchedCampaigns || [],
             stories: fetchedStories || [],
             discoverySections: fetchedSections || []

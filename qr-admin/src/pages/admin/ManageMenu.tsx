@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAdminStore } from '../../store/useAdminStore';
 import type { MenuItem } from '../../data/menu';
-import { Search, Plus, Edit2, Trash2 } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, MoreVertical, ChevronRight, ChevronDown } from 'lucide-react';
 import ItemEditModal from '../../components/admin/ItemEditModal';
 import CategoryEditModal from '../../components/admin/CategoryEditModal';
 import type { Addon } from '../../data/models'; 
@@ -9,6 +9,8 @@ import type { Addon } from '../../data/models';
 export default function ManageMenu() {
   const { 
     categories, 
+    categoryDetails, 
+    deleteCategory, 
     menuItems, 
     activeItems, 
     activeCategories, 
@@ -29,7 +31,10 @@ export default function ManageMenu() {
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null); // We'll just use any for local type safety ease
+  const [editingItem, setEditingItem] = useState<any>(null);
+  const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({}); // We'll just use any for local type safety ease
 
   // Addon form state
   const [showAddonForm, setShowAddonForm] = useState(false);
@@ -117,40 +122,113 @@ export default function ManageMenu() {
 
           <div className="flex flex-1 overflow-hidden">
             {/* Categories Sidebar */}
-            <div className="w-64 border-r border-gray-200 bg-gray-50 flex flex-col">
+            <div className="w-72 border-r border-gray-200 bg-gray-50 flex flex-col">
               <div className="p-4 border-b border-gray-200 bg-gray-100 flex justify-between items-center">
-                <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Categories</h3>
+                <h3 className="text-xs font-bold text-gray-700 uppercase tracking-wider">CATEGORY ({categories.length})</h3>
                 <button 
-                  onClick={() => setIsCategoryModalOpen(true)}
-                  className="text-blue-600 hover:text-blue-800"
+                  onClick={() => { setEditingCategory(null); setIsCategoryModalOpen(true); }}
+                  className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-xs font-bold"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-4 h-4" /> ADD NEW
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto p-2">
-                {categories.map((category) => {
-                  const isActiveCat = activeCategories[category];
-                  const isSelected = selectedCategory === category;
+              <div className="flex-1 overflow-y-auto p-2 pb-20">
+                {categoryDetails.map((catObj) => {
+                  const categoryName = catObj.name;
+                  const isActiveCat = activeCategories[categoryName];
+                  const isSelected = selectedCategory === categoryName;
+                  const isExpanded = expandedCategories[categoryName] || false;
                   
                   return (
-                    <div
-                      key={category}
-                      onClick={() => setSelectedCategory(category)}
-                      className={`flex items-center justify-between p-3 rounded-lg mb-1 cursor-pointer transition-colors ${
-                        isSelected ? 'bg-blue-100 text-blue-800' : 'hover:bg-gray-100 text-gray-700'
-                      }`}
-                    >
-                      <span className={`text-sm font-medium ${isSelected ? 'font-bold' : ''}`}>{category}</span>
+                    <div key={catObj.id} className="mb-2">
+                      <div
+                        onClick={() => setSelectedCategory(categoryName)}
+                        className={`group flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
+                          isSelected ? 'bg-blue-100 text-blue-800 border border-blue-200' : 'hover:bg-gray-100 text-gray-700 border border-transparent'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          {catObj.subcategories && catObj.subcategories.length > 0 ? (
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedCategories({...expandedCategories, [categoryName]: !isExpanded});
+                              }}
+                              className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                            >
+                              {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                            </button>
+                          ) : (
+                            <div className="w-4" /> // placeholder for alignment
+                          )}
+                          <span className={`text-sm truncate ${isSelected ? 'font-bold' : 'font-medium'}`}>{categoryName}</span>
+                        </div>
+                        
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <label className="relative inline-flex items-center cursor-pointer" onClick={(e) => e.stopPropagation()}>
+                            <input 
+                              type="checkbox" 
+                              className="sr-only peer"
+                              checked={isActiveCat}
+                              onChange={() => toggleCategoryActive(categoryName)}
+                            />
+                            <div className="w-8 h-4 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-green-500"></div>
+                          </label>
+                          
+                          <div className="relative">
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenDropdownId(openDropdownId === catObj.id ? null : catObj.id);
+                              }}
+                              className="p-1 rounded hover:bg-black/5 text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                              <MoreVertical size={16} />
+                            </button>
+                            
+                            {openDropdownId === catObj.id && (
+                              <>
+                                <div className="fixed inset-0 z-10" onClick={(e) => { e.stopPropagation(); setOpenDropdownId(null); }} />
+                                <div className="absolute right-0 mt-1 w-36 bg-white rounded-md shadow-lg border border-gray-200 z-20 py-1" onClick={e => e.stopPropagation()}>
+                                  <button 
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                                    onClick={() => {
+                                      setEditingCategory(catObj);
+                                      setIsCategoryModalOpen(true);
+                                      setOpenDropdownId(null);
+                                    }}
+                                  >
+                                    <Edit2 size={14} /> Edit Category
+                                  </button>
+                                  <button 
+                                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                    onClick={() => {
+                                      if (confirm('Are you sure you want to delete this category?')) {
+                                        deleteCategory(catObj.id);
+                                        if (isSelected) setSelectedCategory('');
+                                      }
+                                      setOpenDropdownId(null);
+                                    }}
+                                  >
+                                    <Trash2 size={14} /> Delete
+                                  </button>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                       
-                      <label className="relative inline-flex items-center cursor-pointer" onClick={(e) => e.stopPropagation()}>
-                        <input 
-                          type="checkbox" 
-                          className="sr-only peer"
-                          checked={isActiveCat}
-                          onChange={() => toggleCategoryActive(category)}
-                        />
-                        <div className="w-8 h-4 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-green-500"></div>
-                      </label>
+                      {/* Subcategories Dropdown */}
+                      {isExpanded && catObj.subcategories && catObj.subcategories.length > 0 && (
+                        <div className="ml-9 mt-1 space-y-1">
+                          {catObj.subcategories.map((sub: string, idx: number) => (
+                            <div key={idx} className="text-xs text-gray-500 py-1.5 px-2 hover:bg-gray-100 rounded-md truncate cursor-default">
+                              {sub}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -369,7 +447,8 @@ export default function ManageMenu() {
       {/* Category Edit Modal */}
       <CategoryEditModal
         isOpen={isCategoryModalOpen}
-        onClose={() => setIsCategoryModalOpen(false)}
+        onClose={() => { setIsCategoryModalOpen(false); setEditingCategory(null); }}
+        initialData={editingCategory}
       />
     </div>
   );
