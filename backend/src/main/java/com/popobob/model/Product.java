@@ -19,7 +19,7 @@ public class Product {
     @com.fasterxml.jackson.annotation.JsonProperty("isAvailable")
     private Boolean isAvailable = true;
     @com.fasterxml.jackson.annotation.JsonProperty("image")
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String imageUrl;
     
     // Menu Display Flags
