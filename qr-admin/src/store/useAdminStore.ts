@@ -206,7 +206,12 @@ export const useAdminStore = create<AdminState>((set) => ({
         discoverySections
       }));
     } catch (e) {
-      console.error('Failed to initialize admin store from API', e);
+      console.error('Failed to initialize admin store from API:', e);
+      if (e.response) {
+         console.error('Error response data:', e.response.data);
+         console.error('Error response status:', e.response.status);
+         console.error('Error response URL:', e.response.config.url);
+      }
     }
   },
 

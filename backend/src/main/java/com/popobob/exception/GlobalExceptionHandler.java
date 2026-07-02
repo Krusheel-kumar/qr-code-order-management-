@@ -15,15 +15,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleAllExceptions(Exception ex) {
-        ex.printStackTrace(); // Log exactly what went wrong to the console
-        
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        ex.printStackTrace(pw);
+        // Log exactly what went wrong to the server console safely
+        System.err.println("Unhandled Exception: " + ex.getMessage());
+        ex.printStackTrace();
         
         Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", ex.getMessage());
-        errorResponse.put("trace", sw.toString()); // Send the full trace to the frontend so we can see it!
+        errorResponse.put("error", "An unexpected error occurred. Please contact support if the issue persists.");
+        // We do NOT send stack traces to the frontend in production for security reasons.
         
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }

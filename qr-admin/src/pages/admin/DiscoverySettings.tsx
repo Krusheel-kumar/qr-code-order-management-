@@ -24,6 +24,12 @@ export default function DiscoverySettings() {
   const [selectedFeaturedId, setSelectedFeaturedId] = useState<string>(currentFeatured?.id || '');
   const [featuredImage, setFeaturedImage] = useState<string>('');
 
+  React.useEffect(() => {
+    if (currentFeatured && !selectedFeaturedId) {
+      setSelectedFeaturedId(currentFeatured.id);
+    }
+  }, [currentFeatured, selectedFeaturedId]);
+
   const handleAddCampaign = (e: React.FormEvent) => {
     e.preventDefault();
     addCampaign({

@@ -17,11 +17,18 @@ import java.util.function.Function;
 public class JwtUtil {
 
     // Must be at least 256 bits (32 bytes) for HS256
-    @Value("${jwt.secret:defaultSecretKeyWithAtLeast32CharactersLongToEnsureSecureEncryption!!!}")
+    @Value("${jwt.secret}")
     private String secret;
 
     @Value("${jwt.expiration:86400000}")
     private long jwtExpirationInMs;
+
+    @jakarta.annotation.PostConstruct
+    public void init() {
+        if (secret == null || secret.trim().isEmpty() || secret.length() < 32) {
+            throw new IllegalStateException("CRITICAL ERROR: A valid jwt.secret (at least 32 characters) MUST be provided in environment variables.");
+        }
+    }
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());

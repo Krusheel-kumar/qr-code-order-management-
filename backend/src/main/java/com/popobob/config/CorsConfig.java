@@ -15,8 +15,13 @@ public class CorsConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // Allows both localhost (development) and deployed frontend domains (e.g. Vercel)
-        configuration.setAllowedOriginPatterns(Arrays.asList("*")); 
+        configuration.setAllowedOrigins(Arrays.asList(
+            "https://www.popobob.com",
+            "https://popobob.com",
+            "https://YOUR-ADMIN-VERCEL-DOMAIN.vercel.app",
+            "http://localhost:5173",
+            "http://localhost:3000"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
         configuration.setAllowCredentials(true);

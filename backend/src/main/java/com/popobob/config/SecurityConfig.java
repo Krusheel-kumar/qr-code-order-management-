@@ -34,9 +34,12 @@ public class SecurityConfig {
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/api/menu/**", "/api/discovery/**", "/ws/**").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/menu/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/discovery/**", "/ws/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .anyRequest().permitAll()
+                // Protect any write endpoints under /api/menu (e.g. POST, PUT, DELETE)
+                .requestMatchers("/api/menu/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
             

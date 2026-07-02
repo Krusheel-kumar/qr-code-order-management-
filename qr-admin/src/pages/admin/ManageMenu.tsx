@@ -28,6 +28,16 @@ export default function ManageMenu() {
   const [selectedCategory, setSelectedCategory] = useState<string>(categories[0] || '');
   const [searchQuery, setSearchQuery] = useState('');
   
+  React.useEffect(() => {
+    if (categories.length > 0) {
+      if (!selectedCategory || !categories.includes(selectedCategory)) {
+        setSelectedCategory(categories[0]);
+      }
+    } else {
+      setSelectedCategory('');
+    }
+  }, [categories, selectedCategory]);
+  
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
