@@ -1,61 +1,23 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Tag, Copy, Gift, Sparkles, Clock, ArrowRight } from 'lucide-react';
+import { ChevronLeft, Copy, Gift, Sparkles, Clock, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-// Mock Offers Data tailored for a Bubble Tea brand
-const brandOffers = [
-  {
-    id: 'o1',
-    title: 'BOGO BOBA',
-    subtitle: 'Buy 1 Get 1 Free on all Classic Milk Teas',
-    code: 'BOGOBA',
-    validUntil: 'Every Thursday, 2 PM - 6 PM',
-    bgColor: 'bg-gradient-to-br from-purple-500 to-indigo-600',
-    icon: <Gift className="w-8 h-8 text-white/90" />,
-    popular: true,
-  },
-  {
-    id: 'o2',
-    title: 'FLAT 50% OFF',
-    subtitle: "On your first order! Welcome to POP O'BOB®.",
-    code: 'WELCOME50',
-    validUntil: 'Valid for new users only',
-    bgColor: 'bg-gradient-to-br from-emerald-400 to-teal-500',
-    icon: <Sparkles className="w-8 h-8 text-white/90" />,
-    popular: false,
-  },
-  {
-    id: 'o3',
-    title: 'FREE UPSIZE',
-    subtitle: 'Upgrade any Regular drink to Large for free!',
-    code: 'UPSIZE',
-    validUntil: 'Valid till end of month',
-    bgColor: 'bg-gradient-to-br from-pink-500 to-rose-500',
-    icon: <Tag className="w-8 h-8 text-white/90" />,
-    popular: false,
-  },
-  {
-    id: 'o4',
-    title: 'STUDENT SPECIAL',
-    subtitle: 'Show your Student ID at pickup & get 15% OFF.',
-    code: 'STUDENT15',
-    validUntil: 'Always Valid',
-    bgColor: 'bg-gradient-to-br from-amber-400 to-orange-500',
-    icon: <Clock className="w-8 h-8 text-white/90" />,
-    popular: false,
-  }
-];
+import { useMenuStore } from '../../store/useMenuStore';
 
 export default function OffersHub() {
   const navigate = useNavigate();
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const { coupons } = useMenuStore();
 
   const copyToClipboard = (code: string) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);
   };
+  
+  // Filter active coupons and provide defaults if properties are missing
+  const activeCoupons = coupons?.filter(c => c.active !== false) || [];
 
   return (
     <div className="min-h-[100dvh] bg-[#FFFBF2] flex flex-col font-sans pb-[100px]">
@@ -75,34 +37,48 @@ export default function OffersHub() {
         </div>
 
         <div className="flex flex-col gap-5">
-          {brandOffers.map((offer, idx) => (
+          {activeCoupons.length === 0 && (
+            <div className="text-center py-10 text-gray-500">
+              <Gift className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <p>No active offers at the moment.</p>
+              <p className="text-sm mt-1">Check back soon!</p>
+            </div>
+          )}
+          {activeCoupons.map((offer, idx) => {
+            // Assign a random background gradient based on index if none provided
+            const bgColors = [
+              'bg-gradient-to-br from-purple-500 to-indigo-600',
+              'bg-gradient-to-br from-emerald-400 to-teal-500',
+              'bg-gradient-to-br from-pink-500 to-rose-500',
+              'bg-gradient-to-br from-amber-400 to-orange-500'
+            ];
+            const bgColor = bgColors[idx % bgColors.length];
+            
+            return (
             <motion.div 
               key={offer.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
-              className={`relative overflow-hidden rounded-[1.5rem] shadow-lg ${offer.bgColor} text-white p-6`}
+              className={`relative overflow-hidden rounded-[1.5rem] shadow-lg ${bgColor} text-white p-6`}
             >
-              {offer.popular && (
-                <div className="absolute top-0 right-0 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-bl-xl text-xs font-bold uppercase tracking-wider">
-                  Trending
-                </div>
-              )}
               
               {/* Decorative Circle */}
               <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
 
               <div className="flex items-start gap-4 relative z-10">
                 <div className="w-14 h-14 shrink-0 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner">
-                  {offer.icon}
+                  <Gift className="w-8 h-8 text-white/90" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black tracking-tight mb-1">{offer.title}</h3>
-                  <p className="text-white/80 text-sm leading-snug font-medium mb-3">{offer.subtitle}</p>
+                  <h3 className="text-xl font-black tracking-tight mb-1">
+                    {offer.type === 'PERCENTAGE' ? `${offer.discountValue}% OFF` : `₹${offer.discountValue} OFF`}
+                  </h3>
+                  <p className="text-white/80 text-sm leading-snug font-medium mb-3">Min Order: ₹{offer.minOrderAmount}</p>
                   
                   <div className="flex items-center gap-1.5 text-xs font-bold text-white/70 mb-4">
                     <Clock size={12} />
-                    <span>{offer.validUntil}</span>
+                    <span>Apply code at checkout</span>
                   </div>
                 </div>
               </div>
@@ -129,7 +105,8 @@ export default function OffersHub() {
                 </button>
               </div>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Loyalty Program Teaser */}

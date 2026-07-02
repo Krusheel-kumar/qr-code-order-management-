@@ -50,6 +50,16 @@ export interface Offer {
   ctaText: string;
 }
 
+export interface Coupon {
+  id: string;
+  code: string;
+  type: 'PERCENTAGE' | 'FLAT';
+  discountValue: number;
+  minOrderAmount: number;
+  maxDiscount?: number;
+  active: boolean;
+}
+
 export interface Combo {
   id: string;
   title: string;

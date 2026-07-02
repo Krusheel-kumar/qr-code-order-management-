@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { MENU, CATEGORIES } from '../data/menu';
 import { 
   getStoreSettings, 
   updateStoreSettings, 
@@ -74,15 +73,9 @@ interface AdminState {
 }
 
 // Initialize all to true initially for mockup purposes
-const initialActiveItems = MENU.reduce((acc, item) => {
-  acc[item.id] = true;
-  return acc;
-}, {} as Record<string, boolean>);
+const initialActiveItems = {} as Record<string, boolean>;
 
-const initialActiveCategories = CATEGORIES.reduce((acc, cat) => {
-  acc[cat] = true;
-  return acc;
-}, {} as Record<string, boolean>);
+const initialActiveCategories = {} as Record<string, boolean>;
 
 export const useAdminStore = create<AdminState>((set) => ({
   isStoreActive: true,

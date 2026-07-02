@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { getProducts, getCategories, getCampaigns, getStories, getDiscoverySections } from '../api';
+import { getProducts, getCategories, getCampaigns, getStories, getDiscoverySections, getCoupons } from '../api';
 import type { MenuItem } from '../data/menu';
-import type { Campaign, Story, DiscoverySection, Category } from '../data/models';
+import type { Campaign, Story, DiscoverySection, Category, Coupon } from '../data/models';
 
 
 interface MenuState {
@@ -11,6 +11,7 @@ interface MenuState {
   campaigns: Campaign[];
   stories: Story[];
   discoverySections: DiscoverySection[];
+  coupons: Coupon[];
   isLoading: boolean;
   pollingInterval: ReturnType<typeof setInterval> | null;
   initializeMenu: () => Promise<void>;
@@ -36,27 +37,30 @@ export const useMenuStore = create<MenuState>()(
   campaigns: [],
   stories: [],
   discoverySections: [],
+  coupons: [],
   isLoading: true,
   pollingInterval: null,
   
   initializeMenu: async () => {
     try {
-      const [products, fetchedCategories, fetchedCampaigns, fetchedStories, fetchedSections] = await Promise.all([
-        getProducts().catch(() => []),
-        getCategories().catch(() => []),
-        getCampaigns().catch(() => []),
-        getStories().catch(() => []),
-        getDiscoverySections().catch(() => [])
+      const [products, fetchedCategories, fetchedCampaigns, fetchedStories, fetchedSections, fetchedCoupons] = await Promise.all([
+        getProducts().catch((e) => { console.error('Products API failed', e); return null; }),
+        getCategories().catch((e) => { console.error('Categories API failed', e); return null; }),
+        getCampaigns().catch((e) => { console.error('Campaigns API failed', e); return null; }),
+        getStories().catch((e) => { console.error('Stories API failed', e); return null; }),
+        getDiscoverySections().catch((e) => { console.error('Discovery API failed', e); return null; }),
+        getCoupons().catch((e) => { console.error('Coupons API failed', e); return null; })
       ]);
       
-      set({ 
-        menuItems: products || [], 
-        categories: fetchedCategories || [],
-        campaigns: fetchedCampaigns || [],
-        stories: fetchedStories || [],
-        discoverySections: fetchedSections || [],
+      set((state) => ({ 
+        menuItems: products !== null ? products : state.menuItems, 
+        categories: fetchedCategories !== null ? fetchedCategories : state.categories,
+        campaigns: fetchedCampaigns !== null ? fetchedCampaigns : state.campaigns,
+        stories: fetchedStories !== null ? fetchedStories : state.stories,
+        discoverySections: fetchedSections !== null ? fetchedSections : state.discoverySections,
+        coupons: fetchedCoupons !== null ? fetchedCoupons : state.coupons,
         isLoading: false 
-      });
+      }));
     } catch (error) {
       console.error('Failed to fetch menu from backend', error);
       set({ isLoading: false });
@@ -67,22 +71,23 @@ export const useMenuStore = create<MenuState>()(
     if (get().pollingInterval) return;
     const interval = setInterval(async () => {
       try {
-        const [products, fetchedCategories, fetchedCampaigns, fetchedStories, fetchedSections] = await Promise.all([
-          getProducts().catch(() => []),
-          getCategories().catch(() => []),
-          getCampaigns().catch(() => []),
-          getStories().catch(() => []),
-          getDiscoverySections().catch(() => [])
+        const [products, fetchedCategories, fetchedCampaigns, fetchedStories, fetchedSections, fetchedCoupons] = await Promise.all([
+          getProducts().catch((e) => { console.error('Products API failed', e); return null; }),
+          getCategories().catch((e) => { console.error('Categories API failed', e); return null; }),
+          getCampaigns().catch((e) => { console.error('Campaigns API failed', e); return null; }),
+          getStories().catch((e) => { console.error('Stories API failed', e); return null; }),
+          getDiscoverySections().catch((e) => { console.error('Discovery API failed', e); return null; }),
+          getCoupons().catch((e) => { console.error('Coupons API failed', e); return null; })
         ]);
-        if (products) {
-          set({ 
-            menuItems: products,
-            categories: fetchedCategories || [],
-            campaigns: fetchedCampaigns || [],
-            stories: fetchedStories || [],
-            discoverySections: fetchedSections || []
-          });
-        }
+        
+        set((state) => ({ 
+          menuItems: products !== null ? products : state.menuItems,
+          categories: fetchedCategories !== null ? fetchedCategories : state.categories,
+          campaigns: fetchedCampaigns !== null ? fetchedCampaigns : state.campaigns,
+          stories: fetchedStories !== null ? fetchedStories : state.stories,
+          discoverySections: fetchedSections !== null ? fetchedSections : state.discoverySections,
+          coupons: fetchedCoupons !== null ? fetchedCoupons : state.coupons
+        }));
       } catch (error) {
         console.error('Polling failed', error);
       }
