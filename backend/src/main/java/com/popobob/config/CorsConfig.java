@@ -18,7 +18,7 @@ public class CorsConfig {
         configuration.setAllowedOrigins(Arrays.asList(
             "https://www.popobob.com",
             "https://popobob.com",
-            "https://YOUR-ADMIN-VERCEL-DOMAIN.vercel.app",
+            "https://popobob-admin-panel.vercel.app",
             "http://localhost:5173",
             "http://localhost:3000"
         ));
