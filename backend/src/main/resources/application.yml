@@ -2,23 +2,28 @@ spring:
   application:
     name: Pop O Bob
   datasource:
-    url: jdbc:h2:mem:popobob;DB_CLOSE_DELAY=-1
-    username: sa
-    password: 
-    driverClassName: org.h2.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:popobob;DB_CLOSE_DELAY=-1}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
   h2:
     console:
       enabled: true
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
+
 server:
   port: 8080
 
 razorpay:
   key-id: rzp_test_T4aQ5u6TRc7G0O
   key-secret: wds1TgsHLGs5qdrb7NwmAhtN
+
+logging:
+  level:
+    org.hibernate.SQL: ERROR
+    org.hibernate.type.descriptor.sql.BasicBinder: ERROR
