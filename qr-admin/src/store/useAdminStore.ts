@@ -3,9 +3,6 @@ import { MENU, CATEGORIES } from '../data/menu';
 import { 
   getStoreSettings, 
   updateStoreSettings, 
-  addCategory, 
-  updateCategory, 
-  deleteCategory, 
   getProducts, 
   getCampaigns, 
   getStories, 
