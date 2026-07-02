@@ -28,7 +28,6 @@ public class SecurityConfig {
             .httpBasic(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**", "/api/menu/**", "/api/discovery/**", "/ws/**").permitAll()
-                .requestMatchers("/api/admin/migrate-images").permitAll()
                 .requestMatchers("/api/admin/**").permitAll() // TEMPORARILY permitAll to avoid breaking qr-admin which lacks a login flow
                 .anyRequest().permitAll()
             )
