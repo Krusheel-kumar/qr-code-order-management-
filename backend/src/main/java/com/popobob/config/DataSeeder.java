@@ -2,11 +2,15 @@ package com.popobob.config;
 
 import com.popobob.model.Category;
 import com.popobob.model.Product;
+import com.popobob.model.User;
 import com.popobob.repository.CategoryRepository;
 import com.popobob.repository.ProductRepository;
+import com.popobob.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -16,15 +20,27 @@ public class DataSeeder implements CommandLineRunner {
 
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public DataSeeder(CategoryRepository categoryRepository, ProductRepository productRepository) {
+    @Value("${ADMIN_EMAIL:}")
+    private String adminEmail;
+
+    @Value("${ADMIN_PASSWORD:}")
+    private String adminPassword;
+
+    public DataSeeder(CategoryRepository categoryRepository, ProductRepository productRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     @Transactional
     public void run(String... args) throws Exception {
+        seedAdminUser();
+
         if (categoryRepository.count() > 0) {
             return;
         }
@@ -566,5 +582,19 @@ public class DataSeeder implements CommandLineRunner {
         prod_53.setCategory(cat_10);
         productRepository.save(prod_53);
 
+    }
+
+    private void seedAdminUser() {
+        if (adminEmail != null && !adminEmail.isEmpty() && adminPassword != null && !adminPassword.isEmpty()) {
+            if (userRepository.findByEmail(adminEmail).isEmpty()) {
+                User admin = new User();
+                admin.setUsername("Admin");
+                admin.setEmail(adminEmail);
+                admin.setPasswordHash(passwordEncoder.encode(adminPassword));
+                admin.setRole("ADMIN");
+                admin.setLoyaltyPoints(0);
+                userRepository.save(admin);
+            }
+        }
     }
 }

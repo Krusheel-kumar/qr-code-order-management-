@@ -20,6 +20,9 @@ public class AuthController {
     @Autowired
     private com.popobob.security.JwtUtil jwtUtil;
 
+    @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
         String name = body.get("name");
@@ -35,7 +38,7 @@ public class AuthController {
         user.setUsername(name);
         user.setEmail(email);
         user.setPhoneNumber(phoneNumber);
-        user.setPasswordHash(password); // Note: Should be hashed in prod
+        user.setPasswordHash(passwordEncoder.encode(password)); 
         user.setRole("USER");
         user.setLoyaltyPoints(0);
 
@@ -55,7 +58,7 @@ public class AuthController {
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            if (user.getPasswordHash().equals(password)) {
+            if (passwordEncoder.matches(password, user.getPasswordHash())) {
                 String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
                 return ResponseEntity.ok(Map.of("user", user, "token", token));
             }

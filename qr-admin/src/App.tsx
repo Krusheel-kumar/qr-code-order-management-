@@ -11,6 +11,8 @@ import StoreSettings from './pages/admin/StoreSettings';
 import ManageCoupons from './pages/admin/ManageCoupons';
 import OrderHistory from './pages/admin/OrderHistory';
 import QRGenerator from './pages/admin/QRGenerator';
+import Login from './pages/admin/Login';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -18,21 +20,25 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
         
+        <Route path="/admin/login" element={<Login />} />
+        
         {/* Admin Flows */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Navigate to="/admin/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="orders" element={<ManageOrders />} />
-          <Route path="menu" element={<ManageMenu />} />
-          <Route path="discovery" element={<DiscoverySettings />} />
-          <Route path="ai-settings" element={<AISettings />} />
-          <Route path="store-settings" element={<StoreSettings />} />
-          <Route path="coupons" element={<ManageCoupons />} />
-          <Route path="history" element={<OrderHistory />} />
-          <Route path="qr-generator" element={<QRGenerator />} />
-          
-          {/* Dummy routes for other sidebar items to prevent errors */}
-          <Route path="profile" element={<div className="p-8">Profile settings...</div>} />
+        <Route path="/admin" element={<ProtectedRoute />}>
+          <Route element={<AdminLayout />}>
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="orders" element={<ManageOrders />} />
+            <Route path="menu" element={<ManageMenu />} />
+            <Route path="discovery" element={<DiscoverySettings />} />
+            <Route path="ai-settings" element={<AISettings />} />
+            <Route path="store-settings" element={<StoreSettings />} />
+            <Route path="coupons" element={<ManageCoupons />} />
+            <Route path="history" element={<OrderHistory />} />
+            <Route path="qr-generator" element={<QRGenerator />} />
+            
+            {/* Dummy routes for other sidebar items to prevent errors */}
+            <Route path="profile" element={<div className="p-8">Profile settings...</div>} />
+          </Route>
         </Route>
       </Routes>
     </Router>

@@ -1,10 +1,12 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import { useAdminStore } from '../../store/useAdminStore';
-import { Store, LayoutDashboard, Settings, Star, User, Bell, ShoppingBag, Coffee, Bot, Ticket, FileText } from 'lucide-react';
+import { useAuthStore } from '../../store/useAuthStore';
+import { Store, LayoutDashboard, Settings, Star, User, Bell, ShoppingBag, Coffee, Bot, Ticket, FileText, LogOut } from 'lucide-react';
 import { useEffect } from 'react';
 
 export default function AdminLayout() {
   const { isStoreActive, toggleStoreActive, initializeStore } = useAdminStore();
+  const logout = useAuthStore((state) => state.logout);
 
   useEffect(() => {
     initializeStore();
@@ -89,6 +91,14 @@ export default function AdminLayout() {
             <button className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full transition-colors">
               <Bell className="w-5 h-5" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+            </button>
+
+            <button 
+              onClick={logout}
+              className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+              title="Logout"
+            >
+              <LogOut className="w-5 h-5" />
             </button>
           </div>
         </header>

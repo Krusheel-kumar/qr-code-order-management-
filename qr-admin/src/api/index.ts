@@ -1,7 +1,15 @@
 import axios from 'axios';
+import { useAuthStore } from '../store/useAuthStore';
 
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const API_URL = isLocalhost ? `http://${window.location.hostname}:8080/api` : import.meta.env.VITE_API_URL || 'https://qr-code-order-management-production.up.railway.app/api';
+
+export const authApi = axios.create({
+  baseURL: `${API_URL}/auth`,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 export const adminApi = axios.create({
   baseURL: `${API_URL}/admin`,
@@ -9,6 +17,28 @@ export const adminApi = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+const applyAuthInterceptor = (apiInstance: any) => {
+  apiInstance.interceptors.request.use((config: any) => {
+    const token = useAuthStore.getState().token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+
+  apiInstance.interceptors.response.use(
+    (response: any) => response,
+    (error: any) => {
+      if (error.response && error.response.status === 401) {
+        useAuthStore.getState().logout();
+      }
+      return Promise.reject(error);
+    }
+  );
+};
+
+applyAuthInterceptor(adminApi);
 
 export const getStoreSettings = async () => (await adminApi.get('/settings', { params: { t: new Date().getTime() } })).data;
 export const updateStoreSettings = async (settings: any) => (await adminApi.post('/settings', settings)).data;
@@ -40,6 +70,8 @@ export const menuApi = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+applyAuthInterceptor(menuApi);
 
 let cachedCategories: any[] = [];
 
