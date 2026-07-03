@@ -585,16 +585,23 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedAdminUser() {
-        if (adminEmail != null && !adminEmail.isEmpty() && adminPassword != null && !adminPassword.isEmpty()) {
-            if (userRepository.findByEmail(adminEmail).isEmpty()) {
-                User admin = new User();
+        if (adminEmail != null && !adminEmail.trim().isEmpty() && adminPassword != null && !adminPassword.trim().isEmpty()) {
+            String cleanEmail = adminEmail.trim();
+            java.util.Optional<User> existing = userRepository.findByEmail(cleanEmail);
+            User admin;
+            if (existing.isEmpty()) {
+                admin = new User();
                 admin.setUsername("Admin");
-                admin.setEmail(adminEmail);
-                admin.setPasswordHash(passwordEncoder.encode(adminPassword));
+                admin.setEmail(cleanEmail);
                 admin.setRole("ADMIN");
                 admin.setLoyaltyPoints(0);
-                userRepository.save(admin);
+            } else {
+                admin = existing.get();
+                admin.setRole("ADMIN");
             }
+            // Always update the password hash to ensure the Railway variable is the source of truth
+            admin.setPasswordHash(passwordEncoder.encode(adminPassword.trim()));
+            userRepository.save(admin);
         }
     }
 }
