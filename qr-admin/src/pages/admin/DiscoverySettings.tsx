@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useAdminStore } from '../../store/useAdminStore';
 import { Star, Plus, Trash2, UploadCloud, X, Link } from 'lucide-react';
 import { compressImage } from '../../utils/imageUtils';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAdminStore } from '../../store/useAdminStore';
-import type { MenuItem } from '../../data/menu';
+// import type { MenuItem } from '../../data/menu';
 import { Search, Plus, Edit2, Trash2, MoreVertical, ChevronRight, ChevronDown } from 'lucide-react';
 import ItemEditModal from '../../components/admin/ItemEditModal';
 import CategoryEditModal from '../../components/admin/CategoryEditModal';
@@ -12,11 +12,11 @@ export default function ManageMenu() {
     categoryDetails, 
     deleteCategory, 
     menuItems, 
-    activeItems, 
+    // activeItems, 
     activeCategories, 
-    toggleItemActive, 
+    // toggleItemActive, 
     toggleCategoryActive,
-    deleteItem,
+    // deleteItem,
     addons,
     addAddon,
     updateAddon,
@@ -50,10 +50,10 @@ export default function ManageMenu() {
   const [showAddonForm, setShowAddonForm] = useState(false);
   const [newAddon, setNewAddon] = useState<Partial<Addon>>({ name: '', price: 0, isActive: true });
 
-  const handleEditItem = (item: any) => {
-    setEditingItem(item);
-    setIsModalOpen(true);
-  };
+  // const handleEditItem = (item: any) => {
+  //   setEditingItem(item);
+  //   setIsModalOpen(true);
+  // };
 
   const handleAddNewItem = () => {
     setEditingItem(null);
@@ -85,7 +85,7 @@ export default function ManageMenu() {
     selectedCategory
   });
 
-  const displayedItems = menuItems;
+  // const displayedItems = menuItems;
 
   return (
     <div className="flex flex-col h-full space-y-6 pb-6">

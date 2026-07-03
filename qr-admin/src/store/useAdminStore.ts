@@ -217,7 +217,7 @@ export const useAdminStore = create<AdminState>((set) => ({
       console.log(useAdminStore.getState());
       console.log("Store menuItems:", useAdminStore.getState().menuItems.length);
       console.log("Store categories:", useAdminStore.getState().categories.length);
-    } catch (e) {
+    } catch (e: any) {
       console.error('Failed to initialize admin store from API:', e);
       if (e.response) {
          console.error('Error response data:', e.response.data);
