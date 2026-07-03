@@ -177,54 +177,77 @@ export const useAdminStore = create<AdminState>((set) => ({
   })),
 
   initializeStore: async () => {
-    try {
-      const [storeSettings, products, campaigns, stories, discoverySections, categories] = await Promise.all([
-        getStoreSettings(),
-        getProducts(),
-        getCampaigns(),
-        getStories(),
-        getDiscoverySections(),
-        getCategories()
-      ]);
-      
-      const newActiveItems = { ...useAdminStore.getState().activeItems };
-      if (products.length > 0) {
-        products.forEach((p: any) => {
-          newActiveItems[p.id] = p.isAvailable !== false; // Default to true if missing
-        });
-      }
+    const [settingsResult, productsResult, campaignsResult, storiesResult, discoverySectionsResult, categoriesResult] = await Promise.allSettled([
+      getStoreSettings(),
+      getProducts(),
+      getCampaigns(),
+      getStories(),
+      getDiscoverySections(),
+      getCategories()
+    ]);
 
-      console.log(products);
-      console.log(categories);
-      console.log(campaigns);
-      console.log(stories);
-      console.log(discoverySections);
-      console.log(storeSettings);
+    // --- Status report for each promise ---
+    console.log("========== PROMISE STATUS REPORT ==========");
+    console.log("settings:         ", settingsResult.status,         settingsResult.status === 'rejected' ? settingsResult.reason : '');
+    console.log("products:         ", productsResult.status,         productsResult.status === 'rejected' ? productsResult.reason : '');
+    console.log("campaigns:        ", campaignsResult.status,        campaignsResult.status === 'rejected' ? campaignsResult.reason : '');
+    console.log("stories:          ", storiesResult.status,          storiesResult.status === 'rejected' ? storiesResult.reason : '');
+    console.log("discoverySections:", discoverySectionsResult.status, discoverySectionsResult.status === 'rejected' ? discoverySectionsResult.reason : '');
+    console.log("categories:       ", categoriesResult.status,       categoriesResult.status === 'rejected' ? categoriesResult.reason : '');
 
-      console.log("BEFORE SET");
-      set(() => ({ 
-        storeSettings,
-        isStoreActive: storeSettings.storeActive !== false, // default to true
-        menuItems: products, // No fallback to mock
-        categories: categories.map((c: any) => c.name),
-        categoryDetails: categories,
-        activeItems: newActiveItems,
-        campaigns,
-        stories,
-        discoverySections
-      }));
-      console.log("AFTER SET");
-      console.log(useAdminStore.getState());
-      console.log("Store menuItems:", useAdminStore.getState().menuItems.length);
-      console.log("Store categories:", useAdminStore.getState().categories.length);
-    } catch (e: any) {
-      console.error('Failed to initialize admin store from API:', e);
-      if (e.response) {
-         console.error('Error response data:', e.response.data);
-         console.error('Error response status:', e.response.status);
-         console.error('Error response URL:', e.response.config.url);
-      }
+    // --- Fulfilled values ---
+    console.log("========== FULFILLED VALUES ==========");
+    if (settingsResult.status         === 'fulfilled') console.log("settings value:",          settingsResult.value);
+    if (productsResult.status         === 'fulfilled') console.log("products value:",          productsResult.value);
+    if (campaignsResult.status        === 'fulfilled') console.log("campaigns value:",         campaignsResult.value);
+    if (storiesResult.status          === 'fulfilled') console.log("stories value:",           storiesResult.value);
+    if (discoverySectionsResult.status === 'fulfilled') console.log("discoverySections value:", discoverySectionsResult.value);
+    if (categoriesResult.status       === 'fulfilled') console.log("categories value:",        categoriesResult.value);
+
+    // Extract values, falling back to safe defaults for rejected promises
+    const storeSettings      = settingsResult.status         === 'fulfilled' ? settingsResult.value         : undefined;
+    const products           = productsResult.status         === 'fulfilled' ? productsResult.value         : [];
+    const campaigns          = campaignsResult.status        === 'fulfilled' ? campaignsResult.value        : [];
+    const stories            = storiesResult.status          === 'fulfilled' ? storiesResult.value          : [];
+    const discoverySections  = discoverySectionsResult.status === 'fulfilled' ? discoverySectionsResult.value : [];
+    const categories         = categoriesResult.status       === 'fulfilled' ? categoriesResult.value       : [];
+
+    const newActiveItems = { ...useAdminStore.getState().activeItems };
+    if (products.length > 0) {
+      products.forEach((p: any) => {
+        newActiveItems[p.id] = p.isAvailable !== false;
+      });
     }
+
+    const setPayload: any = {
+      menuItems:       products,
+      categories:      categories.map((c: any) => c.name),
+      categoryDetails: categories,
+      activeItems:     newActiveItems,
+      campaigns,
+      stories,
+      discoverySections,
+    };
+    if (storeSettings !== undefined) {
+      setPayload.storeSettings  = storeSettings;
+      setPayload.isStoreActive  = storeSettings.storeActive !== false;
+    }
+
+    console.log("========== SET() PAYLOAD ==========");
+    console.log("menuItems (count):",       setPayload.menuItems.length);
+    console.log("categories:",              setPayload.categories);
+    console.log("categoryDetails (count):", setPayload.categoryDetails.length);
+    console.log("campaigns (count):",       setPayload.campaigns.length);
+    console.log("stories (count):",         setPayload.stories.length);
+    console.log("discoverySections (count):", setPayload.discoverySections.length);
+    console.log("storeSettings:",           setPayload.storeSettings);
+    console.log("full payload:",            setPayload);
+
+    set(() => setPayload);
+
+    console.log("========== AFTER SET ==========");
+    console.log("Store menuItems:",   useAdminStore.getState().menuItems.length);
+    console.log("Store categories:",  useAdminStore.getState().categories.length);
   },
 
   storeSettings: {
@@ -232,6 +255,7 @@ export const useAdminStore = create<AdminState>((set) => ({
     deliveryFee: 40,
     packingCharge: 15,
     prepTime: 15,
+    storeActive: true,
   },
   updateStoreSettings: async (settings) => {
     const api = await import('../api');

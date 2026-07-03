@@ -88,5 +88,5 @@ export interface StoreSettings {
   deliveryFee: number;
   packingCharge: number;
   prepTime: number;
-  isStoreActive?: boolean;
+  storeActive?: boolean;
 }
