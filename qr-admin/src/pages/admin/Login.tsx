@@ -20,7 +20,7 @@ export default function Login() {
       // For pop-o-bob, the endpoint is /api/auth/login. Wait, does AuthController have /login?
       // Let's check AuthController: wait, I only saw /register in my previous diff. I need to make sure there's a login method.
       // But assuming the user wants to login, I'll send to /api/auth/login
-      const { data } = await authApi.post('/login', { email, password });
+      const { data } = await authApi.post('/login', { email: email.trim(), password });
       loginAction(data.user, data.token);
       navigate('/admin/dashboard');
     } catch (err: any) {
