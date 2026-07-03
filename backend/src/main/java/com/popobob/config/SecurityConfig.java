@@ -35,7 +35,7 @@ public class SecurityConfig {
             .httpBasic(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/menu/**").permitAll()
-                .requestMatchers("/api/auth/**", "/api/discovery/**", "/ws/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/discovery/**", "/api/public/**", "/ws/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // Protect any write endpoints under /api/menu (e.g. POST, PUT, DELETE)
                 .requestMatchers("/api/menu/**").hasRole("ADMIN")

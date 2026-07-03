@@ -2,19 +2,14 @@ import axios from 'axios';
 
 const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 const API_URL = isLocalhost ? `http://${window.location.hostname}:8080/api` : import.meta.env.VITE_API_URL || 'https://qr-code-order-management-production.up.railway.app/api';
-export const adminApi = axios.create({
-  baseURL: `${API_URL}/admin`,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-export const getStoreSettings = async () => (await adminApi.get('/settings', { params: { t: new Date().getTime() } })).data;
+// Public endpoint — no authentication required.
+// Returns: storeActive, taxRate, deliveryFee, packingCharge, prepTime
+export const getStoreSettings = async () => (await axios.get(`${API_URL}/public/store-status`, { params: { t: new Date().getTime() } })).data;
 export const getCampaigns = async () => (await axios.get(`${API_URL}/discovery/campaigns`)).data;
 export const getStories = async () => (await axios.get(`${API_URL}/discovery/stories`)).data;
 export const getDiscoverySections = async () => (await axios.get(`${API_URL}/discovery/sections`)).data;
-export const getCoupons = async () => (await adminApi.get('/coupons')).data;
-export const getAddons = async () => (await adminApi.get('/addons')).data;
+export const getCoupons = async (): Promise<any[]> => [];
+export const getAddons = async () => (await axios.get(`${API_URL}/menu/addons`)).data;
 
 export const menuApi = axios.create({
   baseURL: `${API_URL}/menu`,
