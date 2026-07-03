@@ -77,7 +77,9 @@ let cachedCategories: any[] = [];
 
 export const getCategories = async () => {
   try {
-    const { data } = await menuApi.get('/categories');
+    const response = await menuApi.get('/categories');
+    console.log("API CATEGORIES", response.data);
+    const { data } = response;
     cachedCategories = data;
     return data;
   } catch (e) {
@@ -104,7 +106,9 @@ export const deleteCategory = async (id: string) => {
 };
 
 export const getProducts = async () => {
-  const { data } = await menuApi.get('/admin/products', { params: { t: new Date().getTime() } });
+  const response = await menuApi.get('/admin/products', { params: { t: new Date().getTime() } });
+  console.log("API PRODUCTS", response.data);
+  const { data } = response;
   return data.map((item: any) => ({
     ...item,
     category: item.category?.name?.split(' - ')[0] || item.category?.id || (typeof item.category === 'string' ? item.category : 'Unknown'),

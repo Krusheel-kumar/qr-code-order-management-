@@ -194,6 +194,14 @@ export const useAdminStore = create<AdminState>((set) => ({
         });
       }
 
+      console.log(products);
+      console.log(categories);
+      console.log(campaigns);
+      console.log(stories);
+      console.log(discoverySections);
+      console.log(storeSettings);
+
+      console.log("BEFORE SET");
       set(() => ({ 
         storeSettings,
         isStoreActive: storeSettings.storeActive !== false, // default to true
@@ -205,6 +213,10 @@ export const useAdminStore = create<AdminState>((set) => ({
         stories,
         discoverySections
       }));
+      console.log("AFTER SET");
+      console.log(useAdminStore.getState());
+      console.log("Store menuItems:", useAdminStore.getState().menuItems.length);
+      console.log("Store categories:", useAdminStore.getState().categories.length);
     } catch (e) {
       console.error('Failed to initialize admin store from API:', e);
       if (e.response) {
