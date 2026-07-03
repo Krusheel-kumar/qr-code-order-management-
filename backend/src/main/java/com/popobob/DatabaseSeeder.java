@@ -20,8 +20,16 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Autowired
     private ProductRepository productRepository;
 
+    @org.springframework.beans.factory.annotation.Value("${app.seed.enabled:false}")
+    private boolean seedEnabled;
+
     @Override
     public void run(String... args) throws Exception {
+        if (!seedEnabled) {
+            System.out.println("DatabaseSeeder: Default menu seeding is disabled by configuration.");
+            return;
+        }
+
         // Only seed if the database is completely empty to prevent overwriting user data
         if (productRepository.count() == 0) {
             System.out.println("Seeding database with full default menu...");

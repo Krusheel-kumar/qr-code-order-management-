@@ -16,6 +16,10 @@ spring:
 server:
   port: 8080
 
+app:
+  seed:
+    enabled: true
+
 razorpay:
   key-id: rzp_test_T4aQ5u6TRc7G0O
   key-secret: wds1TgsHLGs5qdrb7NwmAhtN
@@ -24,3 +28,12 @@ logging:
   level:
     org.hibernate.SQL: ERROR
     org.hibernate.type.descriptor.sql.BasicBinder: ERROR
+
+# -------------------------------------------------------
+# LOCAL DEVELOPMENT ONLY — never commit a real secret here
+# Production reads JWT_SECRET from the Railway environment variable.
+# This value is used ONLY when running on localhost.
+# -------------------------------------------------------
+jwt:
+  secret: ${JWT_SECRET:local-dev-only-secret-key-min-32chars}
+  expiration: 86400000

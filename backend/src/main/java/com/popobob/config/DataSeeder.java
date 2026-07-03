@@ -29,6 +29,9 @@ public class DataSeeder implements CommandLineRunner {
     @Value("${ADMIN_PASSWORD:}")
     private String adminPassword;
 
+    @Value("${app.seed.enabled:false}")
+    private boolean seedEnabled;
+
     public DataSeeder(CategoryRepository categoryRepository, ProductRepository productRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
@@ -40,6 +43,11 @@ public class DataSeeder implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
         seedAdminUser();
+
+        if (!seedEnabled) {
+            System.out.println("DataSeeder: Default menu seeding is disabled by configuration.");
+            return;
+        }
 
         if (categoryRepository.count() > 0) {
             return;
