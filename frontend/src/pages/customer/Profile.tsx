@@ -19,13 +19,14 @@ export default function Profile() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (user) {
-      setLoadingOrders(true);
-      getUserOrders(user.id).then(data => {
-        setOrders(data);
-        setLoadingOrders(false);
-      });
-    }
+    // Guard: only fetch orders when user.id is a valid non-empty string.
+    // Prevents GET /api/users/undefined/orders if persisted state is stale.
+    if (!user?.id) return;
+    setLoadingOrders(true);
+    getUserOrders(user.id).then(data => {
+      setOrders(data);
+      setLoadingOrders(false);
+    });
   }, [user]);
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
@@ -35,11 +36,13 @@ export default function Profile() {
 
     try {
       if (isLogin) {
-        const u = await loginUser({ email, password });
-        setUser(u);
+        // Backend returns { user: {...}, token: "..." }. Extract only the user object.
+        const response = await loginUser({ email, password });
+        setUser(response.user);
       } else {
-        const u = await registerUser({ name, email, password, phoneNumber });
-        setUser(u);
+        // Same structure for registration response.
+        const response = await registerUser({ name, email, password, phoneNumber });
+        setUser(response.user);
       }
     } catch (err: any) {
       setError(err.message || 'Authentication failed');
