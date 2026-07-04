@@ -36,8 +36,27 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/menu/**").permitAll()
                 .requestMatchers("/api/auth/**", "/api/discovery/**", "/api/public/**", "/ws/**").permitAll()
+
+                // --- Admin-only order endpoints (declared FIRST so they take priority) ---
+                // These must be before the customer wildcard rules below
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/orders/active").hasRole("ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/orders/history").hasRole("ADMIN")
+                .requestMatchers(org.springframework.http.HttpMethod.PATCH, "/api/orders/*/status").hasRole("ADMIN")
+
+                // --- Customer order endpoints (unauthenticated customers) ---
+                // POST: place a new order (QR dine-in, pickup, delivery)
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/orders").permitAll()
+                // GET by ID: customer tracks their own order — only UUID-shaped paths reach here
+                // because /active and /history are already handled above
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/orders/*").permitAll()
+                // POST: customer initiates Razorpay payment for pickup orders
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/payments/create-order").permitAll()
+                // GET: customer fetches their own profile and order history
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/users/*").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/users/*/orders").permitAll()
+
+                // All remaining requests require authentication
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                // Protect any write endpoints under /api/menu (e.g. POST, PUT, DELETE)
                 .requestMatchers("/api/menu/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
