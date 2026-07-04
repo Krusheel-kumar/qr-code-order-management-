@@ -152,6 +152,8 @@ export const ordersApi = axios.create({
   },
 });
 
+applyAuthInterceptor(ordersApi);
+
 export const getActiveOrders = async () => (await ordersApi.get('/active')).data;
 export const getOrderHistory = async () => (await ordersApi.get('/history')).data;
 export const updateOrderStatus = async (id: string, status: string) => 
