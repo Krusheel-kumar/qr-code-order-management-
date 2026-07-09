@@ -51,8 +51,19 @@ public class MenuController {
     }
 
     @org.springframework.web.bind.annotation.PostMapping("/products")
-    public Product saveProduct(@org.springframework.web.bind.annotation.RequestBody Product product) {
-        return menuService.saveProduct(product);
+    public Product saveProduct(@org.springframework.web.bind.annotation.RequestBody String rawBody) {
+        System.out.println("========== RAW BODY START ==========");
+        System.out.println(rawBody);
+        System.out.println("========== RAW BODY END ==========");
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            mapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            Product product = mapper.readValue(rawBody, Product.class);
+            return menuService.saveProduct(product);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Parse error", e);
+        }
     }
 
     @org.springframework.web.bind.annotation.DeleteMapping("/products/{id}")

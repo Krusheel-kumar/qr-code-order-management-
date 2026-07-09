@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { X, LogOut, Clock, Award } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { getUserOrders } from '../../api';
@@ -10,6 +11,7 @@ interface ProfileSheetProps {
 }
 
 export default function ProfileSheet({ isOpen, onClose }: ProfileSheetProps) {
+  const navigate = useNavigate();
   const { user, setUser, getLoyaltyTier } = useAuthStore();
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -63,7 +65,18 @@ export default function ProfileSheet({ isOpen, onClose }: ProfileSheetProps) {
             <div className="flex-1 overflow-y-auto px-6 pb-10">
               
               {/* Loyalty Card */}
-              <div className={`w-full rounded-[1.5rem] p-5 text-white mb-8 bg-gradient-to-br ${tier?.color || 'from-[#CD7F32] to-[#B87333]'} shadow-lg relative overflow-hidden`}>
+              <div 
+                onClick={() => {
+                  onClose();
+                  navigate('/ai/home', {
+                    state: {
+                      customerName: user?.username || null,
+                      isGuest: !user
+                    }
+                  });
+                }}
+                className={`w-full rounded-[1.5rem] p-5 text-white mb-8 bg-gradient-to-br ${tier?.color || 'from-[#CD7F32] to-[#B87333]'} shadow-lg relative overflow-hidden cursor-pointer hover:scale-[1.01] transition-transform`}
+              >
                 <div className="relative z-10">
                   <div className="flex justify-between items-start mb-4">
                     <div>

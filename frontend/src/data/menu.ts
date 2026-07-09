@@ -1,3 +1,5 @@
+import type { CustomizationGroup } from './models';
+
 export interface ProductFlavorProfile {
   sweetness: number; // 0-5
   creaminess: number; // 0-5
@@ -28,4 +30,5 @@ export interface MenuItem {
   isFeatured?: boolean;
   isBestseller?: boolean;
   isNewLaunch?: boolean;
+  customizationGroups?: CustomizationGroup[];
 }

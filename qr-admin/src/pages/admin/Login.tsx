@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/useAuthStore';
 import { authApi } from '../../api';
+import { Mail, Lock, Loader2 } from 'lucide-react';
+import brandLogo from '../../assets/Brand Emblem.png';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -31,54 +33,69 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-8">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-black text-[#FF4500] mb-2">Pop-O-Bob</h1>
-          <h2 className="text-xl font-bold text-[#1A1A1A]">Admin Portal</h2>
+    <div className="min-h-screen bg-[#FFF8EE] flex items-center justify-center p-4 relative overflow-hidden font-sans">
+      
+      {/* Background decoration matching customer frontend */}
+      <div className="absolute top-[10%] left-[10%] w-[60%] h-[60%] bg-white blur-[100px] opacity-60 rounded-full z-0" />
+      <div className="absolute bottom-[0%] right-[0%] w-[100%] h-[40%] bg-[#FFEAC5] blur-[100px] opacity-40 rounded-t-[100%] z-0" />
+      
+      <div className="glass-panel rounded-3xl w-full max-w-md p-8 relative z-10 border border-white/60">
+        <div className="text-center mb-8 flex flex-col items-center">
+          <div className="w-24 h-24 mb-4 drop-shadow-md hover:scale-105 transition-transform duration-300">
+            <img src={brandLogo} alt="POP O'BOB Logo" className="w-full h-full object-contain" />
+          </div>
+          <h1 className="text-3xl font-heading font-black text-[#2A1B16] tracking-tight mb-1">
+            POP O'BOB®
+          </h1>
+          <h2 className="text-xs font-bold uppercase tracking-widest text-[#8D6E63]/80">
+            Admin Portal
+          </h2>
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-500 p-4 rounded-xl text-sm font-medium mb-6">
+          <div className="bg-red-50/80 border border-red-200 text-red-600 p-4 rounded-xl text-sm font-semibold mb-6 animate-pulse">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm font-bold text-[#1A1A1A] mb-2">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-5 py-4 rounded-xl border border-gray-200 focus:border-[#FF4500] focus:ring-4 focus:ring-[#FF4500]/10 outline-none transition-all font-medium"
-              placeholder="admin@popobob.com"
-              required
-            />
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#8D6E63] mb-2">Email Address</label>
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8D6E63] w-5 h-5" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full pl-12 pr-5 py-3.5 rounded-2xl bg-white/80 border border-[#FAEDCD] focus:border-[#FFD54F] focus:ring-4 focus:ring-[#FFD54F]/20 outline-none transition-all font-medium text-[#2A1B16] placeholder-[#8D6E63]/40 shadow-inner"
+                placeholder="admin@popobob.com"
+                required
+              />
+            </div>
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-[#1A1A1A] mb-2">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-5 py-4 rounded-xl border border-gray-200 focus:border-[#FF4500] focus:ring-4 focus:ring-[#FF4500]/10 outline-none transition-all font-medium"
-              placeholder="••••••••"
-              required
-            />
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#8D6E63] mb-2">Password</label>
+            <div className="relative">
+              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8D6E63] w-5 h-5" />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-12 pr-5 py-3.5 rounded-2xl bg-white/80 border border-[#FAEDCD] focus:border-[#FFD54F] focus:ring-4 focus:ring-[#FFD54F]/20 outline-none transition-all font-medium text-[#2A1B16] placeholder-[#8D6E63]/40 shadow-inner"
+                placeholder="••••••••"
+                required
+              />
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#FF4500] text-white py-4 rounded-xl font-bold hover:bg-[#E63E00] transform active:scale-95 transition-all shadow-lg shadow-[#FF4500]/30 disabled:opacity-70 flex justify-center items-center"
+            className="w-full bg-[#2A1B16] hover:bg-[#3D2921] text-[#FFD54F] py-4 rounded-2xl font-bold transition-all shadow-md hover:shadow-lg disabled:opacity-70 flex justify-center items-center gap-2 transform active:scale-[0.98] cursor-pointer mt-4"
           >
             {loading ? (
-              <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
+              <Loader2 className="animate-spin h-5 w-5 text-[#FFD54F]" />
             ) : (
               'Login to Dashboard'
             )}
@@ -88,3 +105,4 @@ export default function Login() {
     </div>
   );
 }
+

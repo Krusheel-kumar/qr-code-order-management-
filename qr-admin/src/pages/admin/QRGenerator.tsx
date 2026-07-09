@@ -52,22 +52,22 @@ export default function QRGenerator() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 pb-12 font-sans">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">QR Generator</h1>
-        <p className="text-gray-500 mt-1">Generate specific Dine-In QR codes for tables across your locations.</p>
+        <h1 className="text-3xl font-heading font-black text-[#2A1B16] tracking-tight">QR Generator</h1>
+        <p className="text-[#8D6E63] font-medium mt-1">Generate specific Dine-In QR codes for tables across your locations.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Side: Configuration */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden h-fit">
-          <div className="p-6 border-b border-gray-200 bg-gray-50 flex items-center gap-3">
-            <QrCode className="w-5 h-5 text-gray-500" />
-            <h2 className="text-lg font-bold text-gray-900">Table Settings</h2>
+        <div className="glass-panel rounded-2xl border border-[#FAEDCD] overflow-hidden h-fit bg-[#FFFDF8]">
+          <div className="p-6 border-b border-[#FAEDCD]/60 bg-[#FFF8E8]/40 flex items-center gap-3">
+            <QrCode className="w-5 h-5 text-[#8D6E63]" />
+            <h2 className="text-lg font-heading font-bold text-[#2A1B16]">Table Settings</h2>
           </div>
           <div className="p-6 space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Live Customer App URL</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#2A1B16] mb-1.5">Live Customer App URL</label>
               <input 
                 type="text" 
                 placeholder="e.g. https://popobob.com" 
@@ -76,17 +76,17 @@ export default function QRGenerator() {
                   setFrontendUrl(e.target.value);
                   localStorage.setItem('qr_frontend_url', e.target.value);
                 }}
-                className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full border border-[#FAEDCD] rounded-xl bg-white/80 p-3 text-sm text-[#2A1B16] outline-none focus:ring-4 focus:ring-[#FFD54F]/20 focus:border-[#FFD54F] transition-all font-medium placeholder-[#8D6E63]/30"
               />
-              <p className="text-xs text-gray-500 mt-1">The generated QR code will redirect users to this domain.</p>
+              <p className="text-2xs text-[#8D6E63]/70 font-semibold mt-1.5">The generated QR code will redirect users to this domain.</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Store Location</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#2A1B16] mb-1.5">Store Location</label>
               <select 
                 value={selectedStore}
                 onChange={(e) => setSelectedStore(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="w-full border border-[#FAEDCD] rounded-xl bg-white/80 p-3 text-sm text-[#2A1B16] outline-none focus:ring-4 focus:ring-[#FFD54F]/20 focus:border-[#FFD54F] transition-all font-medium cursor-pointer"
               >
                 {STORES.map(store => (
                   <option key={store.id} value={store.id}>{store.name}</option>
@@ -95,62 +95,63 @@ export default function QRGenerator() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Table Number / Identifier</label>
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#2A1B16] mb-1.5">Table Number / Identifier</label>
               <input 
                 type="text" 
                 placeholder="e.g. 5, Balcony-1, VIP-2" 
                 value={tableNumber}
                 onChange={(e) => setTableNumber(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full border border-[#FAEDCD] rounded-xl bg-white/80 p-3 text-sm text-[#2A1B16] outline-none focus:ring-4 focus:ring-[#FFD54F]/20 focus:border-[#FFD54F] transition-all font-medium placeholder-[#8D6E63]/30"
               />
             </div>
           </div>
         </div>
 
         {/* Right Side: QR Preview */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 flex flex-col items-center justify-center text-center">
+        <div className="glass-panel rounded-2xl border border-[#FAEDCD] p-8 flex flex-col items-center justify-center text-center bg-[#FFFDF8]">
           {tableNumber ? (
             <div className="space-y-6 w-full max-w-sm">
-              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 shadow-inner inline-block">
+              <div className="bg-[#FFF8E8]/30 p-4.5 rounded-3xl border border-[#FAEDCD]/50 shadow-inner inline-block">
                 <img 
                   src={getQrCodeUrl()} 
                   alt={`QR for Table ${tableNumber}`} 
-                  className="w-64 h-64 rounded-lg object-contain bg-white p-2 border border-gray-100 shadow-sm"
+                  className="w-64 h-64 rounded-xl object-contain bg-white p-2 border border-[#FAEDCD]/50 shadow-2xs"
                 />
               </div>
               
               <div>
-                <h3 className="font-bold text-gray-900 text-lg">Table {tableNumber}</h3>
-                <p className="text-sm text-gray-500">{STORES.find(s => s.id === selectedStore)?.name}</p>
+                <h3 className="font-heading font-black text-[#2A1B16] text-xl">Table {tableNumber}</h3>
+                <p className="text-xs text-[#8D6E63] font-semibold mt-0.5">{STORES.find(s => s.id === selectedStore)?.name}</p>
               </div>
 
               <div className="flex flex-col gap-3">
                 <button 
                   onClick={downloadQR}
-                  className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition-colors shadow-sm"
+                  className="w-full flex items-center justify-center gap-2 bg-[#2A1B16] hover:bg-[#3D2921] text-[#FFD54F] px-6 py-3.5 rounded-xl font-bold transition-all shadow-xs cursor-pointer active:scale-95 text-xs uppercase tracking-wider"
                 >
-                  <Download className="w-5 h-5" />
+                  <Download className="w-4.5 h-4.5" />
                   Download High-Res QR
                 </button>
                 
                 <button 
                   onClick={handleCopyLink}
-                  className="w-full flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 px-6 py-3 rounded-lg font-bold transition-colors shadow-sm"
+                  className="w-full flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-[#8D6E63] border border-gray-300 px-6 py-3.5 rounded-xl font-bold transition-all shadow-2xs cursor-pointer text-xs uppercase tracking-wider"
                 >
                   {copied ? (
-                    <><CheckCircle2 className="w-5 h-5 text-emerald-500" /> Copied!</>
+                    <><CheckCircle2 className="w-4.5 h-4.5 text-emerald-500" /> Copied!</>
                   ) : (
-                    <><Link2 className="w-5 h-5" /> Copy Direct Link</>
+                    <><Link2 className="w-4.5 h-4.5" /> Copy Direct Link</>
                   )}
                 </button>
               </div>
             </div>
           ) : (
-            <div className="py-16 flex flex-col items-center justify-center text-gray-400">
-              <div className="w-24 h-24 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl mb-4 flex items-center justify-center">
-                <QrCode className="w-10 h-10 text-gray-300" />
+            <div className="py-16 flex flex-col items-center justify-center text-[#8D6E63]">
+              <div className="w-24 h-24 bg-[#FFF8E8]/30 border-2 border-dashed border-[#FAEDCD] rounded-2xl mb-4 flex items-center justify-center">
+                <QrCode className="w-10 h-10 text-[#8D6E63]/40" />
               </div>
-              <p className="font-medium text-gray-500">Enter a table number to generate QR</p>
+              <p className="font-heading font-bold text-sm text-[#2A1B16]">Dine-In QR Code Preview</p>
+              <p className="text-2xs text-[#8D6E63]/70 font-semibold mt-1">Enter a table number in settings to generate.</p>
             </div>
           )}
         </div>

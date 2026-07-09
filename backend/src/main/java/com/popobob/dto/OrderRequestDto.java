@@ -11,7 +11,7 @@ public class OrderRequestDto {
     private String tableNumber;
     private String paymentReference;
     private String orderType;
-    private Long storeId;
+    private String storeId;
     private UUID userId;
     private Integer pointsUsed;
     private List<OrderItemDto> items;

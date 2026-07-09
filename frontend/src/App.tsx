@@ -17,6 +17,13 @@ import Profile from './pages/customer/Profile';
 
 import AIChatScreen from './pages/customer/chat/AIChatScreen';
 
+// AI Engagement Layer
+import POPBuddyWelcome from './pages/customer/ai/POPBuddyWelcome';
+import POPBuddyIntro from './pages/customer/ai/POPBuddyIntro';
+import POPBuddyJoin from './pages/customer/ai/POPBuddyJoin';
+import POPBuddyMaybeLater from './pages/customer/ai/POPBuddyMaybeLater';
+import POPBuddyHome from './pages/customer/ai/POPBuddyHome';
+
 import BottomNavigation from './components/ui/BottomNavigation';
 import FloatingCartButton from './components/ui/FloatingCartButton';
 import FloatingAIButton from './components/ui/FloatingAIButton';
@@ -138,6 +145,13 @@ function App() {
           
           {/* Screen 18 */}
           <Route path="/tracking/:id" element={<OrderTracking />} />
+
+          {/* AI Engagement Layer Screens */}
+          <Route path="/ai/welcome" element={<POPBuddyWelcome />} />
+          <Route path="/ai/intro" element={<POPBuddyIntro />} />
+          <Route path="/ai/join" element={<POPBuddyJoin />} />
+          <Route path="/ai/maybe-later" element={<POPBuddyMaybeLater />} />
+          <Route path="/ai/home" element={<POPBuddyHome />} />
 
         </Routes>
       </Router>

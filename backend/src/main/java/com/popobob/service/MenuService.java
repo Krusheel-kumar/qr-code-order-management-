@@ -40,6 +40,13 @@ public class MenuService {
         if (product.getImageUrl() != null && product.getImageUrl().startsWith("data:image")) {
             product.setImageUrl(cloudinaryService.uploadBase64Image(product.getImageUrl()));
         }
+        if (product.getId() != null) {
+            productRepository.findById(product.getId()).ifPresent(existing -> {
+                if (product.getVersion() == null) {
+                    product.setVersion(existing.getVersion() != null ? existing.getVersion() : 0);
+                }
+            });
+        }
         return productRepository.save(product);
     }
 

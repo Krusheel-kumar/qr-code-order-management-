@@ -8,18 +8,30 @@ import { useMenuStore } from '../../store/useMenuStore';
 import { shareContent } from '../../utils/shareUtils';
 import CustomizerSheet from '../../components/CustomizerSheet';
 import ShareModal from '../../components/ui/ShareModal';
+import { getBlacklistedProducts } from '../../api';
 
 export default function FullMenu() {
   const location = useLocation();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('');
+  const [blacklistedProductIds, setBlacklistedProductIds] = useState<string[]>([]);
   
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
   const [shareModal, setShareModal] = useState<{isOpen: boolean, title: string, url: string}>({isOpen: false, title: '', url: ''});
   
   const cartStore = useCartStore();
   const { menuItems: MENU } = useMenuStore();
+
+  useEffect(() => {
+    if (cartStore.storeId) {
+      getBlacklistedProducts(cartStore.storeId)
+        .then(setBlacklistedProductIds)
+        .catch(console.error);
+    } else {
+      setBlacklistedProductIds([]);
+    }
+  }, [cartStore.storeId]);
 
   const DYNAMIC_CATEGORIES = useMemo(() => {
     const cats = new Set(MENU.map(item => item.category).filter(Boolean));
@@ -238,18 +250,24 @@ export default function FullMenu() {
             
             {/* Visual Prominent Grid Layout for Premium Feel */}
             <div className="grid grid-cols-2 gap-3.5">
-              {groupedMenu[cat].map(product => (
-                <div 
-                  key={product.id}
-                  onClick={() => openCustomizer(product)}
-                  className="bg-white p-2 rounded-[1.2rem] flex flex-col gap-2 border border-black/5 shadow-sm active:scale-[0.98] transition-transform cursor-pointer group hover:shadow-md"
-                >
-                  <div className="w-full aspect-square rounded-[1rem] overflow-hidden bg-gray-100 relative shadow-inner">
-                    {product.badge && (
-                      <div className="absolute top-2 left-2 z-10 bg-black/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-sm">
-                        {product.badge}
-                      </div>
-                    )}
+              {groupedMenu[cat].map(product => {
+                const isBlacklisted = blacklistedProductIds.includes(product.id);
+                return (
+                  <div 
+                    key={product.id}
+                    onClick={() => !isBlacklisted && openCustomizer(product)}
+                    className={`bg-white p-2 rounded-[1.2rem] flex flex-col gap-2 border border-black/5 shadow-sm transition-transform cursor-pointer group hover:shadow-md ${isBlacklisted ? 'opacity-55 cursor-not-allowed' : 'active:scale-[0.98]'}`}
+                  >
+                    <div className="w-full aspect-square rounded-[1rem] overflow-hidden bg-gray-100 relative shadow-inner">
+                      {isBlacklisted ? (
+                        <div className="absolute top-2 left-2 z-10 bg-red-600 text-white text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md shadow-sm">
+                          Sold Out
+                        </div>
+                      ) : product.badge ? (
+                        <div className="absolute top-2 left-2 z-10 bg-black/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-sm">
+                          {product.badge}
+                        </div>
+                      ) : null}
                     <button 
                       onClick={(e) => handleShare(e, product)}
                       className="absolute top-2 right-2 z-10 bg-white/60 backdrop-blur-md hover:bg-white/90 text-gray-800 p-1.5 rounded-full shadow-sm transition-all active:scale-95"
@@ -277,7 +295,8 @@ export default function FullMenu() {
                     </div>
                   </div>
                 </div>
-              ))}
+              );
+            })}
             </div>
           </div>
         ))}

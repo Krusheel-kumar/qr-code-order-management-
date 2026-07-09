@@ -35,6 +35,9 @@ public class SecurityConfig {
             .httpBasic(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/menu/**").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/ai/context").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/admin/coupons").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v2/admin/stores/*/blacklist/**").permitAll()
                 .requestMatchers("/api/auth/**", "/api/discovery/**", "/api/public/**", "/ws/**").permitAll()
 
                 // --- Admin-only order endpoints (declared FIRST so they take priority) ---
@@ -51,12 +54,13 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/orders/*").permitAll()
                 // POST: customer initiates Razorpay payment for pickup orders
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/payments/create-order").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v2/payments/callback").permitAll()
                 // GET: customer fetches their own profile and order history
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/users/*").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/users/*/orders").permitAll()
 
                 // All remaining requests require authentication
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/admin/**", "/api/v2/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/menu/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )

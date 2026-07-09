@@ -8,6 +8,7 @@ export interface CartItem {
   customization: string;
   price: number;
   quantity: number;
+  customizationsList?: { optionId: string; quantity: number }[];
 }
 
 interface CartStore {

@@ -26,9 +26,10 @@ public class Order {
     private String customerPhone;
     private String tableNumber;
     
-    private Long storeId;
+    private String storeId;
     private String orderType; // "DINE_IN" or "PICKUP"
     
+    @Column(name = "payment_reference", unique = true)
     private String paymentReference;
     private String paymentStatus;
     

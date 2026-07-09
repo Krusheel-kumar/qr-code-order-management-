@@ -5,13 +5,8 @@ import type { MenuItem } from '../data/menu';
 import { useCartStore } from '../store/useCartStore';
 import { shareContent } from '../utils/shareUtils';
 import ShareModal from './ui/ShareModal';
-
-const MILK_OPTIONS = ['Fresh Milk', 'Soy Milk', 'Non Dairy', 'Oat Milk', 'Almond Milk'];
-const ALL_TOPPINGS = [
-  'Tapioca Pearls (Boba)', 'Popping Boba (Strawberry)', 'Popping Boba (Mango)', 
-  'Lychee Boba', 'Blueberry Boba', 'Chocolate Boba', 'Brown Sugar Jelly', 
-  'Mango Jelly', 'Coffee Foam', 'Cheese Foam', 'Whipped Cream'
-];
+import type { CustomizationGroup, CustomizationOption } from '../data/models';
+import { getBlacklistedOptions } from '../api';
 
 interface CustomizerSheetProps {
   product: MenuItem | null;
@@ -23,65 +18,151 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
   const cartStore = useCartStore();
 
   const [step, setStep] = useState<'details' | 'customize'>('details');
-  const [size, setSize] = useState('Regular');
-  const [milk, setMilk] = useState(MILK_OPTIONS[0]);
-  const [freeTopping, setFreeTopping] = useState('');
-  const [extraToppings, setExtraToppings] = useState<string[]>([]);
-  const [showError, setShowError] = useState(false);
   
+  // Customizations state: maps groupId -> list of selected options
+  const [selections, setSelections] = useState<Record<string, CustomizationOption[]>>({});
+  const [groupErrors, setGroupErrors] = useState<Record<string, string>>({});
+  const [blacklistedOptionIds, setBlacklistedOptionIds] = useState<string[]>([]);
   const [shareModal, setShareModal] = useState<{isOpen: boolean, title: string, url: string}>({isOpen: false, title: '', url: ''});
 
-  // Reset state when product changes
+  // Load branch blacklist overrides when sheet opens
+  useEffect(() => {
+    if (isOpen && cartStore.storeId) {
+      getBlacklistedOptions(cartStore.storeId)
+        .then(setBlacklistedOptionIds)
+        .catch(console.error);
+    } else {
+      setBlacklistedOptionIds([]);
+    }
+  }, [isOpen, cartStore.storeId]);
+
+  // Reset selections state when product changes
   useEffect(() => {
     if (product) {
       setStep('details');
-      setSize('Regular');
-      setMilk(MILK_OPTIONS[0]);
-      setFreeTopping('');
-      setExtraToppings([]);
-      setShowError(false);
+      setGroupErrors({});
+      
+      const initialSelections: Record<string, CustomizationOption[]> = {};
+      product.customizationGroups?.forEach(group => {
+        // Pre-select the first available option if required and minSelections > 0
+        if (group.minSelections > 0 && group.options && group.options.length > 0) {
+          const defaultOpt = group.options.find(o => o.isAvailable && !blacklistedOptionIds.includes(o.id));
+          if (defaultOpt) {
+            initialSelections[group.id] = [defaultOpt];
+          } else {
+            initialSelections[group.id] = [];
+          }
+        } else {
+          initialSelections[group.id] = [];
+        }
+      });
+      setSelections(initialSelections);
     }
-  }, [product]);
+  }, [product, blacklistedOptionIds]);
 
   if (!product) return null;
 
-  let totalPrice = product.price;
-  if (size === 'Large') totalPrice += (product.largePriceAddOn || 30);
-  totalPrice += (extraToppings.length * 60);
+  // Price Calculation: Base + Customization extra charges (with group free limits)
+  let expectedItemPrice = product.price;
+
+  let customizationsPrice = 0;
+  product.customizationGroups?.forEach(group => {
+    const selected = selections[group.id] || [];
+    const freeLimit = group.freeSelectionsLimit || 0;
+    
+    // Sort options ascending by price so cheapest options are discounted first
+    const sorted = [...selected].sort((a, b) => a.defaultPrice - b.defaultPrice);
+    
+    let remainingFree = freeLimit;
+    sorted.forEach(opt => {
+      // In customer customizer sheet, option qty is treated as 1
+      const qty = 1;
+      const freeApplied = Math.min(qty, remainingFree);
+      remainingFree -= freeApplied;
+      
+      const billableQty = qty - freeApplied;
+      customizationsPrice += opt.defaultPrice * billableQty;
+    });
+  });
+
+  const totalPrice = expectedItemPrice + customizationsPrice;
+
+  const handleSelectOption = (group: CustomizationGroup, option: CustomizationOption) => {
+    const current = selections[group.id] || [];
+    const isAlreadySelected = current.some(o => o.id === option.id);
+    let newSelected: CustomizationOption[] = [];
+
+    if (isAlreadySelected) {
+      newSelected = current.filter(o => o.id !== option.id);
+    } else {
+      if (group.maxSelections === 1) {
+        newSelected = [option];
+      } else if (current.length < group.maxSelections) {
+        newSelected = [...current, option];
+      } else {
+        alert(`You can select a maximum of ${group.maxSelections} option(s) for "${group.name}".`);
+        return;
+      }
+    }
+
+    setSelections({ ...selections, [group.id]: newSelected });
+    setGroupErrors({ ...groupErrors, [group.id]: '' });
+  };
 
   const handleAddToCart = () => {
-    if (!freeTopping) {
-      setShowError(true);
-      const element = document.getElementById('free-topping-section');
+    // Validate minSelection requirements for each group
+    const errors: Record<string, string> = {};
+    let hasErrors = false;
+
+    product.customizationGroups?.forEach(group => {
+      const selectedCount = (selections[group.id] || []).length;
+      if (selectedCount < group.minSelections) {
+        errors[group.id] = `Please select at least ${group.minSelections} option(s).`;
+        hasErrors = true;
+      }
+    });
+
+    if (hasErrors) {
+      setGroupErrors(errors);
+      // Scroll to the first group that has an error
+      const firstErrorGroupId = Object.keys(errors)[0];
+      const element = document.getElementById(`group-section-${firstErrorGroupId}`);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
       return;
     }
 
-    let customizations = [];
-    customizations.push(size);
-    if (product.category === 'Milk Teas') customizations.push(milk);
-    if (freeTopping) customizations.push(`Free: ${freeTopping}`);
-    if (extraToppings.length > 0) customizations.push(`Extra: ${extraToppings.join(', ')}`);
+    // Build customizations text string for backward compatibility
+    const customizationsText: string[] = [];
     
+    const customizationsList: { optionId: string; quantity: number }[] = [];
+
+    product.customizationGroups?.forEach(group => {
+      const selected = selections[group.id] || [];
+      if (selected.length > 0) {
+        const optionNames = selected.map(o => o.name).join(', ');
+        customizationsText.push(`${group.name}: ${optionNames}`);
+        
+        selected.forEach(o => {
+          customizationsList.push({
+            optionId: o.id,
+            quantity: 1
+          });
+        });
+      }
+    });
+
     cartStore.addItem({
       product: product,
-      customization: customizations.join(' | '),
+      customization: customizationsText.join(' | '),
       price: totalPrice,
-      quantity: 1
+      quantity: 1,
+      customizationsList
     });
-    
+
     if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
     onClose();
-  };
-
-  const toggleExtraTopping = (t: string) => {
-    if (extraToppings.includes(t)) {
-      setExtraToppings(extraToppings.filter(item => item !== t));
-    } else {
-      setExtraToppings([...extraToppings, t]);
-    }
   };
 
   const handleShare = () => {
@@ -115,7 +196,7 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-[var(--color-premium-dark)]/60 backdrop-blur-sm z-[100000]"
+            className="fixed inset-0 bg-[#1A0B05]/60 backdrop-blur-sm z-[100000]"
           />
           
           <motion.div
@@ -169,7 +250,7 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
                       </div>
                       <button 
                         onClick={() => setStep('customize')}
-                        className="shrink-0 bg-[var(--color-premium-dark)] text-white px-5 py-3 rounded-full font-bold text-sm shadow-[0_8px_20px_rgba(0,0,0,0.15)] hover:scale-105 active:scale-95 transition-all mt-1"
+                        className="shrink-0 bg-[#1A0B05] text-white px-5 py-3 rounded-full font-bold text-sm shadow-[0_8px_20px_rgba(0,0,0,0.15)] hover:scale-105 active:scale-95 transition-all mt-1"
                       >
                         Customize
                       </button>
@@ -208,111 +289,94 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
                   </div>
 
                   <div className="p-6 space-y-8 flex-1">
-
-                {/* Size */}
-                <div>
-                  <h4 className="font-bold text-foreground mb-3 uppercase tracking-widest text-gray-500 text-sm">Size</h4>
-                  <div className="flex gap-3">
-                    {['Regular', 'Large'].map(s => (
-                      <button 
-                        key={s} 
-                        onClick={() => setSize(s)}
-                        className={`flex-1 py-3 rounded-2xl border text-base font-bold transition-all flex flex-col items-center justify-center gap-1 ${size === s ? 'border-primary bg-[var(--color-cream)] text-primary-foreground shadow-sm' : 'border-gray-200 text-gray-400 hover:border-gray-300 bg-white'}`}
-                      >
-                        {s}
-                        <span className="text-[12px] font-medium opacity-60">
-                          {s === 'Regular' ? `₹${product.price}` : `₹${product.price + (product.largePriceAddOn || 30)}`}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Choice of Milk */}
-                {product.category === 'Milk Teas' && (
-                  <div>
-                    <h4 className="font-bold text-foreground mb-3 uppercase tracking-widest text-gray-500 text-sm">Choice of Milk</h4>
-                    <div className="flex flex-col gap-2">
-                      {MILK_OPTIONS.map(m => (
-                        <button 
-                          key={m} 
-                          onClick={() => setMilk(m)}
-                          className={`w-full py-3.5 px-5 rounded-2xl border text-base font-bold transition-all flex justify-between items-center ${milk === m ? 'border-primary bg-primary/10 text-primary-foreground shadow-sm' : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-white'}`}
+                    {/* Dynamic Customization Groups */}
+                    {product.customizationGroups?.map(group => {
+                      const selected = selections[group.id] || [];
+                      const error = groupErrors[group.id];
+                      return (
+                        <div 
+                          key={group.id} 
+                          id={`group-section-${group.id}`} 
+                          className={`p-4 -mx-4 rounded-2xl border transition-all duration-300 ${error ? 'bg-red-50/50 border-red-200 shadow-sm' : 'border-transparent'}`}
                         >
-                          {m}
-                          {milk === m && <Check size={18} className="text-primary" />}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                          <div className="flex justify-between items-start mb-1">
+                            <h4 className="font-bold text-[#1A0B05] uppercase tracking-widest text-sm flex items-center gap-1">
+                              {group.name}
+                              {group.isRequired && <span className="text-red-500">*</span>}
+                            </h4>
+                            {group.freeSelectionsLimit > 0 && (
+                              <span className="text-xs text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-md">
+                                First {group.freeSelectionsLimit} Free
+                              </span>
+                            )}
+                          </div>
+                          
+                          <p className="text-[12px] text-gray-400 mb-4">
+                            Choose between {group.minSelections} and {group.maxSelections} option(s)
+                          </p>
 
-                {/* Choice of Free Topping */}
-                <div id="free-topping-section" className={`p-4 -mx-4 rounded-2xl transition-all duration-300 ${showError ? 'bg-red-50 border border-red-200 shadow-inner' : ''}`}>
-                  <h4 className={`font-bold mb-1 uppercase tracking-widest text-sm ${showError ? 'text-red-500' : 'text-gray-500'}`}>Choice of Free Topping <span className="text-red-500">*</span></h4>
-                  <p className={`text-[12px] mb-3 ${showError ? 'text-red-500 font-bold' : 'text-gray-400'}`}>
-                    {showError ? 'Please select 1 free topping to continue' : '(Choose 1) • Included'}
-                  </p>
-                  <div className="flex flex-col gap-2">
-                     {ALL_TOPPINGS.map(t => {
-                        const isSelected = freeTopping === t;
-                        const isExtra = extraToppings.includes(t);
-                        return (
-                          <button 
-                            key={t} 
-                            onClick={() => {
-                                if (isExtra) setExtraToppings(extraToppings.filter(item => item !== t));
-                                setFreeTopping(isSelected ? '' : t);
-                                if (!isSelected) setShowError(false);
-                            }}
-                            className={`w-full py-3.5 px-5 rounded-2xl border text-base font-bold transition-all flex justify-between items-center ${isSelected ? 'border-primary bg-primary/10 text-primary-foreground shadow-sm' : showError ? 'border-red-200 bg-white hover:border-red-300' : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-white'}`}
-                          >
-                            <span className={showError && !isSelected ? 'text-red-700' : ''}>{t}</span>
-                            {isSelected && <Check size={18} className="text-primary" />}
-                          </button>
-                        )
-                     })}
+                          {error && (
+                            <p className="text-xs text-red-500 font-bold mb-3 bg-red-100/50 p-2 rounded-xl border border-red-200/40">
+                              {error}
+                            </p>
+                          )}
+
+                          <div className="flex flex-col gap-2">
+                            {group.options?.map(option => {
+                              const isSelected = selected.some(o => o.id === option.id);
+                              const isBlacklisted = blacklistedOptionIds.includes(option.id);
+                              const isAvailable = option.isAvailable && !isBlacklisted;
+                              
+                              return (
+                                <button
+                                  key={option.id}
+                                  disabled={!isAvailable}
+                                  onClick={() => handleSelectOption(group, option)}
+                                  className={`w-full py-3.5 px-5 rounded-2xl border text-base font-bold transition-all flex justify-between items-center ${
+                                    !isAvailable
+                                      ? 'border-gray-100 bg-gray-50/70 text-gray-300 cursor-not-allowed'
+                                      : isSelected
+                                      ? 'border-primary bg-primary/10 text-primary shadow-sm'
+                                      : 'border-gray-200 text-gray-700 hover:border-gray-300 bg-white'
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span>{option.name}</span>
+                                    {!isAvailable && (
+                                      <span className="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-md uppercase font-bold tracking-wider">
+                                        Sold Out
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2 text-sm">
+                                    {option.defaultPrice > 0 && (
+                                      <span className={isSelected ? 'text-primary font-bold' : 'text-gray-500'}>
+                                        +₹{option.defaultPrice}
+                                      </span>
+                                    )}
+                                    {isSelected && <Check size={18} className="text-primary shrink-0" />}
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
+              )}
+            </div>
 
-                {/* Choice of Extra Toppings */}
-                <div>
-                  <h4 className="font-bold text-foreground mb-1 uppercase tracking-widest text-gray-500 text-sm">Choice of Extra Toppings</h4>
-                  <p className="text-[12px] text-primary font-bold mb-3">+₹60 each</p>
-                  <div className="flex flex-col gap-2">
-                     {ALL_TOPPINGS.map(t => {
-                        const isSelected = extraToppings.includes(t);
-                        const isFree = freeTopping === t;
-                        return (
-                          <button 
-                            key={t} 
-                            onClick={() => {
-                                if (isFree) setFreeTopping('');
-                                toggleExtraTopping(t);
-                            }}
-                            className={`w-full py-3.5 px-5 rounded-2xl border text-base font-bold transition-all flex justify-between items-center ${isSelected ? 'border-primary bg-primary/10 text-primary-foreground shadow-sm' : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-white'}`}
-                          >
-                            <span>{t}</span>
-                            {isSelected && <Check size={18} className="text-primary" />}
-                          </button>
-                        )
-                     })}
-                  </div>
-                </div>
-              </div>
-              </div>
-            )}
-          </div>
-
-            {/* Footer */}
+            {/* Footer Add To Cart Button */}
             {step === 'customize' && (
               <div className="shrink-0 p-4 bg-white/95 backdrop-blur-xl border-t border-gray-100 z-50">
                 <button
                   onClick={handleAddToCart}
-                  className={`w-full text-white py-4 rounded-2xl font-bold text-lg shadow-[0_8px_20px_rgba(0,0,0,0.15)] hover:shadow-[0_10px_25px_rgba(0,0,0,0.2)] hover:scale-[1.02] active:scale-95 transition-all flex justify-between items-center px-6 border border-black/10 ${showError ? 'bg-red-500 hover:bg-red-600 animate-pulse' : 'bg-[var(--color-premium-dark)] hover:bg-[var(--color-premium-dark)]'}`}
+                  className="w-full text-white py-4 rounded-2xl font-bold text-lg bg-[#1A0B05] hover:bg-[#2A150C] shadow-[0_8px_20px_rgba(0,0,0,0.15)] active:scale-[0.98] transition-all flex justify-between items-center px-6 border border-black/10"
                 >
-                  <span className="uppercase tracking-widest text-sm">{showError ? 'Select a Topping' : 'Add to Cart'}</span>
-                  {!showError && <span className="opacity-90 text-[17px] tracking-tight font-extrabold text-primary">₹{totalPrice}</span>}
+                  <span className="uppercase tracking-widest text-sm">Add to Cart</span>
+                  <span className="opacity-90 text-[17px] tracking-tight font-extrabold text-primary">₹{totalPrice}</span>
                 </button>
               </div>
             )}

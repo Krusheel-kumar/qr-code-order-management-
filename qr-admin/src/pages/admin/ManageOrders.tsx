@@ -140,57 +140,64 @@ export default function ManageOrders() {
     setIsSoundEnabled(!isSoundEnabled);
   };
 
-  const renderOrderCard = (order: Order, nextStatus: string, nextStatusLabel: string, colorClass: string) => (
-    <div key={order.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-4 flex flex-col">
-      <div className="flex justify-between items-start mb-2">
+  const renderOrderCard = (order: Order, nextStatus: string, nextStatusLabel: string) => (
+    <div key={order.id} className="glass-panel rounded-2xl border border-[#FAEDCD] p-5 mb-4 flex flex-col hover:shadow-md transition-all duration-300">
+      <div className="flex justify-between items-start mb-3">
         <div>
-          <h3 className="font-bold text-lg">{order.orderNumber || `#${order.id.substring(0, 8).toUpperCase()}`}</h3>
-          <p className="text-sm text-gray-500">{new Date(order.createdAt).toLocaleTimeString()}</p>
+          <h3 className="font-heading font-black text-[#2A1B16] text-lg">{order.orderNumber || `#${order.id.substring(0, 8).toUpperCase()}`}</h3>
+          <p className="text-xs text-[#8D6E63] font-semibold mt-0.5">{new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
         </div>
-        <div className={`px-2 py-1 rounded-lg text-xs font-bold ${order.orderType === 'PICKUP' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700'}`}>
+        <div className={`px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-wider ${order.orderType === 'PICKUP' ? 'bg-[#FFB5A7]/25 text-[#C26B5C] border border-[#FFB5A7]/30' : 'bg-[#FFD54F]/25 text-[#2A1B16] border border-[#FFD54F]/30'}`}>
           {order.orderType === 'PICKUP' ? 'PICKUP' : 'DINE-IN'}
         </div>
       </div>
       
-      <div className="flex justify-between items-center mb-2">
-        <p className="font-semibold text-gray-800">{order.customerName}</p>
-        <div className={`px-2 py-1 rounded-lg text-xs font-bold flex flex-col items-end ${colorClass}`}>
+      <div className="flex justify-between items-center mb-3">
+        <p className="font-bold text-[#2A1B16] text-sm">{order.customerName}</p>
+        <div className={`px-2 py-0.5 rounded-lg text-xs font-semibold flex flex-col items-end`}>
           {order.orderType === 'PICKUP' ? (
             <>
-              <span>{order.customerPhone || 'No Phone'}</span>
+              <span className="text-[#8D6E63] font-mono">{order.customerPhone || 'No Phone'}</span>
               {order.storeId && (
-                <span className="text-[10px] opacity-90 mt-0.5">
+                <span className="text-[9px] font-black text-[#B87A42] uppercase tracking-wider mt-0.5">
                   {STORES.find(s => s.id === order.storeId?.toString())?.name || `Store ${order.storeId}`}
                 </span>
               )}
             </>
-          ) : `Table ${order.tableNumber || '?'}`}
+          ) : (
+            <span className="bg-[#A3B18A]/15 text-[#5B6D49] border border-[#A3B18A]/30 px-2 py-0.5 rounded-lg font-bold text-[11px]">
+              Table {order.tableNumber || '?'}
+            </span>
+          )}
         </div>
       </div>
       
-      <div className="flex-1 space-y-2 mb-4">
+      <div className="flex-1 space-y-2.5 mb-5 border-t border-[#FAEDCD]/50 pt-3">
         {order.items?.map(item => (
-          <div key={item.id} className="text-sm">
-            <span className="font-bold">{item.quantity}x</span> {item.productName}
+          <div key={item.id} className="text-sm text-[#2A1B16] font-medium leading-relaxed">
+            <span className="font-black bg-[#FAEDCD]/60 px-1.5 py-0.5 rounded mr-2 text-xs text-[#2A1B16]">{item.quantity}x</span> 
+            {item.productName}
             {item.customizations && (
-              <p className="text-xs text-gray-500 ml-5">{item.customizations}</p>
+              <p className="text-xs text-[#8D6E63] italic ml-7 mt-1 bg-[#FFF8E8] px-2 py-0.5 rounded border border-[#FAEDCD]/30 inline-block">{item.customizations}</p>
             )}
             {item.specialInstructions && (
-              <p className="text-xs text-red-400 ml-5">Note: {item.specialInstructions}</p>
+              <p className="text-xs text-red-500 font-bold bg-red-50/50 border border-red-100/80 rounded-xl p-2.5 mt-1.5 ml-7">
+                Note: {item.specialInstructions}
+              </p>
             )}
           </div>
         ))}
       </div>
 
-      <div className="flex justify-between items-center mt-auto pt-3 border-t border-gray-100">
-        <span className="font-bold">₹{order.totalAmount}</span>
+      <div className="flex justify-between items-center mt-auto pt-3 border-t border-[#FAEDCD]/40">
+        <span className="font-heading font-black text-lg text-[#2A1B16]">₹{order.totalAmount}</span>
         {nextStatus && (
           <button 
             onClick={() => handleStatusUpdate(order.id, nextStatus)}
-            className={`px-4 py-2 rounded-lg text-white font-bold text-sm shadow-sm transition-transform active:scale-95 ${
-              nextStatus === 'PREPARING' ? 'bg-orange-500 hover:bg-orange-600' :
-              nextStatus === 'READY' ? 'bg-emerald-500 hover:bg-emerald-600' :
-              'bg-blue-500 hover:bg-blue-600'
+            className={`px-4 py-2 rounded-xl text-white font-bold text-xs shadow-sm transition-all active:scale-95 cursor-pointer ${
+              nextStatus === 'PREPARING' ? 'bg-[#D4A373] hover:bg-[#C28C5C]' :
+              nextStatus === 'READY' ? 'bg-[#A3B18A] hover:bg-[#8F9F76]' :
+              'bg-[#2A1B16] hover:bg-[#3D2921]'
             }`}
           >
             {nextStatusLabel}
@@ -199,7 +206,7 @@ export default function ManageOrders() {
         {!nextStatus && order.status === 'READY' && (
           <button 
             onClick={() => handleStatusUpdate(order.id, 'DELIVERED')}
-            className="px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-900 text-white font-bold text-sm shadow-sm transition-transform active:scale-95"
+            className="px-4 py-2 rounded-xl bg-[#2A1B16] hover:bg-[#3D2921] text-[#FFD54F] font-bold text-xs shadow-sm transition-all active:scale-95 cursor-pointer"
           >
             Mark Picked Up
           </button>
@@ -209,72 +216,91 @@ export default function ManageOrders() {
   );
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden font-sans">
       <audio ref={audioRef} src={alarmSound} preload="auto" />
+      
+      {/* KDS Title Header */}
       <div className="mb-6 shrink-0 flex justify-between items-end">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Manage Orders</h1>
-          <p className="text-gray-500 mt-1">Live Kitchen Display System (KDS)</p>
+          <h1 className="text-3xl font-heading font-black text-[#2A1B16] tracking-tight">Manage Orders</h1>
+          <p className="text-[#8D6E63] font-medium mt-1">Live Kitchen Display System (KDS)</p>
         </div>
         <button 
           onClick={toggleSound}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all ${isSoundEnabled ? 'bg-[#FFB300] text-white shadow-md' : 'bg-gray-100 text-gray-500'}`}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer ${
+            isSoundEnabled 
+              ? 'bg-[#FFD54F] text-[#2A1B16] border border-[#FFD54F]/50 shadow-sm' 
+              : 'bg-[#FAEDCD]/50 text-[#8D6E63] border border-transparent hover:bg-[#FAEDCD] hover:text-[#2A1B16]'
+          }`}
         >
-          {isSoundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+          {isSoundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
           {isSoundEnabled ? 'Alerts On' : 'Alerts Off'}
         </button>
       </div>
 
-      <div className="flex-1 grid grid-cols-3 gap-6 min-h-0 overflow-hidden">
+      {/* KDS Columns Grid */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0 overflow-hidden">
         
         {/* PLACED COLUMN */}
-        <div className="flex flex-col h-full bg-blue-50/50 rounded-xl border border-blue-100 min-h-0 overflow-hidden">
-          <div className="p-4 border-b border-blue-100 bg-blue-50 rounded-t-xl shrink-0">
-            <h2 className="font-bold text-gray-900 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-blue-600" />
+        <div className="flex flex-col h-full bg-[#FFF8E8]/30 rounded-2xl border border-[#FAEDCD]/60 min-h-0 overflow-hidden">
+          <div className="p-4 border-b border-[#FAEDCD]/60 bg-[#FFD54F]/10 rounded-t-2xl shrink-0 flex items-center gap-2">
+            <Clock className="w-5 h-5 text-[#2A1B16]" />
+            <h2 className="font-heading font-bold text-sm text-[#2A1B16]">
               New Orders 
-              <span className="bg-white px-2 py-0.5 rounded-md text-xs font-bold text-gray-700 shadow-sm ml-auto">
-                {placedOrders.length}
-              </span>
             </h2>
+            <span className="bg-[#2A1B16] text-[#FFD54F] px-2 py-0.5 rounded-md text-[10px] font-bold shadow-sm ml-auto">
+              {placedOrders.length}
+            </span>
           </div>
-          <div className="p-4 flex-1 overflow-y-auto custom-scrollbar">
-            {placedOrders.map(o => renderOrderCard(o, 'PREPARING', 'Start Preparing', 'bg-blue-100 text-blue-700'))}
-            {placedOrders.length === 0 && <div className="text-gray-400 text-center mt-10 p-4 border-2 border-dashed border-gray-200 rounded-lg text-sm">No new orders</div>}
+          <div className="p-4 flex-1 overflow-y-auto hide-scrollbar">
+            {placedOrders.map(o => renderOrderCard(o, 'PREPARING', 'Start Preparing'))}
+            {placedOrders.length === 0 && (
+              <div className="text-[#8D6E63]/70 text-center mt-12 p-6 border-2 border-dashed border-[#FAEDCD] rounded-2xl text-xs font-semibold">
+                No new orders
+              </div>
+            )}
           </div>
         </div>
 
         {/* PREPARING COLUMN */}
-        <div className="flex flex-col h-full bg-orange-50/50 rounded-xl border border-orange-100 min-h-0 overflow-hidden">
-          <div className="p-4 border-b border-orange-100 bg-orange-50 rounded-t-xl shrink-0">
-            <h2 className="font-bold text-gray-900 flex items-center gap-2">
-              <ChefHat className="w-5 h-5 text-orange-600" />
+        <div className="flex flex-col h-full bg-[#FFF8E8]/30 rounded-2xl border border-[#FAEDCD]/60 min-h-0 overflow-hidden">
+          <div className="p-4 border-b border-[#FAEDCD]/60 bg-[#D4A373]/10 rounded-t-2xl shrink-0 flex items-center gap-2">
+            <ChefHat className="w-5 h-5 text-[#B87A42]" />
+            <h2 className="font-heading font-bold text-sm text-[#2A1B16]">
               Preparing
-              <span className="bg-white px-2 py-0.5 rounded-md text-xs font-bold text-gray-700 shadow-sm ml-auto">
-                {preparingOrders.length}
-              </span>
             </h2>
+            <span className="bg-[#2A1B16] text-[#FFD54F] px-2 py-0.5 rounded-md text-[10px] font-bold shadow-sm ml-auto">
+              {preparingOrders.length}
+            </span>
           </div>
-          <div className="p-4 flex-1 overflow-y-auto custom-scrollbar">
-            {preparingOrders.map(o => renderOrderCard(o, 'READY', 'Mark Ready', 'bg-orange-100 text-orange-700'))}
-            {preparingOrders.length === 0 && <div className="text-gray-400 text-center mt-10 p-4 border-2 border-dashed border-gray-200 rounded-lg text-sm">Nothing preparing</div>}
+          <div className="p-4 flex-1 overflow-y-auto hide-scrollbar">
+            {preparingOrders.map(o => renderOrderCard(o, 'READY', 'Mark Ready'))}
+            {preparingOrders.length === 0 && (
+              <div className="text-[#8D6E63]/70 text-center mt-12 p-6 border-2 border-dashed border-[#FAEDCD] rounded-2xl text-xs font-semibold">
+                Nothing preparing
+              </div>
+            )}
           </div>
         </div>
 
         {/* READY COLUMN */}
-        <div className="flex flex-col h-full bg-emerald-50/50 rounded-xl border border-emerald-100 min-h-0 overflow-hidden">
-          <div className="p-4 border-b border-emerald-100 bg-emerald-50 rounded-t-xl shrink-0">
-            <h2 className="font-bold text-gray-900 flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+        <div className="flex flex-col h-full bg-[#FFF8E8]/30 rounded-2xl border border-[#FAEDCD]/60 min-h-0 overflow-hidden">
+          <div className="p-4 border-b border-[#FAEDCD]/60 bg-[#A3B18A]/10 rounded-t-2xl shrink-0 flex items-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-[#5B6D49]" />
+            <h2 className="font-heading font-bold text-sm text-[#2A1B16]">
               Ready For Pickup
-              <span className="bg-white px-2 py-0.5 rounded-md text-xs font-bold text-gray-700 shadow-sm ml-auto">
-                {readyOrders.length}
-              </span>
             </h2>
+            <span className="bg-[#2A1B16] text-[#FFD54F] px-2 py-0.5 rounded-md text-[10px] font-bold shadow-sm ml-auto">
+              {readyOrders.length}
+            </span>
           </div>
-          <div className="p-4 flex-1 overflow-y-auto custom-scrollbar">
-            {readyOrders.map(o => renderOrderCard(o, '', '', 'bg-emerald-100 text-emerald-700'))}
-            {readyOrders.length === 0 && <div className="text-gray-400 text-center mt-10 p-4 border-2 border-dashed border-gray-200 rounded-lg text-sm">No orders ready</div>}
+          <div className="p-4 flex-1 overflow-y-auto hide-scrollbar">
+            {readyOrders.map(o => renderOrderCard(o, '', ''))}
+            {readyOrders.length === 0 && (
+              <div className="text-[#8D6E63]/70 text-center mt-12 p-6 border-2 border-dashed border-[#FAEDCD] rounded-2xl text-xs font-semibold">
+                No orders ready
+              </div>
+            )}
           </div>
         </div>
 

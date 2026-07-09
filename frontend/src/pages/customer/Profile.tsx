@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 import { LogOut, Clock, Award, Mail, Lock, User as UserIcon } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { getUserOrders, loginUser, registerUser } from '../../api';
 
 export default function Profile() {
+  const navigate = useNavigate();
   const { user, setUser, getLoyaltyTier } = useAuthStore();
   const [orders, setOrders] = useState<any[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
@@ -146,7 +147,15 @@ export default function Profile() {
       <h2 className="font-heading font-black text-3xl text-gray-900 mb-6">Your Account</h2>
 
       {/* Loyalty Card */}
-      <div className={`w-full rounded-[1.5rem] p-5 text-white mb-8 bg-gradient-to-br ${tier?.color || 'from-[#CD7F32] to-[#B87333]'} shadow-lg relative overflow-hidden`}>
+      <div 
+        onClick={() => navigate('/ai/home', {
+          state: {
+            customerName: user?.username || null,
+            isGuest: !user
+          }
+        })}
+        className={`w-full rounded-[1.5rem] p-5 text-white mb-8 bg-gradient-to-br ${tier?.color || 'from-[#CD7F32] to-[#B87333]'} shadow-lg relative overflow-hidden cursor-pointer hover:scale-[1.01] transition-transform`}
+      >
         <div className="relative z-10">
           <div className="flex justify-between items-start mb-4">
             <div>

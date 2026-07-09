@@ -13,6 +13,9 @@ public class Product {
     @Id
     private String id;
     
+    @Version
+    private Integer version = 0;
+    
     private String name;
     private String description;
     private BigDecimal price;
@@ -52,11 +55,25 @@ public class Product {
     @com.fasterxml.jackson.annotation.JsonIgnoreProperties("products")
     private List<DiscoverySection> discoverySections;
 
-    @ElementCollection
-    @BatchSize(size = 50)
-    @CollectionTable(name = "product_eligible_addons", joinColumns = @JoinColumn(name = "product_id"))
-    @Column(name = "addon_id")
-    private List<String> eligibleAddons;
+    @ManyToMany
+    @JoinTable(
+        name = "menu_item_customizations",
+        joinColumns = @JoinColumn(name = "menu_item_id"),
+        inverseJoinColumns = @JoinColumn(name = "customization_group_id")
+    )
+    @OrderColumn(name = "display_order")
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("products")
+    @org.hibernate.annotations.BatchSize(size = 50)
+    private List<CustomizationGroup> customizationGroups;
+
+    @ManyToMany
+    @JoinTable(
+        name = "combo_structure",
+        joinColumns = @JoinColumn(name = "parent_product_id"),
+        inverseJoinColumns = @JoinColumn(name = "child_product_id")
+    )
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties("parentProducts")
+    private List<Product> comboItems;
 
     private String subcategory;
     private BigDecimal largePriceAddOn;

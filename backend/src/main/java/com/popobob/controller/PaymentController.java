@@ -34,7 +34,13 @@ public class PaymentController {
 
             Order order = razorpay.orders.create(orderRequest);
 
-            return ResponseEntity.ok(order.toString());
+            Map<String, Object> responseMap = Map.of(
+                "id", order.get("id").toString(),
+                "amount", Integer.parseInt(order.get("amount").toString()),
+                "currency", order.get("currency").toString()
+            );
+
+            return ResponseEntity.ok(responseMap);
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body(Map.of("message", "Payment Order failed: " + e.getMessage()));

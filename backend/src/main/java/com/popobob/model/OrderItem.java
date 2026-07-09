@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.List;
 
 @Data
 @Entity
@@ -26,4 +27,11 @@ public class OrderItem {
     private String specialInstructions;
     @Column(columnDefinition = "TEXT")
     private String customizations;
+
+    @ElementCollection
+    @CollectionTable(
+        name = "order_item_customizations",
+        joinColumns = @JoinColumn(name = "order_item_id")
+    )
+    private List<OrderItemCustomization> customizationsList;
 }

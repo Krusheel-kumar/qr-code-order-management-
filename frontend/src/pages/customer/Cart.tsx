@@ -15,18 +15,71 @@ export default function Cart() {
   
   const [storeSettings, setStoreSettings] = useState({ taxRate: 5, deliveryFee: 40, packingCharge: 15 });
   const [usePoints, setUsePoints] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponsList, setCouponsList] = useState<any[]>([]);
   
   useEffect(() => {
     getStoreSettings().then(setStoreSettings).catch(console.error);
+    import('../../api').then(api => {
+      api.getCoupons().then(setCouponsList).catch(console.error);
+    });
   }, []);
+
+  // Recalculate coupon discount if subtotal changes
+  useEffect(() => {
+    if (appliedCoupon) {
+      if (subtotal < appliedCoupon.minOrderAmount) {
+        setAppliedCoupon(null);
+        setCouponDiscount(0);
+      } else {
+        let discount = 0;
+        if (appliedCoupon.type === 'PERCENTAGE' || appliedCoupon.type === 'percentage') {
+          discount = subtotal * (appliedCoupon.discountValue / 100);
+          if (appliedCoupon.maxDiscount) {
+            discount = Math.min(discount, appliedCoupon.maxDiscount);
+          }
+        } else {
+          discount = appliedCoupon.discountValue;
+        }
+        setCouponDiscount(Math.round(discount));
+      }
+    }
+  }, [subtotal, appliedCoupon]);
+
+  const handleApplyCoupon = () => {
+    if (!couponCode) return;
+    const found = couponsList.find(c => c.code.toUpperCase() === couponCode.toUpperCase() && c.active);
+    if (found) {
+      if (subtotal < found.minOrderAmount) {
+        alert(`This coupon code requires a minimum order of ₹${found.minOrderAmount}`);
+        return;
+      }
+      let discount = 0;
+      if (found.type === 'PERCENTAGE' || found.type === 'percentage') {
+        discount = subtotal * (found.discountValue / 100);
+        if (found.maxDiscount) {
+          discount = Math.min(discount, found.maxDiscount);
+        }
+      } else {
+        discount = found.discountValue;
+      }
+      setAppliedCoupon(found);
+      setCouponDiscount(Math.round(discount));
+    } else {
+      alert("Invalid or expired coupon code!");
+    }
+  };
 
   // Boba Wallet Math
   const loyaltyPoints = user?.loyaltyPoints || 0;
   const canUsePoints = loyaltyPoints >= 100;
   const loyaltyDiscount = usePoints ? Math.floor(loyaltyPoints / 10) : 0;
 
-  const taxes = Math.round((subtotal - loyaltyDiscount) * (storeSettings.taxRate / 100)); 
-  const total = Math.max(0, subtotal - loyaltyDiscount + taxes + storeSettings.packingCharge);
+  const totalDiscount = loyaltyDiscount + couponDiscount;
+  const taxes = Math.round((subtotal - totalDiscount) * (storeSettings.taxRate / 100)); 
+  const total = Math.max(0, subtotal - totalDiscount + taxes + storeSettings.packingCharge);
 
   return (
     <div className="min-h-screen pb-28 bg-[var(--color-background)] font-sans flex flex-col">
@@ -73,18 +126,44 @@ export default function Cart() {
           )}
         </div>
 
-        {/* Promo Code */}
-        <div className="bg-white border border-gray-200 border-dashed rounded-2xl p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
-            <Ticket size={20} />
+        {/* Promo Code Input Panel */}
+        <div className="bg-white border border-gray-200 border-dashed rounded-2xl p-4 space-y-3 shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <Ticket size={20} />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-bold text-base">Promo Code</h4>
+              <p className="text-[12px] text-gray-500">
+                {appliedCoupon ? `Applied: ${appliedCoupon.code} (-₹${couponDiscount})` : 'Save more on your order'}
+              </p>
+            </div>
+            {appliedCoupon && (
+              <button 
+                onClick={() => { setAppliedCoupon(null); setCouponDiscount(0); setCouponCode(''); }}
+                className="text-xs font-bold text-red-500 bg-red-50 px-3 py-1.5 rounded-full"
+              >
+                Remove
+              </button>
+            )}
           </div>
-          <div className="flex-1">
-            <h4 className="font-bold text-base">Apply Coupon</h4>
-            <p className="text-[12px] text-gray-500">Save more on your order</p>
-          </div>
-          <button className="text-sm font-bold text-primary uppercase tracking-widest px-3 py-1.5 bg-primary/10 rounded-full">
-            Apply
-          </button>
+          {!appliedCoupon && (
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder="e.g. SUMMER20"
+                value={couponCode}
+                onChange={e => setCouponCode(e.target.value)}
+                className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2 text-sm font-semibold uppercase outline-none focus:border-primary"
+              />
+              <button 
+                onClick={handleApplyCoupon}
+                className="text-xs font-bold text-primary uppercase tracking-widest px-4 py-2 bg-primary/10 rounded-xl hover:bg-primary/20 transition-all active:scale-95"
+              >
+                Apply
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Boba Wallet */}
@@ -129,6 +208,12 @@ export default function Cart() {
               <span className="text-gray-500">Subtotal</span>
               <span className="font-bold">₹{subtotal}</span>
             </div>
+            {couponDiscount > 0 && (
+              <div className="flex justify-between text-[#FF8F00] font-bold">
+                <span>Coupon Applied ({appliedCoupon?.code})</span>
+                <span>-₹{couponDiscount}</span>
+              </div>
+            )}
             {loyaltyDiscount > 0 && (
               <div className="flex justify-between text-[#FF8F00] font-bold">
                 <span>Points Used ({loyaltyPoints} pts)</span>
@@ -241,13 +326,15 @@ export default function Cart() {
                       paymentReference: paymentRef,
                       paymentStatus: status,
                       pointsUsed: usePoints ? loyaltyPoints : 0,
+                      couponCode: appliedCoupon?.code || null,
                       items: cartItems.map(item => ({
                         productId: item.product.id,
                         productName: item.product.name,
                         price: item.price,
                         quantity: item.quantity,
                         subtotal: item.price * item.quantity,
-                        customizations: item.customization
+                        customizations: item.customization,
+                        customizationsList: item.customizationsList || []
                       }))
                     };
                     

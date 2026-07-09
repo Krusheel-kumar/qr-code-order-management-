@@ -5,7 +5,7 @@ export default function FloatingAIButton() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  if (location.pathname === '/quiz') {
+  if (location.pathname === '/ai/home') {
     return null;
   }
 
@@ -28,7 +28,7 @@ export default function FloatingAIButton() {
       />
 
       <motion.button
-        onClick={() => navigate('/quiz')}
+        onClick={() => navigate('/ai/home')}
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         whileHover={{ scale: 1.05 }}
@@ -54,7 +54,7 @@ export default function FloatingAIButton() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
         className="mt-1 bg-white/95 backdrop-blur-xl border border-black/5 px-2.5 py-0.5 rounded-full text-black text-[9px] font-extrabold tracking-[0.1em] shadow-lg flex items-center gap-1.5 pointer-events-auto"
-        onClick={() => navigate('/quiz')}
+        onClick={() => navigate('/ai/home')}
       >
         <div className="w-1.5 h-1.5 bg-[#FFD54F] rounded-full animate-pulse shadow-sm" />
         POB Ai

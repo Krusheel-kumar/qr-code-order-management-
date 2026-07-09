@@ -8,7 +8,27 @@ export const getStoreSettings = async () => (await axios.get(`${API_URL}/public/
 export const getCampaigns = async () => (await axios.get(`${API_URL}/discovery/campaigns`)).data;
 export const getStories = async () => (await axios.get(`${API_URL}/discovery/stories`)).data;
 export const getDiscoverySections = async () => (await axios.get(`${API_URL}/discovery/sections`)).data;
-export const getCoupons = async (): Promise<any[]> => [];
+export const getCoupons = async () => {
+  try {
+    return (await axios.get(`${API_URL}/admin/coupons`)).data;
+  } catch (e) {
+    return [];
+  }
+};
+export const getBlacklistedProducts = async (storeId: string) => {
+  try {
+    return (await axios.get(`${API_URL}/v2/admin/stores/${storeId}/blacklist/products`)).data;
+  } catch (e) {
+    return [];
+  }
+};
+export const getBlacklistedOptions = async (storeId: string) => {
+  try {
+    return (await axios.get(`${API_URL}/v2/admin/stores/${storeId}/blacklist/options`)).data;
+  } catch (e) {
+    return [];
+  }
+};
 export const getAddons = async () => (await axios.get(`${API_URL}/menu/addons`)).data;
 
 export const menuApi = axios.create({
@@ -93,3 +113,13 @@ export const placeOrder = async (order: any) => {
   return res.data;
 };
 export const getOrderById = async (id: string) => (await ordersApi.get(`/${id}`)).data;
+
+// AI Engagement Layer
+export const getAIContext = async (params: { orderId?: string; customerName?: string; guest?: boolean }) => {
+  try {
+    const res = await axios.get(`${API_URL}/ai/context`, { params });
+    return res.data;
+  } catch (e) {
+    throw e;
+  }
+};

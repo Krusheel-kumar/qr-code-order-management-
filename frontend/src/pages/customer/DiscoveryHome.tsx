@@ -33,7 +33,7 @@ export default function DiscoveryHome() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const hasHandledDeepLink = useRef(false);
-  const { } = useAuthStore();
+  const { user } = useAuthStore();
   const { menuItems: MENU, getFeaturedProducts, campaigns, stories, discoverySections, isLoading } = useMenuStore();
   const featuredProduct = getFeaturedProducts()[0] || MENU[0];
   
@@ -396,7 +396,12 @@ export default function DiscoveryHome() {
         <motion.div 
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => navigate('/quiz')}
+          onClick={() => navigate('/ai/home', {
+            state: {
+              customerName: user?.username || null,
+              isGuest: !user
+            }
+          })}
           className="relative rounded-[2rem] p-5 overflow-hidden shadow-[0_15px_40px_rgba(255,152,0,0.2)] cursor-pointer group flex flex-col gap-3"
         >
           {/* Vibrant Holographic Background */}

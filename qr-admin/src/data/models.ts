@@ -75,6 +75,25 @@ export interface Addon {
   isActive: boolean;
 }
 
+export interface CustomizationGroup {
+  id: string;
+  name: string;
+  minSelections: number;
+  maxSelections: number;
+  freeSelectionsLimit: number;
+  isRequired: boolean;
+  version?: number;
+}
+
+export interface CustomizationOption {
+  id: string;
+  groupId: string;
+  name: string;
+  defaultPrice: number;
+  isAvailable: boolean;
+  version?: number;
+}
+
 export interface Coupon {
   id: string;
   code: string;

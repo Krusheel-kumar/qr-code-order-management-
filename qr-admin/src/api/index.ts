@@ -18,6 +18,13 @@ export const adminApi = axios.create({
   },
 });
 
+export const adminV2Api = axios.create({
+  baseURL: `${API_URL}/v2/admin`,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
 const applyAuthInterceptor = (apiInstance: any) => {
   apiInstance.interceptors.request.use((config: any) => {
     const token = useAuthStore.getState().token;
@@ -39,6 +46,7 @@ const applyAuthInterceptor = (apiInstance: any) => {
 };
 
 applyAuthInterceptor(adminApi);
+applyAuthInterceptor(adminV2Api);
 
 export const getStoreSettings = async () => (await adminApi.get('/settings', { params: { t: new Date().getTime() } })).data;
 export const updateStoreSettings = async (settings: any) => (await adminApi.post('/settings', settings)).data;
@@ -56,13 +64,25 @@ export const getStories = async () => (await adminApi.get('/stories')).data;
 export const createStory = async (story: any) => (await adminApi.post('/stories', story)).data;
 export const deleteStory = async (id: string) => await adminApi.delete(`/stories/${id}`);
 
-export const getCoupons = async () => [];
-export const createCoupon = async (coupon: any) => ({ ...coupon, id: Date.now().toString() });
-export const deleteCoupon = async (_id: string) => {};
+export const getCoupons = async () => (await adminApi.get('/coupons')).data;
+export const createCoupon = async (coupon: any) => (await adminApi.post('/coupons', coupon)).data;
+export const deleteCoupon = async (id: string) => await adminApi.delete(`/coupons/${id}`);
 
 export const getAddons = async () => [];
 export const createAddon = async (addon: any) => ({ ...addon, id: Date.now().toString() });
 export const deleteAddon = async (_id: string) => {};
+
+// --- Customization Groups API (V2) ---
+export const getCustomizationGroups = async () => (await adminV2Api.get('/customization-groups')).data;
+export const createCustomizationGroup = async (group: any) => (await adminV2Api.post('/customization-groups', group)).data;
+export const updateCustomizationGroup = async (id: string, group: any) => (await adminV2Api.put(`/customization-groups/${encodeURIComponent(id)}`, group)).data;
+export const deleteCustomizationGroup = async (id: string) => await adminV2Api.delete(`/customization-groups/${encodeURIComponent(id)}`);
+
+// --- Customization Options API (V2) ---
+export const getCustomizationOptions = async () => (await adminV2Api.get('/customization-options')).data;
+export const createCustomizationOption = async (option: any) => (await adminV2Api.post('/customization-options', option)).data;
+export const updateCustomizationOption = async (id: string, option: any) => (await adminV2Api.put(`/customization-options/${encodeURIComponent(id)}`, option)).data;
+export const deleteCustomizationOption = async (id: string) => await adminV2Api.delete(`/customization-options/${encodeURIComponent(id)}`);
 
 export const menuApi = axios.create({
   baseURL: `${API_URL}/menu`,
@@ -158,4 +178,36 @@ export const getActiveOrders = async () => (await ordersApi.get('/active')).data
 export const getOrderHistory = async () => (await ordersApi.get('/history')).data;
 export const updateOrderStatus = async (id: string, status: string) => 
   (await ordersApi.patch(`/${id}/status?status=${status}`)).data;
+
+// --- Product Customization Group Mapping (V2) ---
+export const getProductCustomizationGroups = async (productId: string) => 
+  (await adminV2Api.get(`/products/${productId}/customization-groups`)).data;
+
+export const assignProductCustomizationGroup = async (productId: string, groupId: string) => 
+  (await adminV2Api.post(`/products/${productId}/customization-groups`, { customizationGroupId: groupId })).data;
+
+export const removeProductCustomizationGroup = async (productId: string, groupId: string) => 
+  (await adminV2Api.delete(`/products/${productId}/customization-groups/${encodeURIComponent(groupId)}`)).data;
+
+export const reorderProductCustomizationGroups = async (productId: string, groupIds: string[]) => 
+  (await adminV2Api.put(`/products/${productId}/customization-groups/reorder`, { groupIds })).data;
+
+// --- Store Blacklists (V2) ---
+export const getStoreProductBlacklist = async (storeId: string) => 
+  (await adminV2Api.get(`/stores/${storeId}/blacklist/products`)).data;
+
+export const blacklistProductAtStore = async (storeId: string, productId: string) => 
+  (await adminV2Api.post(`/stores/${storeId}/blacklist/products`, { productId })).data;
+
+export const removeProductFromStoreBlacklist = async (storeId: string, productId: string) => 
+  (await adminV2Api.delete(`/stores/${storeId}/blacklist/products/${productId}`)).data;
+
+export const getStoreOptionBlacklist = async (storeId: string) => 
+  (await adminV2Api.get(`/stores/${storeId}/blacklist/options`)).data;
+
+export const blacklistOptionAtStore = async (storeId: string, optionId: string) => 
+  (await adminV2Api.post(`/stores/${storeId}/blacklist/options`, { optionId })).data;
+
+export const removeOptionFromStoreBlacklist = async (storeId: string, optionId: string) => 
+  (await adminV2Api.delete(`/stores/${storeId}/blacklist/options/${optionId}`)).data;
 

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '../../../store/useCartStore';
@@ -28,6 +28,8 @@ interface ChatMessage {
 
 export default function AIChatScreen() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state as { orderId?: string; customerName?: string; isGuest?: boolean } | null;
   const bottomRef = useRef<HTMLDivElement>(null);
   
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -79,12 +81,17 @@ export default function AIChatScreen() {
 
   const processGuidedFlow = async (choice: string) => {
     if (choice === "Yes, I know what I want") {
-      addAiMessage("Awesome! You can head straight to our menu or ask me to find something specific for you.", ["Go to Menu"]);
+      addAiMessage("Awesome! You can head straight to our menu, explore your POB AI hub, or ask me to find something specific for you.", ["Go to Menu", "Go to POB AI Hub"]);
       return;
     }
     
     if (choice === "Go to Menu") {
       navigate('/menu');
+      return;
+    }
+
+    if (choice === "Go to POB AI Hub") {
+      navigate('/ai/home', { state });
       return;
     }
 
@@ -132,7 +139,7 @@ export default function AIChatScreen() {
         
         // Generate recommendation
         const rec = getLocalRecommendation(selectedCategory!, selectedSubFlavor!, topping);
-        addAiMessage(rec.reason, ["Start over", "Go to Menu"], rec.productId);
+        addAiMessage(rec.reason, ["Go to Menu", "Go to POB AI Hub", "Start over"], rec.productId);
       }, 1500);
       return;
     }
@@ -175,10 +182,10 @@ export default function AIChatScreen() {
     try {
       const rec = await getLlmRecommendation(query);
       setMessages(prev => prev.filter(m => m.id !== typingId));
-      addAiMessage(rec.reason, ["Go to Menu", "Start over"], rec.productId);
+      addAiMessage(rec.reason, ["Go to Menu", "Go to POB AI Hub", "Start over"], rec.productId);
     } catch (err) {
       setMessages(prev => prev.filter(m => m.id !== typingId));
-      addAiMessage("Oops! My brain is a little cloudy right now. Let's try again, or you can browse the menu.", ["Go to Menu"]);
+      addAiMessage("Oops! My brain is a little cloudy right now. Let's try again, or you can browse the menu or visit the POB AI Hub.", ["Go to Menu", "Go to POB AI Hub"]);
     }
   };
 

@@ -3,6 +3,7 @@ package com.popobob.dto;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.List;
 
 @Data
 public class OrderItemDto {
@@ -13,4 +14,5 @@ public class OrderItemDto {
     private BigDecimal subtotal;
     private String specialInstructions;
     private String customizations;
+    private List<CustomizationSelectionDto> customizationsList;
 }

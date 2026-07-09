@@ -67,57 +67,57 @@ export default function CategoryEditModal({ isOpen, onClose, initialData }: Cate
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
-        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/80">
-          <h2 className="text-xl font-bold text-gray-800">{initialData ? 'Edit Category' : 'Add New Category'}</h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
-            <X className="w-5 h-5 text-gray-500" />
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 font-sans">
+      <div className="glass-panel rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-[#FAEDCD]">
+        <div className="p-6 border-b border-[#FAEDCD]/50 flex justify-between items-center bg-[#FFF8E8]/70">
+          <h2 className="text-xl font-heading font-black text-[#2A1B16]">{initialData ? 'Edit Category' : 'Add New Category'}</h2>
+          <button onClick={onClose} className="p-2 hover:bg-[#FAEDCD] rounded-full transition-colors cursor-pointer text-[#8D6E63] hover:text-[#2A1B16]">
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Category Name</label>
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#8D6E63] mb-1.5">Category Name</label>
             <input
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              placeholder="e.g. Pastries"
+              className="w-full border border-[#FAEDCD] rounded-xl bg-white/80 p-3 text-sm text-[#2A1B16] outline-none focus:ring-4 focus:ring-[#FFD54F]/20 focus:border-[#FFD54F] transition-all font-medium placeholder-[#8D6E63]/30"
+              placeholder="e.g. Special Milkteas"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Subcategories</label>
+            <label className="block text-xs font-bold uppercase tracking-wider text-[#8D6E63] mb-1.5">Subcategories</label>
             <div className="flex gap-2 mb-3">
               <input
                 type="text"
                 value={newSubcategory}
                 onChange={(e) => setNewSubcategory(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddSubcategory())}
-                className="flex-1 border border-gray-300 rounded-lg p-2.5 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                placeholder="e.g. Croissants"
+                className="flex-1 border border-[#FAEDCD] rounded-xl bg-white/80 p-3 text-sm text-[#2A1B16] outline-none focus:ring-4 focus:ring-[#FFD54F]/20 focus:border-[#FFD54F] transition-all font-medium placeholder-[#8D6E63]/30"
+                placeholder="e.g. Cheese Foam"
               />
               <button
                 type="button"
                 onClick={handleAddSubcategory}
-                className="px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors flex items-center gap-1"
+                className="px-4 bg-[#FFD54F]/20 hover:bg-[#FFD54F]/30 text-[#2A1B16] border border-[#FFD54F]/30 rounded-xl text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer"
               >
                 <Plus className="w-4 h-4" /> Add
               </button>
             </div>
             
             {subcategories.length > 0 && (
-              <div className="space-y-2 mt-2">
+              <div className="space-y-2 mt-2 max-h-40 overflow-y-auto pr-1 hide-scrollbar">
                 {subcategories.map((sub, index) => (
-                  <div key={index} className="flex items-center justify-between bg-blue-50/50 border border-blue-100 rounded-lg px-3 py-2">
-                    <span className="text-sm text-blue-900 font-medium">{sub}</span>
+                  <div key={index} className="flex items-center justify-between bg-[#FFF8E8]/50 border border-[#FAEDCD] rounded-xl px-3 py-2">
+                    <span className="text-sm text-[#2A1B16] font-semibold">{sub}</span>
                     <button
                       type="button"
                       onClick={() => handleRemoveSubcategory(sub)}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-md transition-colors"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-lg transition-colors cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -126,21 +126,21 @@ export default function CategoryEditModal({ isOpen, onClose, initialData }: Cate
               </div>
             )}
             {subcategories.length === 0 && (
-              <p className="text-sm text-gray-500 italic mt-2">No subcategories added yet. (Optional)</p>
+              <p className="text-xs text-[#8D6E63] italic mt-2">No subcategories added yet. (Optional)</p>
             )}
           </div>
 
-          <div className="pt-4 border-t border-gray-100 flex gap-3 justify-end">
+          <div className="pt-4 border-t border-[#FAEDCD]/30 flex gap-3 justify-end">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-xl transition-colors"
+              className="px-5 py-2.5 text-xs font-bold text-[#8D6E63] bg-white hover:bg-gray-50 border border-gray-300 rounded-xl transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-sm shadow-blue-200"
+              className="px-5 py-2.5 text-xs font-bold text-[#FFD54F] bg-[#2A1B16] hover:bg-[#3D2921] rounded-xl transition-colors shadow-2xs cursor-pointer"
             >
               {initialData ? 'Save Changes' : 'Create Category'}
             </button>

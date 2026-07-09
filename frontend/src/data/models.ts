@@ -76,3 +76,31 @@ export interface DiscoverySection {
   isActive: boolean;
   products?: any[];
 }
+
+export interface CustomizationGroup {
+  id: string;
+  name: string;
+  minSelections: number;
+  maxSelections: number;
+  freeSelectionsLimit: number;
+  isRequired: boolean;
+  version?: number;
+  options?: CustomizationOption[];
+}
+
+export interface CustomizationOption {
+  id: string;
+  groupId: string;
+  name: string;
+  defaultPrice: number;
+  isAvailable: boolean;
+  version?: number;
+}
+
+export interface StoreSettings {
+  taxRate: number;
+  deliveryFee: number;
+  packingCharge: number;
+  prepTime: number;
+  storeActive?: boolean;
+}

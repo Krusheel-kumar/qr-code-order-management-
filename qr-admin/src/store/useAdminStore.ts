@@ -6,10 +6,13 @@ import {
   getCampaigns, 
   getStories, 
   getDiscoverySections, 
-  getCategories 
+  getCategories,
+  getCoupons,
+  getCustomizationGroups,
+  getCustomizationOptions
 } from '../api';
 import type { MenuItem } from '../data/menu';
-import type { Campaign, Story, Addon, Coupon, StoreSettings, DiscoverySection } from '../data/models';
+import type { Campaign, Story, Addon, Coupon, StoreSettings, DiscoverySection, CustomizationGroup, CustomizationOption } from '../data/models';
 
 interface AdminState {
   isStoreActive: boolean;
@@ -44,6 +47,20 @@ interface AdminState {
   updateCoupon: (coupon: Coupon) => void;
   deleteCoupon: (id: string) => void;
   toggleCouponActive: (id: string) => void;
+
+  // Customization Groups (Categories)
+  customizationGroups: CustomizationGroup[];
+  fetchCustomizationGroups: () => Promise<void>;
+  addCustomizationGroup: (group: CustomizationGroup) => Promise<void>;
+  updateCustomizationGroup: (id: string, group: CustomizationGroup) => Promise<void>;
+  deleteCustomizationGroup: (id: string) => Promise<void>;
+
+  // Customization Options (Toppings/Choices)
+  customizationOptions: CustomizationOption[];
+  fetchCustomizationOptions: () => Promise<void>;
+  addCustomizationOption: (option: CustomizationOption) => Promise<void>;
+  updateCustomizationOption: (id: string, option: CustomizationOption) => Promise<void>;
+  deleteCustomizationOption: (id: string) => Promise<void>;
   
   // CMS
   campaigns: Campaign[];
@@ -68,8 +85,8 @@ interface AdminState {
   toggleCategoryActive: (category: string) => void;
 
   deleteItem: (id: string) => void;
-  addItem: (item: MenuItem) => void;
-  updateItem: (item: MenuItem) => void;
+  addItem: (item: MenuItem) => Promise<any>;
+  updateItem: (item: MenuItem) => Promise<void>;
 }
 
 // Initialize all to true initially for mockup purposes
@@ -177,13 +194,16 @@ export const useAdminStore = create<AdminState>((set) => ({
   })),
 
   initializeStore: async () => {
-    const [settingsResult, productsResult, campaignsResult, storiesResult, discoverySectionsResult, categoriesResult] = await Promise.allSettled([
+    const [settingsResult, productsResult, campaignsResult, storiesResult, discoverySectionsResult, categoriesResult, couponsResult, groupsResult, optionsResult] = await Promise.allSettled([
       getStoreSettings(),
       getProducts(),
       getCampaigns(),
       getStories(),
       getDiscoverySections(),
-      getCategories()
+      getCategories(),
+      getCoupons(),
+      getCustomizationGroups(),
+      getCustomizationOptions()
     ]);
 
     // --- Status report for each promise ---
@@ -211,6 +231,9 @@ export const useAdminStore = create<AdminState>((set) => ({
     const stories            = storiesResult.status          === 'fulfilled' ? storiesResult.value          : [];
     const discoverySections  = discoverySectionsResult.status === 'fulfilled' ? discoverySectionsResult.value : [];
     const categories         = categoriesResult.status       === 'fulfilled' ? categoriesResult.value       : [];
+    const coupons            = couponsResult.status          === 'fulfilled' ? couponsResult.value          : [];
+    const customizationGroups = groupsResult.status          === 'fulfilled' ? groupsResult.value          : [];
+    const customizationOptions = optionsResult.status          === 'fulfilled' ? optionsResult.value          : [];
 
     const newActiveItems = { ...useAdminStore.getState().activeItems };
     if (products.length > 0) {
@@ -227,6 +250,9 @@ export const useAdminStore = create<AdminState>((set) => ({
       campaigns,
       stories,
       discoverySections,
+      coupons,
+      customizationGroups,
+      customizationOptions,
     };
     if (storeSettings !== undefined) {
       setPayload.storeSettings  = storeSettings;
@@ -317,6 +343,58 @@ export const useAdminStore = create<AdminState>((set) => ({
       }
       return state;
     });
+  },
+
+  customizationGroups: [],
+  fetchCustomizationGroups: async () => {
+    const api = await import('../api');
+    const data = await api.getCustomizationGroups();
+    set({ customizationGroups: data });
+  },
+  addCustomizationGroup: async (group) => {
+    const api = await import('../api');
+    const created = await api.createCustomizationGroup(group);
+    set((state) => ({ customizationGroups: [...state.customizationGroups, created] }));
+  },
+  updateCustomizationGroup: async (id, group) => {
+    const api = await import('../api');
+    const updated = await api.updateCustomizationGroup(id, group);
+    set((state) => ({
+      customizationGroups: state.customizationGroups.map(g => g.id === id ? updated : g)
+    }));
+  },
+  deleteCustomizationGroup: async (id) => {
+    const api = await import('../api');
+    await api.deleteCustomizationGroup(id);
+    set((state) => ({
+      customizationGroups: state.customizationGroups.filter(g => g.id !== id)
+    }));
+  },
+
+  customizationOptions: [],
+  fetchCustomizationOptions: async () => {
+    const api = await import('../api');
+    const data = await api.getCustomizationOptions();
+    set({ customizationOptions: data });
+  },
+  addCustomizationOption: async (option) => {
+    const api = await import('../api');
+    const created = await api.createCustomizationOption(option);
+    set((state) => ({ customizationOptions: [...state.customizationOptions, created] }));
+  },
+  updateCustomizationOption: async (id, option) => {
+    const api = await import('../api');
+    const updated = await api.updateCustomizationOption(id, option);
+    set((state) => ({
+      customizationOptions: state.customizationOptions.map(o => o.id === id ? updated : o)
+    }));
+  },
+  deleteCustomizationOption: async (id) => {
+    const api = await import('../api');
+    await api.deleteCustomizationOption(id);
+    set((state) => ({
+      customizationOptions: state.customizationOptions.filter(o => o.id !== id)
+    }));
   },
   
   campaigns: [],
@@ -413,9 +491,11 @@ export const useAdminStore = create<AdminState>((set) => ({
         menuItems: [...state.menuItems, finalItem],
         activeItems: { ...state.activeItems, [finalItem.id]: true }
       }));
+      return created;
     } catch (e: any) { 
       console.error('Failed to add', e);
       alert(`Failed to add item: ${e.response?.data?.message || e.message || 'Unknown error'}`);
+      throw e;
     }
   },
 
@@ -429,6 +509,9 @@ export const useAdminStore = create<AdminState>((set) => ({
       set((state) => ({
         menuItems: state.menuItems.map(item => item.id === finalItem.id ? finalItem : item)
       }));
-    } catch (e) { console.error('Failed to update', e); }
+    } catch (e) {
+      console.error('Failed to update', e);
+      throw e;
+    }
   }
 }));

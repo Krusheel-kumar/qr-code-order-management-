@@ -22,6 +22,7 @@ public class DataSeeder implements CommandLineRunner {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     @Value("${ADMIN_EMAIL:}")
     private String adminEmail;
@@ -32,16 +33,26 @@ public class DataSeeder implements CommandLineRunner {
     @Value("${app.seed.enabled:false}")
     private boolean seedEnabled;
 
-    public DataSeeder(CategoryRepository categoryRepository, ProductRepository productRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public DataSeeder(CategoryRepository categoryRepository, ProductRepository productRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, org.springframework.jdbc.core.JdbcTemplate jdbcTemplate) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
     @Transactional
     public void run(String... args) throws Exception {
+        try {
+            jdbcTemplate.update("UPDATE products SET version = 0 WHERE version IS NULL");
+            jdbcTemplate.update("UPDATE customization_groups SET version = 0 WHERE version IS NULL");
+            jdbcTemplate.update("UPDATE customization_options SET version = 0 WHERE version IS NULL");
+            System.out.println("DataSeeder: Successfully healed version columns in database.");
+        } catch (Exception e) {
+            System.err.println("DataSeeder: Version columns healing failed: " + e.getMessage());
+        }
+        
         seedAdminUser();
 
         if (!seedEnabled) {
