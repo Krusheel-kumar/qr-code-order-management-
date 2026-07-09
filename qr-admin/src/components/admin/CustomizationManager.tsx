@@ -58,39 +58,7 @@ function ToggleSwitch({
   );
 }
 
-function ConfirmDialog({
-  message, onConfirm, onCancel, loading,
-}: { message: string; onConfirm: () => void; onCancel: () => void; loading: boolean }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl border border-[#FAEDCD] p-6 max-w-sm w-full">
-        <div className="flex items-start gap-3 mb-5">
-          <div className="flex-shrink-0 w-9 h-9 rounded-full bg-red-50 flex items-center justify-center">
-            <AlertCircle className="w-5 h-5 text-red-500" />
-          </div>
-          <p className="text-sm text-[#2A1B16] font-semibold leading-relaxed">{message}</p>
-        </div>
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={onCancel}
-            disabled={loading}
-            className="px-4 py-2 text-xs font-bold text-[#8D6E63] bg-white border border-[#FAEDCD] rounded-xl hover:bg-[#FFF8E8] transition-colors cursor-pointer disabled:opacity-50"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={loading}
-            className="px-4 py-2 text-xs font-bold text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
-          >
-            {loading && <Loader2 className="w-3 h-3 animate-spin" />}
-            Delete
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+
 
 // ─── Group Form Modal ─────────────────────────────────────────────────────────
 
