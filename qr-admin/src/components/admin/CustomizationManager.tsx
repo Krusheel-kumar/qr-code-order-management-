@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import {
   Plus, Edit2, Trash2, ChevronDown, ChevronRight,
-  X, AlertCircle, Loader2, Settings2, Tag,
+  X, Loader2, Settings2, Tag,
   ToggleLeft, ToggleRight, PackageOpen
 } from 'lucide-react';
 import { useAdminStore } from '../../store/useAdminStore';
