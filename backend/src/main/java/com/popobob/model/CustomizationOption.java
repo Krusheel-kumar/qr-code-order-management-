@@ -29,6 +29,21 @@ public class CustomizationOption {
     @Column(name = "is_available")
     private Boolean isAvailable = true;
     
+    @Column(name = "badge_enabled")
+    private Boolean badgeEnabled;
+
+    @Column(name = "badge_type")
+    private String badgeType;
+
+    @Column(name = "badge_color")
+    private String badgeColor;
+
+    @Column(name = "badge_icon")
+    private String badgeIcon;
+
+    @Column(name = "badge_priority")
+    private Integer badgePriority;
+
     @Version
     private Integer version = 0;
 }

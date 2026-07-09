@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import { useAdminStore } from '../../store/useAdminStore';
 import type { CustomizationGroup, CustomizationOption } from '../../data/models';
+import { BadgeType, BadgeColor, BadgeIcon } from '../../data/models';
+import BadgeChip from '../ui/BadgeChip';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -24,6 +26,11 @@ interface OptionFormData {
   name: string;
   defaultPrice: number;
   isAvailable: boolean;
+  badgeEnabled?: boolean;
+  badgeType?: string;
+  badgeColor?: string;
+  badgeIcon?: string;
+  badgePriority?: number;
 }
 
 const emptyGroupForm = (): GroupFormData => ({
@@ -32,6 +39,7 @@ const emptyGroupForm = (): GroupFormData => ({
 
 const emptyOptionForm = (groupId = ''): OptionFormData => ({
   id: '', groupId, name: '', defaultPrice: 0, isAvailable: true,
+  badgeEnabled: false, badgeType: BadgeType.MOST_POPULAR, badgeColor: BadgeColor.PURPLE, badgeIcon: BadgeIcon.STAR, badgePriority: 0,
 });
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -191,7 +199,12 @@ function OptionFormModal({
   const [form, setForm] = useState<OptionFormData>(
     initialData
       ? { id: initialData.id, groupId: initialData.groupId, name: initialData.name,
-          defaultPrice: initialData.defaultPrice, isAvailable: initialData.isAvailable }
+          defaultPrice: initialData.defaultPrice, isAvailable: initialData.isAvailable,
+          badgeEnabled: initialData.badgeEnabled || false,
+          badgeType: initialData.badgeType || BadgeType.MOST_POPULAR,
+          badgeColor: initialData.badgeColor || BadgeColor.PURPLE,
+          badgeIcon: initialData.badgeIcon || BadgeIcon.STAR,
+          badgePriority: initialData.badgePriority || 0 }
       : emptyOptionForm(defaultGroupId || groups[0]?.id || '')
   );
   const [saving, setSaving] = useState(false);
@@ -296,6 +309,81 @@ function OptionFormModal({
                 {form.isAvailable ? 'Available in store' : 'Unavailable'}
               </span>
             </div>
+
+            {/* --- Marketing Badge Section --- */}
+            <div className="col-span-2 pt-4 border-t border-[#FAEDCD]/50">
+              <h4 className="text-sm font-heading font-black text-[#2A1B16] mb-4">Marketing Badge</h4>
+              <div className="space-y-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.badgeEnabled}
+                    onChange={e => setForm({ ...form, badgeEnabled: e.target.checked })}
+                    className="w-4 h-4 accent-[#2A1B16] rounded"
+                  />
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#2A1B16]">Enable Badge</span>
+                </label>
+
+                {form.badgeEnabled && (
+                  <div className="grid grid-cols-2 gap-4 bg-[#FFFDF5] border border-[#FAEDCD] p-4 rounded-xl">
+                    <div className="col-span-2 flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#8D6E63]">Live Preview:</span>
+                      <BadgeChip type={form.badgeType} color={form.badgeColor} icon={form.badgeIcon} />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-[#8D6E63] mb-1.5">Badge Type</label>
+                      <select
+                        value={form.badgeType}
+                        onChange={e => setForm({ ...form, badgeType: e.target.value })}
+                        className="w-full border rounded-xl bg-white p-3 text-sm text-[#2A1B16] outline-none focus:ring-4 focus:ring-[#FFD54F]/20 focus:border-[#FFD54F] transition-all font-semibold border-[#FAEDCD]"
+                      >
+                        {Object.values(BadgeType).map(t => (
+                          <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
+                        ))}
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-[#8D6E63] mb-1.5">Color</label>
+                      <select
+                        value={form.badgeColor}
+                        onChange={e => setForm({ ...form, badgeColor: e.target.value })}
+                        className="w-full border rounded-xl bg-white p-3 text-sm text-[#2A1B16] outline-none focus:ring-4 focus:ring-[#FFD54F]/20 focus:border-[#FFD54F] transition-all font-semibold border-[#FAEDCD]"
+                      >
+                        {Object.values(BadgeColor).map(c => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-[#8D6E63] mb-1.5">Icon</label>
+                      <select
+                        value={form.badgeIcon}
+                        onChange={e => setForm({ ...form, badgeIcon: e.target.value })}
+                        className="w-full border rounded-xl bg-white p-3 text-sm text-[#2A1B16] outline-none focus:ring-4 focus:ring-[#FFD54F]/20 focus:border-[#FFD54F] transition-all font-semibold border-[#FAEDCD]"
+                      >
+                        {Object.values(BadgeIcon).map(i => (
+                          <option key={i} value={i}>{i}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-[#8D6E63] mb-1.5">Priority</label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={form.badgePriority}
+                        onChange={e => setForm({ ...form, badgePriority: Number(e.target.value) })}
+                        className="w-full border rounded-xl bg-white p-3 text-sm text-[#2A1B16] outline-none focus:ring-4 focus:ring-[#FFD54F]/20 focus:border-[#FFD54F] transition-all font-semibold border-[#FAEDCD]"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
           <div className="flex justify-end gap-2 pt-2 border-t border-[#FAEDCD]/50">
             <button type="button" onClick={onClose} className="px-4 py-2 text-xs font-bold text-[#8D6E63] bg-white border border-[#FAEDCD] rounded-xl hover:bg-[#FFF8E8] cursor-pointer transition-colors">
@@ -329,6 +417,9 @@ function OptionRow({
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-bold text-sm text-[#2A1B16] truncate">{option.name}</span>
+            {option.badgeEnabled && (
+              <BadgeChip type={option.badgeType} color={option.badgeColor} icon={option.badgeIcon} />
+            )}
             {option.defaultPrice === 0 ? (
               <span className="text-xs font-bold text-[#22C55E] bg-green-50 px-2 py-0.5 rounded-full">Free</span>
             ) : (

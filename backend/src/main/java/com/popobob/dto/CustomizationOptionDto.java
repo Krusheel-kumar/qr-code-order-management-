@@ -22,4 +22,10 @@ public class CustomizationOptionDto {
     private BigDecimal defaultPrice = BigDecimal.ZERO;
 
     private Boolean isAvailable = true;
+
+    private Boolean badgeEnabled;
+    private String badgeType;
+    private String badgeColor;
+    private String badgeIcon;
+    private Integer badgePriority;
 }

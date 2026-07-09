@@ -88,6 +88,43 @@ export interface CustomizationGroup {
   options?: CustomizationOption[];
 }
 
+export const BadgeType = {
+  MOST_POPULAR: 'MOST_POPULAR',
+  BEST_VALUE: 'BEST_VALUE',
+  TRENDING: 'TRENDING',
+  NEW: 'NEW',
+  STAFF_PICK: 'STAFF_PICK',
+  BESTSELLER: 'BESTSELLER',
+  RECOMMENDED: 'RECOMMENDED',
+  PREMIUM: 'PREMIUM',
+  LIMITED: 'LIMITED',
+  VEGAN: 'VEGAN'
+} as const;
+export type BadgeType = typeof BadgeType[keyof typeof BadgeType];
+
+export const BadgeColor = {
+  PURPLE: 'PURPLE',
+  GREEN: 'GREEN',
+  ORANGE: 'ORANGE',
+  BLUE: 'BLUE',
+  RED: 'RED',
+  GOLD: 'GOLD',
+  PINK: 'PINK'
+} as const;
+export type BadgeColor = typeof BadgeColor[keyof typeof BadgeColor];
+
+export const BadgeIcon = {
+  STAR: 'STAR',
+  FIRE: 'FIRE',
+  DIAMOND: 'DIAMOND',
+  CROWN: 'CROWN',
+  TROPHY: 'TROPHY',
+  SPARKLE: 'SPARKLE',
+  LIGHTNING: 'LIGHTNING',
+  LEAF: 'LEAF'
+} as const;
+export type BadgeIcon = typeof BadgeIcon[keyof typeof BadgeIcon];
+
 export interface CustomizationOption {
   id: string;
   groupId: string;
@@ -95,6 +132,11 @@ export interface CustomizationOption {
   defaultPrice: number;
   isAvailable: boolean;
   version?: number;
+  badgeEnabled?: boolean;
+  badgeType?: BadgeType | string;
+  badgeColor?: BadgeColor | string;
+  badgeIcon?: BadgeIcon | string;
+  badgePriority?: number;
 }
 
 export interface StoreSettings {

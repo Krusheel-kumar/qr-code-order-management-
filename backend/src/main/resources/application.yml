@@ -4,7 +4,7 @@ spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://ep-snowy-silence-ahoq2ovz-pooler.c-3.us-east-1.aws.neon.tech:5432/neondb?sslmode=require}
     username: ${SPRING_DATASOURCE_USERNAME:neondb_owner}
-    password: ${SPRING_DATASOURCE_PASSWORD:}
+    password: ${SPRING_DATASOURCE_PASSWORD:npg_M5aqwncLV3uZ}
   jpa:
     hibernate:
       ddl-auto: update

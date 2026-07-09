@@ -35,6 +35,11 @@ public class CustomizationOptionController {
         option.setName(dto.getName());
         option.setDefaultPrice(dto.getDefaultPrice());
         option.setIsAvailable(dto.getIsAvailable());
+        option.setBadgeEnabled(dto.getBadgeEnabled());
+        option.setBadgeType(dto.getBadgeType());
+        option.setBadgeColor(dto.getBadgeColor());
+        option.setBadgeIcon(dto.getBadgeIcon());
+        option.setBadgePriority(dto.getBadgePriority());
 
         CustomizationOption saved = optionRepository.save(option);
         return ResponseEntity.status(201).body(saved);
@@ -64,6 +69,11 @@ public class CustomizationOptionController {
                     option.setName(dto.getName());
                     option.setDefaultPrice(dto.getDefaultPrice());
                     option.setIsAvailable(dto.getIsAvailable());
+                    option.setBadgeEnabled(dto.getBadgeEnabled());
+                    option.setBadgeType(dto.getBadgeType());
+                    option.setBadgeColor(dto.getBadgeColor());
+                    option.setBadgeIcon(dto.getBadgeIcon());
+                    option.setBadgePriority(dto.getBadgePriority());
                     
                     CustomizationOption saved = optionRepository.save(option);
                     return ResponseEntity.ok(saved);

@@ -5,6 +5,7 @@ import type { MenuItem } from '../data/menu';
 import { useCartStore } from '../store/useCartStore';
 import { shareContent } from '../utils/shareUtils';
 import ShareModal from './ui/ShareModal';
+import BadgeChip from './ui/BadgeChip';
 import type { CustomizationGroup, CustomizationOption } from '../data/models';
 import { getBlacklistedOptions } from '../api';
 
@@ -332,29 +333,44 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
                                   key={option.id}
                                   disabled={!isAvailable}
                                   onClick={() => handleSelectOption(group, option)}
-                                  className={`w-full py-3.5 px-5 rounded-2xl border text-base font-bold transition-all flex justify-between items-center ${
+                                  className={`relative w-full p-3 rounded-2xl border-2 transition-all flex items-start justify-between gap-3 text-left overflow-hidden ${
                                     !isAvailable
-                                      ? 'border-gray-100 bg-gray-50/70 text-gray-300 cursor-not-allowed'
+                                      ? 'border-gray-100 bg-gray-50/50 text-gray-400 cursor-not-allowed'
                                       : isSelected
-                                      ? 'border-primary bg-primary/10 text-primary shadow-sm'
-                                      : 'border-gray-200 text-gray-700 hover:border-gray-300 bg-white'
+                                      ? 'border-[#FFD54F] bg-[#FFF8E8] shadow-sm ring-2 ring-[#FFD54F]/20'
+                                      : 'border-[#FAEDCD] bg-white hover:border-[#FFD54F]/50 hover:bg-[#FFF8E8]/50 hover:shadow-sm'
                                   }`}
                                 >
-                                  <div className="flex items-center gap-2">
-                                    <span>{option.name}</span>
-                                    {!isAvailable && (
-                                      <span className="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-md uppercase font-bold tracking-wider">
-                                        Sold Out
-                                      </span>
+                                  <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
+                                    {option.badgeEnabled && (
+                                      <BadgeChip type={option.badgeType} color={option.badgeColor} icon={option.badgeIcon} />
                                     )}
+                                    <div className="flex items-center gap-2 mt-0.5 w-full">
+                                      <span className={`font-black text-[15px] leading-tight truncate ${isSelected ? 'text-[#2A1B16]' : 'text-gray-800'}`}>
+                                        {option.name}
+                                      </span>
+                                      {!isAvailable && (
+                                        <span className="text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-md uppercase font-bold tracking-wider shrink-0">
+                                          Sold Out
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
-                                  <div className="flex items-center gap-2 text-sm">
-                                    {option.defaultPrice > 0 && (
-                                      <span className={isSelected ? 'text-primary font-bold' : 'text-gray-500'}>
+                                  <div className="flex flex-col items-end gap-1.5 shrink-0 mt-0.5">
+                                    {option.defaultPrice > 0 ? (
+                                      <span className={`font-black text-[14px] ${isSelected ? 'text-[#B87A42]' : 'text-gray-500'}`}>
                                         +₹{option.defaultPrice}
                                       </span>
+                                    ) : (
+                                      <span className={`font-black text-[12px] uppercase tracking-wider ${isSelected ? 'text-[#2A1B16]' : 'text-gray-400'}`}>
+                                        Free
+                                      </span>
                                     )}
-                                    {isSelected && <Check size={18} className="text-primary shrink-0" />}
+                                    {isSelected && (
+                                      <div className="bg-[#2A1B16] text-[#FFD54F] p-1 rounded-full shadow-sm mt-0.5">
+                                        <Check size={12} strokeWidth={4} />
+                                      </div>
+                                    )}
                                   </div>
                                 </button>
                               );
