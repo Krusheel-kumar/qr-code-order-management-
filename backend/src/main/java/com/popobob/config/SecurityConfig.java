@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/ai/context").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/admin/coupons").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v2/admin/stores/*/blacklist/**").permitAll()
-                .requestMatchers("/api/auth/**", "/api/discovery/**", "/api/public/**", "/ws/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/discovery/**", "/api/public/**", "/ws/**", "/api/loyalty/guest/**").permitAll()
 
                 // --- Admin-only order endpoints (declared FIRST so they take priority) ---
                 // These must be before the customer wildcard rules below

@@ -9,6 +9,12 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
+
+guest:
+  reward:
+    enabled: true
+    expiry-hours: 24
+    cleanup-cron: "0 0 * * * *"
     properties:
       hibernate:
         format_sql: false

@@ -271,7 +271,7 @@ export default function Cart() {
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1">
               Mobile Number 
-              {cartStore.orderType === 'PICKUP' ? <span className="text-red-500 ml-1">*</span> : <span className="text-gray-400 font-normal ml-1">(Optional)</span>}
+              {!user || cartStore.orderType === 'PICKUP' ? <span className="text-red-500 ml-1">*</span> : <span className="text-gray-400 font-normal ml-1">(Optional)</span>}
             </label>
             <input 
               type="tel" 
@@ -303,8 +303,8 @@ export default function Cart() {
                 alert("Please enter your table number or scan the QR code again.");
                 return;
               }
-              if (finalOrderType === 'PICKUP' && !cartStore.customerPhone) {
-                alert("Please enter your mobile number for pickup orders.");
+              if ((!user || finalOrderType === 'PICKUP') && !cartStore.customerPhone) {
+                alert("Please enter your mobile number to earn and claim loyalty points.");
                 return;
               }
               if (finalOrderType === 'PICKUP' && !cartStore.storeId) {

@@ -4,6 +4,7 @@ import { MapPin, Bell, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { STORES } from '../../data/stores';
 import { useAuthStore } from '../../store/useAuthStore';
+import { getGuestRewardByOrderId } from '../../api';
 
 const STAGES = [
   { id: 'PLACED', label: 'Order Confirmed' },
@@ -19,6 +20,8 @@ export default function OrderTracking() {
   const [isExiting, setIsExiting] = useState(false);
   const { user } = useAuthStore();
   const hasTriggeredAI = useRef(false);
+  const [showGuestRewardModal, setShowGuestRewardModal] = useState(false);
+  const [guestRewardPoints, setGuestRewardPoints] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -31,7 +34,7 @@ export default function OrderTracking() {
         
         if (order.status === 'PLACED' || order.status === 'NEW') setCurrentStage(0);
         else if (order.status === 'PREPARING') setCurrentStage(1);
-        else if (order.status === 'READY' || order.status === 'DELIVERED') setCurrentStage(2);
+         if (order.status === 'READY' || order.status === 'DELIVERED') setCurrentStage(2);
       } catch (err) {
         console.error("Failed to fetch order", err);
       }
@@ -42,31 +45,65 @@ export default function OrderTracking() {
     return () => clearInterval(interval);
   }, [id]);
 
+  // Guest Reward Check
+  const [guestRewardChecked, setGuestRewardChecked] = useState(false);
+
+  useEffect(() => {
+    if (orderData && id) {
+      if (user) {
+        setGuestRewardChecked(true);
+        return;
+      }
+      const dismissed = localStorage.getItem(`guest_reward_dismissed_${id}`);
+      if (!dismissed) {
+        getGuestRewardByOrderId(id).then(reward => {
+          if (reward && reward.points > 0 && reward.status === 'PENDING') {
+            setGuestRewardPoints(reward.points);
+            setShowGuestRewardModal(true);
+            // Mark AI onboarding as complete since we are showing the reward modal
+            localStorage.setItem(`ai_onboarding_completed_${id}`, 'true');
+          }
+        }).catch(console.error).finally(() => {
+          setGuestRewardChecked(true);
+        });
+      } else {
+        setGuestRewardChecked(true);
+      }
+    }
+  }, [orderData, user, id]);
+
   // AI Engagement Layer Trigger
   useEffect(() => {
-    if (orderData && !hasTriggeredAI.current) {
-      hasTriggeredAI.current = true;
-      
-      const timer = setTimeout(() => {
-        setIsExiting(true);
-        setTimeout(() => {
-          navigate('/ai/welcome', {
-            state: {
-              orderId: id,
-              orderNumber: orderData.orderNumber,
-              customerName: orderData.customerName || user?.username || null,
-              isGuest: !user
-            }
-          });
-        }, 600); // Wait for exit animation
-      }, 2500); 
-      
-      return () => {
-        clearTimeout(timer);
-        hasTriggeredAI.current = false;
-      };
+    if (!guestRewardChecked || showGuestRewardModal) return; // Wait for reward check to complete
+
+    if (orderData && id && !hasTriggeredAI.current) {
+      const storageKey = `ai_onboarding_completed_${id}`;
+      const hasCompletedOnboarding = localStorage.getItem(storageKey);
+
+      if (!hasCompletedOnboarding) {
+        hasTriggeredAI.current = true;
+        
+        const timer = setTimeout(() => {
+          setIsExiting(true);
+          setTimeout(() => {
+            navigate('/ai/welcome', {
+              state: {
+                orderId: id,
+                orderNumber: orderData.orderNumber,
+                customerName: orderData.customerName || user?.username || null,
+                isGuest: !user
+              }
+            });
+          }, 600); // Wait for exit animation
+        }, 2500); 
+        
+        return () => {
+          clearTimeout(timer);
+          hasTriggeredAI.current = false;
+        };
+      }
     }
-  }, [orderData, navigate, id, user]);
+  }, [orderData, navigate, id, user, showGuestRewardModal]);
 
   const storeInfo = orderData?.storeId ? STORES.find(s => s.id === orderData.storeId?.toString()) : STORES[0];
 
@@ -211,6 +248,60 @@ export default function OrderTracking() {
             
             <div className="h-8" />
           </main>
+
+          {/* Guest Reward Modal */}
+          <AnimatePresence>
+            {showGuestRewardModal && (
+              <>
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
+                />
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                  className="fixed inset-0 z-[101] flex items-center justify-center p-4 pointer-events-none"
+                >
+                  <div className="bg-white w-full max-w-sm rounded-[32px] p-8 text-center shadow-2xl pointer-events-auto border border-gray-100">
+                    <div className="w-20 h-20 bg-[#FFF5E1] rounded-full mx-auto flex items-center justify-center mb-6 shadow-inner">
+                      <span className="text-4xl">🎁</span>
+                    </div>
+                    <h2 className="font-heading font-black text-2xl mb-2 text-[#1A0B05]">🎉 Congratulations!</h2>
+                    <p className="text-gray-500 font-medium mb-6">You earned:</p>
+                    <div className="bg-[#FFF5E1] rounded-[20px] py-4 px-6 mb-6 inline-block">
+                      <p className="font-black text-2xl text-[#FFB800] tracking-tight">
+                        ⭐ {guestRewardPoints} POP Points
+                      </p>
+                    </div>
+                    <p className="text-gray-600 text-[15px] font-medium leading-relaxed mb-8 px-2">
+                      Create your free account to unlock your rewards.
+                    </p>
+                    <div className="space-y-3 w-full">
+                      <button
+                        onClick={() => navigate('/profile')}
+                        className="w-full bg-[#FFB800] text-[#1A0B05] font-bold py-4 rounded-[16px] active:scale-[0.98] transition-transform shadow-[0_8px_24px_rgba(255,184,0,0.25)]"
+                      >
+                        Claim My Rewards
+                      </button>
+                      <button
+                        onClick={() => {
+                          localStorage.setItem(`guest_reward_dismissed_${id}`, 'true');
+                          setShowGuestRewardModal(false);
+                        }}
+                        className="w-full bg-white text-gray-500 font-bold py-4 rounded-[16px] active:scale-[0.98] transition-transform border border-gray-200"
+                      >
+                        Maybe Later
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+
         </motion.div>
       )}
     </AnimatePresence>

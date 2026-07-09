@@ -23,6 +23,9 @@ public class AuthController {
     @Autowired
     private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private com.popobob.service.LoyaltyService loyaltyService;
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
         String name = body.get("name");
@@ -44,6 +47,9 @@ public class AuthController {
 
         userRepository.save(user);
 
+        // Claim any pending guest rewards using the phone number
+        loyaltyService.claimGuestRewards(user.getPhoneNumber(), user);
+
         String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
 
         return ResponseEntity.ok(Map.of("user", user, "token", token));
@@ -59,6 +65,9 @@ public class AuthController {
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             if (passwordEncoder.matches(password, user.getPasswordHash())) {
+                // Claim any pending guest rewards on login just in case
+                loyaltyService.claimGuestRewards(user.getPhoneNumber(), user);
+
                 String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
                 return ResponseEntity.ok(Map.of("user", user, "token", token));
             }

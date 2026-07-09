@@ -123,3 +123,21 @@ export const getAIContext = async (params: { orderId?: string; customerName?: st
     throw e;
   }
 };
+
+export const getGuestRewardByOrderId = async (orderId: string) => {
+  try {
+    const res = await axios.get(`${API_URL}/loyalty/guest/order/${orderId}`);
+    return res.data;
+  } catch (e) {
+    return null;
+  }
+};
+
+export const getLoyaltyAnalytics = async () => {
+  try {
+    const res = await axios.get(`${API_URL}/admin/loyalty/analytics`);
+    return res.data;
+  } catch (e) {
+    return null;
+  }
+};

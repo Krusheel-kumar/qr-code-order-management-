@@ -211,3 +211,7 @@ export const blacklistOptionAtStore = async (storeId: string, optionId: string) 
 export const removeOptionFromStoreBlacklist = async (storeId: string, optionId: string) => 
   (await adminV2Api.delete(`/stores/${storeId}/blacklist/options/${optionId}`)).data;
 
+// --- Loyalty Analytics ---
+export const getLoyaltyAnalytics = async () => 
+  (await adminApi.get('/loyalty/analytics')).data;
+

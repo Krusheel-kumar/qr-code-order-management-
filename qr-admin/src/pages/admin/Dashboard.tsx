@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, Users, ShoppingBag, IndianRupee, BarChart3, PieChart } from 'lucide-react';
-import { getOrderHistory } from '../../api';
+import { TrendingUp, Users, ShoppingBag, IndianRupee, PieChart, Award } from 'lucide-react';
+import { getOrderHistory, getLoyaltyAnalytics } from '../../api';
 
 interface Order {
   id: string;
@@ -19,6 +19,12 @@ export default function Dashboard() {
   });
 
   const [loading, setLoading] = useState(true);
+  const [loyaltyStats, setLoyaltyStats] = useState({
+    pendingCount: 0,
+    claimedCount: 0,
+    expiredCount: 0,
+    conversionRate: 0
+  });
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -50,6 +56,10 @@ export default function Dashboard() {
           avgOrderValue
         });
 
+        const loyaltyData = await getLoyaltyAnalytics();
+        if (loyaltyData) {
+          setLoyaltyStats(loyaltyData);
+        }
       } catch (e) {
         console.error('Failed to fetch dashboard data', e);
       } finally {
@@ -127,19 +137,40 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Placeholder for more complex analytics */}
+      {/* Analytics Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 glass-panel p-8 rounded-3xl border border-[#FAEDCD] shadow-xs h-96 flex flex-col items-center justify-center text-center">
-          <div className="w-16 h-16 bg-[#FFD54F]/20 text-[#2A1B16] rounded-full flex items-center justify-center mb-4">
-            <BarChart3 className="w-8 h-8" />
+        <div className="lg:col-span-2 glass-panel p-8 rounded-3xl border border-[#FAEDCD] shadow-xs flex flex-col justify-center">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="w-12 h-12 bg-[#FFD54F]/20 text-[#2A1B16] rounded-full flex items-center justify-center">
+              <Award className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="font-heading font-bold text-[#2A1B16] text-xl mb-0.5">Guest Loyalty Conversions</h3>
+              <p className="text-sm text-[#8D6E63]">Track how many guest orders convert into registered accounts.</p>
+            </div>
           </div>
-          <h3 className="font-heading font-bold text-[#2A1B16] text-lg mb-1">Revenue Performance Analytics</h3>
-          <p className="text-sm text-[#8D6E63] max-w-sm">
-            Live chart data integration and visual sales analytics will display here in the next update.
-          </p>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2">
+            <div className="bg-white/50 rounded-2xl p-4 border border-[#FAEDCD]">
+              <p className="text-xs font-bold text-[#8D6E63] uppercase tracking-wider mb-1">Pending</p>
+              <p className="text-2xl font-black text-[#B87A42]">{loyaltyStats.pendingCount}</p>
+            </div>
+            <div className="bg-white/50 rounded-2xl p-4 border border-[#FAEDCD]">
+              <p className="text-xs font-bold text-[#8D6E63] uppercase tracking-wider mb-1">Claimed</p>
+              <p className="text-2xl font-black text-[#5B6D49]">{loyaltyStats.claimedCount}</p>
+            </div>
+            <div className="bg-white/50 rounded-2xl p-4 border border-[#FAEDCD]">
+              <p className="text-xs font-bold text-[#8D6E63] uppercase tracking-wider mb-1">Expired</p>
+              <p className="text-2xl font-black text-[#C26B5C]">{loyaltyStats.expiredCount}</p>
+            </div>
+            <div className="bg-[#FFD54F]/10 rounded-2xl p-4 border border-[#FFD54F]/30">
+              <p className="text-xs font-bold text-[#2A1B16] uppercase tracking-wider mb-1">Conversion Rate</p>
+              <p className="text-2xl font-black text-[#2A1B16]">{loyaltyStats.conversionRate.toFixed(1)}%</p>
+            </div>
+          </div>
         </div>
 
-        <div className="glass-panel p-8 rounded-3xl border border-[#FAEDCD] shadow-xs h-96 flex flex-col items-center justify-center text-center">
+        <div className="glass-panel p-8 rounded-3xl border border-[#FAEDCD] shadow-xs flex flex-col items-center justify-center text-center">
           <div className="w-16 h-16 bg-[#A3B18A]/20 text-[#5B6D49] rounded-full flex items-center justify-center mb-4">
             <PieChart className="w-8 h-8" />
           </div>

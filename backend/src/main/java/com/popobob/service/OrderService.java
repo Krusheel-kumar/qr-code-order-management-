@@ -25,6 +25,7 @@ public class OrderService {
     
     private final StoreRepository storeRepository;
     private final CustomizationOptionRepository optionRepository;
+    private final LoyaltyService loyaltyService;
 
     @Transactional
     public Order createOrder(OrderRequestDto request) {
@@ -197,24 +198,10 @@ public class OrderService {
         
         order.setTotalAmount(totalAmount);
         
-        // Calculate and add loyalty points based on Tier Multiplier
-        if (order.getUser() != null) {
-            User user = order.getUser();
-            int currentPoints = user.getLoyaltyPoints() == null ? 0 : user.getLoyaltyPoints();
-            
-            // Determine multiplier based on current points (Tiers)
-            double multiplier = 1.0; // Bronze
-            if (currentPoints >= 2000) multiplier = 1.5; // Gold
-            else if (currentPoints >= 500) multiplier = 1.2; // Silver
-            
-            int basePoints = totalAmount.divideToIntegralValue(new BigDecimal("10")).intValue();
-            int earnedPoints = (int) (basePoints * multiplier);
-            
-            user.setLoyaltyPoints(currentPoints + earnedPoints);
-            userRepository.save(user);
-        }
-        
         Order savedOrder = orderRepository.save(order);
+        
+        // Calculate and add loyalty points via Loyalty Module (requires saved order ID)
+        loyaltyService.processOrderLoyalty(savedOrder);
         
         // Notify Staff KDS via WebSocket
         messagingTemplate.convertAndSend("/topic/orders", savedOrder);
