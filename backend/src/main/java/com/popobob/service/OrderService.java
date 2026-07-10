@@ -26,7 +26,8 @@ public class OrderService {
     private final StoreRepository storeRepository;
     private final CustomizationOptionRepository optionRepository;
     private final LoyaltyService loyaltyService;
-
+    private final CouponRepository couponRepository;
+    private final StoreSettingsRepository storeSettingsRepository;
     @Transactional
     public Order createOrder(OrderRequestDto request) {
         Order order = new Order();
@@ -181,20 +182,66 @@ public class OrderService {
         }
 
         order.setItems(items);
+        order.setItems(items);
+        order.setSubtotalAmount(totalAmount);
+
+        // Apply Coupon Discount
+        BigDecimal couponDiscountAmt = BigDecimal.ZERO;
+        if (request.getCouponCode() != null && !request.getCouponCode().isEmpty()) {
+            Coupon coupon = couponRepository.findByCodeIgnoreCase(request.getCouponCode())
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid or expired coupon code!"));
+            if (coupon.getActive() != null && !coupon.getActive()) {
+                throw new IllegalArgumentException("Invalid or expired coupon code!");
+            }
+            if (coupon.getType() != null && (coupon.getType().equalsIgnoreCase("PERCENTAGE"))) {
+                couponDiscountAmt = totalAmount.multiply(new BigDecimal(coupon.getValue() != null ? coupon.getValue() : 0)).divide(new BigDecimal("100"));
+            } else if (coupon.getValue() != null) {
+                couponDiscountAmt = new BigDecimal(coupon.getValue());
+            }
+            totalAmount = totalAmount.subtract(couponDiscountAmt);
+            if (totalAmount.compareTo(BigDecimal.ZERO) < 0) {
+                totalAmount = BigDecimal.ZERO;
+            }
+        }
+        order.setCouponDiscount(couponDiscountAmt);
+
         // Apply Wallet Discount if points used
+        BigDecimal walletDiscountAmt = BigDecimal.ZERO;
         if (request.getPointsUsed() != null && request.getPointsUsed() > 0 && order.getUser() != null) {
             User user = order.getUser();
             int currentPoints = user.getLoyaltyPoints() == null ? 0 : user.getLoyaltyPoints();
             if (currentPoints >= request.getPointsUsed()) {
                 user.setLoyaltyPoints(currentPoints - request.getPointsUsed());
                 // 10 points = 1 currency unit
-                BigDecimal discount = new BigDecimal(request.getPointsUsed()).divide(new BigDecimal("10"));
-                totalAmount = totalAmount.subtract(discount);
+                walletDiscountAmt = new BigDecimal(request.getPointsUsed()).divide(new BigDecimal("10"));
+                totalAmount = totalAmount.subtract(walletDiscountAmt);
                 if (totalAmount.compareTo(BigDecimal.ZERO) < 0) {
                     totalAmount = BigDecimal.ZERO;
                 }
             }
         }
+        order.setWalletDiscount(walletDiscountAmt);
+        order.setDiscountTotal(couponDiscountAmt.add(walletDiscountAmt));
+
+        // Apply Taxes and Packing Charge to match Frontend Razorpay Payment Exactly
+        StoreSettings settings = storeSettingsRepository.findById(1L).orElse(new StoreSettings());
+        BigDecimal taxRate = settings.getTaxRate() != null ? new BigDecimal(settings.getTaxRate().toString()) : new BigDecimal("5");
+        
+        BigDecimal taxes = totalAmount.multiply(taxRate).divide(new BigDecimal("100"));
+        taxes = taxes.setScale(0, java.math.RoundingMode.HALF_UP);
+        order.setTaxRateApplied(taxRate);
+        order.setTaxAmount(taxes);
+        
+        BigDecimal packingChargeAmt = BigDecimal.ZERO;
+        boolean packingApplied = false;
+        if ("PICKUP".equalsIgnoreCase(request.getOrderType())) {
+            packingChargeAmt = settings.getPackingCharge() != null ? new BigDecimal(settings.getPackingCharge().toString()) : new BigDecimal("15");
+            packingApplied = true;
+        }
+        order.setPackingChargeAmount(packingChargeAmt);
+        order.setPackingChargeApplied(packingApplied);
+        
+        totalAmount = totalAmount.add(taxes).add(packingChargeAmt);
         
         order.setTotalAmount(totalAmount);
         

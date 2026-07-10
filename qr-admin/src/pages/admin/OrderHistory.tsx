@@ -28,6 +28,14 @@ interface Order {
   paymentStatus: string;
   status: string;
   totalAmount: number;
+  subtotalAmount?: number;
+  couponDiscount?: number;
+  walletDiscount?: number;
+  discountTotal?: number;
+  taxAmount?: number;
+  taxRateApplied?: number;
+  packingChargeAmount?: number;
+  packingChargeApplied?: boolean;
   createdAt: string;
   items: OrderItem[];
 }

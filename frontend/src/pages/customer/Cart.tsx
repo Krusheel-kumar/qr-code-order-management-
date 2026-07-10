@@ -30,18 +30,19 @@ export default function Cart() {
   // Recalculate coupon discount if subtotal changes
   useEffect(() => {
     if (appliedCoupon) {
-      if (subtotal < appliedCoupon.minOrderAmount) {
+      const minOrder = appliedCoupon.minOrderAmount || 0;
+      if (subtotal < minOrder) {
         setAppliedCoupon(null);
         setCouponDiscount(0);
       } else {
         let discount = 0;
         if (appliedCoupon.type === 'PERCENTAGE' || appliedCoupon.type === 'percentage') {
-          discount = subtotal * (appliedCoupon.discountValue / 100);
+          discount = subtotal * ((appliedCoupon.value || appliedCoupon.discountValue || 0) / 100);
           if (appliedCoupon.maxDiscount) {
             discount = Math.min(discount, appliedCoupon.maxDiscount);
           }
         } else {
-          discount = appliedCoupon.discountValue;
+          discount = (appliedCoupon.value || appliedCoupon.discountValue || 0);
         }
         setCouponDiscount(Math.round(discount));
       }
@@ -52,18 +53,19 @@ export default function Cart() {
     if (!couponCode) return;
     const found = couponsList.find(c => c.code.toUpperCase() === couponCode.toUpperCase() && c.active);
     if (found) {
-      if (subtotal < found.minOrderAmount) {
-        alert(`This coupon code requires a minimum order of ₹${found.minOrderAmount}`);
+      const minOrder = found.minOrderAmount || 0;
+      if (subtotal < minOrder) {
+        alert(`This coupon code requires a minimum order of ₹${minOrder}`);
         return;
       }
       let discount = 0;
       if (found.type === 'PERCENTAGE' || found.type === 'percentage') {
-        discount = subtotal * (found.discountValue / 100);
+        discount = subtotal * ((found.value || found.discountValue || 0) / 100);
         if (found.maxDiscount) {
           discount = Math.min(discount, found.maxDiscount);
         }
       } else {
-        discount = found.discountValue;
+        discount = (found.value || found.discountValue || 0);
       }
       setAppliedCoupon(found);
       setCouponDiscount(Math.round(discount));
@@ -79,7 +81,9 @@ export default function Cart() {
 
   const totalDiscount = loyaltyDiscount + couponDiscount;
   const taxes = Math.round((subtotal - totalDiscount) * (storeSettings.taxRate / 100)); 
-  const total = Math.max(0, subtotal - totalDiscount + taxes + storeSettings.packingCharge);
+  const isPickup = cartStore.orderType === 'PICKUP';
+  const appliedPackingCharge = isPickup ? storeSettings.packingCharge : 0;
+  const total = Math.max(0, subtotal - totalDiscount + taxes + appliedPackingCharge);
 
   return (
     <div className="min-h-screen pb-28 bg-[var(--color-background)] font-sans flex flex-col">
@@ -224,10 +228,10 @@ export default function Cart() {
               <span className="text-gray-500">Taxes</span>
               <span className="font-bold">₹{taxes}</span>
             </div>
-            {storeSettings.packingCharge > 0 && (
+            {appliedPackingCharge > 0 && (
               <div className="flex justify-between">
                 <span className="text-gray-500">Packaging Fee</span>
-                <span className="font-bold">₹{storeSettings.packingCharge}</span>
+                <span className="font-bold">₹{appliedPackingCharge}</span>
               </div>
             )}
             

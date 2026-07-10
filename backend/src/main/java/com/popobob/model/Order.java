@@ -35,6 +35,17 @@ public class Order {
     
     private String status;
     private BigDecimal totalAmount;
+    
+    // Financial Breakdown
+    private BigDecimal subtotalAmount;
+    private BigDecimal couponDiscount;
+    private BigDecimal walletDiscount;
+    private BigDecimal discountTotal;
+    private BigDecimal taxAmount;
+    private BigDecimal taxRateApplied;
+    private BigDecimal packingChargeAmount;
+    private Boolean packingChargeApplied;
+
     private LocalDateTime createdAt = LocalDateTime.now();
     
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)

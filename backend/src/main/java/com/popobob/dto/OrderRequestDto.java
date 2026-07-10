@@ -14,5 +14,6 @@ public class OrderRequestDto {
     private String storeId;
     private UUID userId;
     private Integer pointsUsed;
+    private String couponCode;
     private List<OrderItemDto> items;
 }

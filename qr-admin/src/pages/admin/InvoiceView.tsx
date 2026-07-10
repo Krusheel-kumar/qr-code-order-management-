@@ -22,6 +22,14 @@ export interface InvoiceOrder {
   paymentStatus: string;
   status: string;
   totalAmount: number;
+  subtotalAmount?: number;
+  couponDiscount?: number;
+  walletDiscount?: number;
+  discountTotal?: number;
+  taxAmount?: number;
+  taxRateApplied?: number;
+  packingChargeAmount?: number;
+  packingChargeApplied?: boolean;
   createdAt: string;
   items: OrderItem[];
 }
@@ -132,18 +140,35 @@ export default function InvoiceView({ order, onClose }: { order: InvoiceOrder; o
             <div className="w-72 space-y-3">
               <div className="flex justify-between text-[#8D6E63] font-semibold text-sm">
                 <span>Subtotal</span>
-                <span className="font-bold text-[#2A1B16]">₹{order.items?.reduce((acc, item) => acc + item.subtotal, 0).toFixed(2)}</span>
+                <span className="font-bold text-[#2A1B16]">₹{(order.subtotalAmount || order.items?.reduce((acc, item) => acc + item.subtotal, 0) || 0).toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-[#8D6E63] font-semibold text-sm">
-                <span>Tax (GST Included)</span>
-                <span className="font-bold text-[#2A1B16]">₹0.00</span>
-              </div>
-              {order.totalAmount < (order.items?.reduce((acc, item) => acc + item.subtotal, 0) || 0) && (
+              
+              {!!order.couponDiscount && order.couponDiscount > 0 && (
                 <div className="flex justify-between text-[#22C55E] font-bold text-sm">
-                  <span>Loyalty Discount</span>
-                  <span>-₹{((order.items?.reduce((acc, item) => acc + item.subtotal, 0) || 0) - order.totalAmount).toFixed(2)}</span>
+                  <span>Coupon Discount</span>
+                  <span>-₹{order.couponDiscount.toFixed(2)}</span>
                 </div>
               )}
+              
+              {!!order.walletDiscount && order.walletDiscount > 0 && (
+                <div className="flex justify-between text-[#22C55E] font-bold text-sm">
+                  <span>Loyalty Points Used</span>
+                  <span>-₹{order.walletDiscount.toFixed(2)}</span>
+                </div>
+              )}
+              
+              <div className="flex justify-between text-[#8D6E63] font-semibold text-sm">
+                <span>Tax {order.taxRateApplied ? `(${order.taxRateApplied}%)` : '(GST Included)'}</span>
+                <span className="font-bold text-[#2A1B16]">₹{(order.taxAmount || 0).toFixed(2)}</span>
+              </div>
+              
+              {!!order.packingChargeApplied && !!order.packingChargeAmount && order.packingChargeAmount > 0 && (
+                <div className="flex justify-between text-[#8D6E63] font-semibold text-sm">
+                  <span>Packing Charge</span>
+                  <span className="font-bold text-[#2A1B16]">₹{order.packingChargeAmount.toFixed(2)}</span>
+                </div>
+              )}
+              
               <div className="flex justify-between items-center border-t border-[#FAEDCD]/60 pt-3 mt-3">
                 <span className="text-lg font-bold text-[#2A1B16]">Total</span>
                 <span className="text-2xl font-heading font-black text-[#2A1B16]">₹{order.totalAmount.toFixed(2)}</span>
