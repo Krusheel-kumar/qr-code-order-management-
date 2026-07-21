@@ -19,6 +19,7 @@ public class CorsConfig {
             "https://www.popobob.com",
             "https://popobob.com",
             "https://popobob-admin-panel.vercel.app",
+            "https://*.vercel.app",
             "http://localhost:*",
             "http://127.0.0.1:*",
             "http://[::1]:*"
