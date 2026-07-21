@@ -16,4 +16,4 @@ COPY --from=build /app/target/backend-0.0.1-SNAPSHOT.jar app.jar
 # Expose port 8080 (Koyeb maps this automatically if configured)
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xmx300m", "-jar", "app.jar"]

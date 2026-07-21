@@ -606,7 +606,7 @@ public class DataSeeder implements CommandLineRunner {
     private void seedAdminUser() {
         if (adminEmail != null && !adminEmail.trim().isEmpty() && adminPassword != null && !adminPassword.trim().isEmpty()) {
             String cleanEmail = adminEmail.trim();
-            java.util.Optional<User> existing = userRepository.findByEmail(cleanEmail);
+            java.util.Optional<User> existing = userRepository.findByEmailIgnoreCase(cleanEmail);
             User admin;
             if (existing.isEmpty()) {
                 admin = new User();

@@ -33,7 +33,7 @@ public class AuthController {
         String password = body.get("password");
         String phoneNumber = body.get("phoneNumber");
 
-        if (userRepository.findByEmail(email).isPresent()) {
+        if (userRepository.findByEmailIgnoreCase(email).isPresent()) {
             return ResponseEntity.badRequest().body(Map.of("message", "Email already exists"));
         }
 
@@ -60,7 +60,7 @@ public class AuthController {
         String email = body.get("email");
         String password = body.get("password");
 
-        Optional<User> userOpt = userRepository.findByEmail(email);
+        Optional<User> userOpt = userRepository.findByEmailIgnoreCase(email);
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
