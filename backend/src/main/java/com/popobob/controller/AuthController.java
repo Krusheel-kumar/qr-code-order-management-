@@ -57,8 +57,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
-        String email = body.get("email");
-        String password = body.get("password");
+        String email = body.get("email") != null ? body.get("email").trim() : null;
+        String password = body.get("password") != null ? body.get("password").trim() : null;
 
         Optional<User> userOpt = userRepository.findByEmailIgnoreCase(email);
 
