@@ -1,11 +1,11 @@
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Navigation, Clock, ChevronLeft, Phone } from 'lucide-react';
+import { MapPin, Navigation, Clock, ChevronLeft, Phone, CheckCircle2 } from 'lucide-react';
 import { useCartStore } from '../../store/useCartStore';
 import { STORES } from '../../data/stores';
 
 export default function PickupLocations() {
   const navigate = useNavigate();
-  const { setOrderType, setStoreId } = useCartStore();
+  const { setOrderType, setStoreId, storeId: currentStoreId } = useCartStore();
 
   const handleSelectStore = (storeId: string) => {
     setOrderType('PICKUP');
@@ -18,90 +18,113 @@ export default function PickupLocations() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-[#FFFBF2] flex flex-col font-sans relative">
-      {/* Header */}
-      <div className="bg-white px-5 pt-6 pb-4 flex items-center justify-between border-b border-gray-100 shadow-sm sticky top-0 z-10">
-        <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 text-gray-700 active:scale-95 transition-transform">
-          <ChevronLeft size={24} />
-        </button>
-        <h1 className="text-xl font-black text-gray-900 tracking-tight">Select Pickup Store</h1>
-        <div className="w-10" /> {/* spacer for centering */}
+    <div className="min-h-[100dvh] bg-[#FDFCF9] flex flex-col font-sans relative">
+      {/* Premium Header */}
+      <div className="bg-[#1A0B05] px-6 pt-10 pb-6 flex flex-col justify-end sticky top-0 z-20 rounded-b-[2rem] shadow-xl shadow-[#1A0B05]/10">
+        <div className="flex items-center gap-4 mb-2">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white active:scale-95 transition-all"
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <div>
+            <p className="text-[#D4AF37] text-[10px] font-black uppercase tracking-[0.2em] mb-0.5">Find a store</p>
+            <h1 className="text-2xl font-black text-white tracking-tight leading-none">Our Locations</h1>
+          </div>
+        </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-5 overflow-y-auto">
-        <p className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4">Available Stores</p>
+      <div className="flex-1 p-6 md:p-8 xl:p-12 overflow-y-auto max-w-[1440px] mx-auto w-full">
+        <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-6 px-1">Available Stores</p>
         
-        <div className="grid gap-4 pb-20">
-          {STORES.map(store => (
-            <div 
-              key={store.id}
-              className={`bg-white rounded-[1.5rem] p-5 shadow-[0_8px_24px_rgba(0,0,0,0.04)] border ${!store.isOpen ? 'border-red-100/50 opacity-70' : 'border-gray-100/80'} relative overflow-hidden`}
-            >
-              <div className="flex justify-between items-start mb-2">
-                <div 
-                  className="flex-1 cursor-pointer"
-                  onClick={() => store.isOpen && handleSelectStore(store.id)}
-                >
-                  <h3 className="text-lg font-black text-gray-900 mb-1">{store.name}</h3>
-                  <div className="flex items-start gap-1.5 text-gray-500 text-xs font-medium pr-4">
-                    <MapPin size={14} className="shrink-0 mt-0.5 text-primary" />
-                    <span>{store.address}</span>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 xl:gap-8 pb-20">
+          {STORES.map(store => {
+            const isSelected = currentStoreId === store.id;
+            return (
+              <div 
+                key={store.id}
+                className={`bg-white rounded-[2rem] p-6 shadow-sm border transition-all duration-300 relative overflow-hidden group ${
+                  !store.isOpen 
+                    ? 'border-red-100/50 opacity-70' 
+                    : isSelected 
+                      ? 'border-[#D4AF37] shadow-[0_8px_30px_rgba(212,175,55,0.15)] ring-1 ring-[#D4AF37]' 
+                      : 'border-gray-100 hover:border-[#D4AF37]/40 hover:shadow-md'
+                }`}
+              >
+                {/* Selected Badge */}
+                {isSelected && (
+                  <div className="absolute top-5 right-5 bg-[#D4AF37]/10 text-[#D4AF37] p-1.5 rounded-full">
+                    <CheckCircle2 size={20} className="fill-[#D4AF37] text-white" />
+                  </div>
+                )}
+
+                <div className="flex justify-between items-start mb-4">
+                  <div 
+                    className="flex-1 cursor-pointer pr-10"
+                    onClick={() => store.isOpen && handleSelectStore(store.id)}
+                  >
+                    <h3 className="text-xl font-black text-[#1A0B05] mb-1.5 group-hover:text-[#D4AF37] transition-colors">{store.name}</h3>
+                    <div className="flex items-start gap-2 text-gray-500 text-sm font-medium">
+                      <MapPin size={16} className="shrink-0 mt-0.5 text-[#D4AF37]" />
+                      <span className="leading-snug">{store.address}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div 
-                className="flex items-center justify-between mt-4 pt-3 border-t border-gray-50 cursor-pointer mb-4"
-                onClick={() => store.isOpen && handleSelectStore(store.id)}
-              >
-                <div className="flex items-center gap-4 text-xs font-bold">
-                  <span className={`flex items-center gap-1.5 ${store.isOpen ? 'text-emerald-600' : 'text-red-500'}`}>
-                    <span className={`w-2 h-2 rounded-full ${store.isOpen ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
-                    {store.isOpen ? 'OPEN' : 'CLOSED'}
-                  </span>
-                  <span className="flex items-center gap-1 text-gray-500">
-                    <Clock size={12} />
-                    Closes {store.closesAt}
+                <div 
+                  className="flex items-center justify-between mb-6 cursor-pointer bg-gray-50/50 rounded-xl p-3"
+                  onClick={() => store.isOpen && handleSelectStore(store.id)}
+                >
+                  <div className="flex items-center gap-4 text-xs font-bold">
+                    <span className={`flex items-center gap-1.5 px-2 py-1 rounded-md ${store.isOpen ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${store.isOpen ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
+                      {store.isOpen ? 'OPEN' : 'CLOSED'}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-gray-400">
+                      <Clock size={14} />
+                      Closes {store.closesAt}
+                    </span>
+                  </div>
+                  
+                  <span className="text-xs font-black text-[#1A0B05] bg-[#D4AF37]/20 px-3 py-1.5 rounded-lg border border-[#D4AF37]/20">
+                    {store.distance}
                   </span>
                 </div>
                 
-                <span className="text-xs font-black text-primary bg-primary/10 px-3 py-1.5 rounded-lg">
-                  {store.distance}
-                </span>
-              </div>
-              
-              <div className="flex gap-3">
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    window.open(`tel:${store.phone}`, '_self');
-                  }}
-                  className="flex-1 py-2.5 rounded-xl bg-gray-50 text-gray-700 font-bold text-sm flex items-center justify-center gap-2 border border-gray-200 hover:bg-gray-100 active:scale-[0.98] transition-all"
-                >
-                  <Phone size={16} /> Call Store
-                </button>
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // @ts-ignore - mapUrl is optional
-                    window.open(store.mapUrl || getDirectionsUrl(store.address), '_blank');
-                  }}
-                  className="flex-1 py-2.5 rounded-xl bg-blue-50 text-blue-600 font-bold text-sm flex items-center justify-center gap-2 border border-blue-100 hover:bg-blue-100 active:scale-[0.98] transition-all shadow-sm"
-                >
-                  <Navigation size={16} fill="currentColor" /> Directions
-                </button>
-              </div>
-              
-              {!store.isOpen && (
-                <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px] flex items-center justify-center cursor-not-allowed">
-                  <span className="bg-red-500 text-white font-black px-4 py-2 rounded-xl text-sm shadow-lg tracking-widest uppercase rotate-[-5deg]">
-                    Currently Closed
-                  </span>
+                <div className="flex gap-3">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(`tel:${store.phone}`, '_self');
+                    }}
+                    className="flex-1 py-3.5 rounded-full bg-white text-[#1A0B05] font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 border-2 border-[#1A0B05] hover:bg-[#1A0B05] hover:text-white active:scale-[0.98] transition-all"
+                  >
+                    <Phone size={14} /> Call Store
+                  </button>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // @ts-ignore - mapUrl is optional
+                      window.open(store.mapUrl || getDirectionsUrl(store.address), '_blank');
+                    }}
+                    className="flex-1 py-3.5 rounded-full bg-[#1A0B05] text-white font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 border-2 border-[#1A0B05] hover:bg-[#D4AF37] hover:text-[#1A0B05] hover:border-[#D4AF37] active:scale-[0.98] transition-all shadow-md"
+                  >
+                    <Navigation size={14} fill="currentColor" /> Directions
+                  </button>
                 </div>
-              )}
-            </div>
-          ))}
+                
+                {!store.isOpen && (
+                  <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex items-center justify-center cursor-not-allowed z-10">
+                    <span className="bg-[#1A0B05] text-white font-black px-6 py-3 rounded-full text-sm shadow-xl tracking-widest uppercase rotate-[-5deg] border border-white/20">
+                      Currently Closed
+                    </span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

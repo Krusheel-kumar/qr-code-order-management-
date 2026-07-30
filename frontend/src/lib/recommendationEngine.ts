@@ -9,7 +9,7 @@ export type SubFlavor =
 export type ToppingPreference = 'Tapioca (Chewy)' | 'Popping Bubbles' | 'Jellies' | 'Recommend for me';
 
 export interface RecommendationResult {
-  productId: string;
+  productIds: string[];
   reason: string;
 }
 
@@ -91,7 +91,7 @@ export const getLocalRecommendation = (
   ) || menuItems[0]; // Fallback to first product in category/menu to prevent undefined IDs
 
   return { 
-    productId: matchedProduct ? matchedProduct.id : 'fallback-id', 
+    productIds: matchedProduct ? [matchedProduct.id] : ['fallback-id'], 
     reason 
   };
 };
@@ -115,5 +115,12 @@ export const getLlmRecommendation = async (craving: string): Promise<Recommendat
     throw new Error('Failed to get recommendation from AI');
   }
 
-  return response.json();
+  const data = await response.json();
+  
+  // Defensive mapping to handle both old and new backend JSON schemas
+  if (data.productId && !data.productIds) {
+    data.productIds = [data.productId];
+  }
+  
+  return data;
 };

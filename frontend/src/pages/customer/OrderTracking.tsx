@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { MapPin, Bell, ChevronLeft } from 'lucide-react';
+import { MapPin, Bell, ChevronLeft, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { STORES } from '../../data/stores';
 import { useAuthStore } from '../../store/useAuthStore';
+import { useOrderStore } from '../../store/useOrderStore';
 import { getGuestRewardByOrderId } from '../../api';
 
 const STAGES = [
@@ -20,8 +21,6 @@ export default function OrderTracking() {
   const [isExiting, setIsExiting] = useState(false);
   const { user } = useAuthStore();
   const hasTriggeredAI = useRef(false);
-  const [showGuestRewardModal, setShowGuestRewardModal] = useState(false);
-  const [guestRewardPoints, setGuestRewardPoints] = useState(0);
 
   useEffect(() => {
     if (!id) return;
@@ -34,7 +33,12 @@ export default function OrderTracking() {
         
         if (order.status === 'PLACED' || order.status === 'NEW') setCurrentStage(0);
         else if (order.status === 'PREPARING') setCurrentStage(1);
-         if (order.status === 'READY' || order.status === 'DELIVERED') setCurrentStage(2);
+        if (order.status === 'READY' || order.status === 'DELIVERED') setCurrentStage(2);
+        
+        const terminalStates = ['DELIVERED', 'COMPLETED', 'CANCELLED', 'REJECTED'];
+        if (terminalStates.includes(order.status) && !useOrderStore.getState().orders.find(o => o.id === id)?.terminalTimestamp) {
+          useOrderStore.getState().markTerminal(id, Date.now());
+        }
       } catch (err) {
         console.error("Failed to fetch order", err);
       }
@@ -44,66 +48,6 @@ export default function OrderTracking() {
     const interval = setInterval(fetchStatus, 3000);
     return () => clearInterval(interval);
   }, [id]);
-
-  // Guest Reward Check
-  const [guestRewardChecked, setGuestRewardChecked] = useState(false);
-
-  useEffect(() => {
-    if (orderData && id) {
-      if (user) {
-        setGuestRewardChecked(true);
-        return;
-      }
-      const dismissed = localStorage.getItem(`guest_reward_dismissed_${id}`);
-      if (!dismissed) {
-        getGuestRewardByOrderId(id).then(reward => {
-          if (reward && reward.points > 0 && reward.status === 'PENDING') {
-            setGuestRewardPoints(reward.points);
-            setShowGuestRewardModal(true);
-            // Mark AI onboarding as complete since we are showing the reward modal
-            localStorage.setItem(`ai_onboarding_completed_${id}`, 'true');
-          }
-        }).catch(console.error).finally(() => {
-          setGuestRewardChecked(true);
-        });
-      } else {
-        setGuestRewardChecked(true);
-      }
-    }
-  }, [orderData, user, id]);
-
-  // AI Engagement Layer Trigger
-  useEffect(() => {
-    if (!guestRewardChecked || showGuestRewardModal) return; // Wait for reward check to complete
-
-    if (orderData && id && !hasTriggeredAI.current) {
-      const storageKey = `ai_onboarding_completed_${id}`;
-      const hasCompletedOnboarding = localStorage.getItem(storageKey);
-
-      if (!hasCompletedOnboarding) {
-        hasTriggeredAI.current = true;
-        
-        const timer = setTimeout(() => {
-          setIsExiting(true);
-          setTimeout(() => {
-            navigate('/ai/welcome', {
-              state: {
-                orderId: id,
-                orderNumber: orderData.orderNumber,
-                customerName: orderData.customerName || user?.username || null,
-                isGuest: !user
-              }
-            });
-          }, 600); // Wait for exit animation
-        }, 2500); 
-        
-        return () => {
-          clearTimeout(timer);
-          hasTriggeredAI.current = false;
-        };
-      }
-    }
-  }, [orderData, navigate, id, user, showGuestRewardModal]);
 
   const storeInfo = orderData?.storeId ? STORES.find(s => s.id === orderData.storeId?.toString()) : STORES[0];
 
@@ -128,7 +72,12 @@ export default function OrderTracking() {
             <h1 className="font-heading font-extrabold text-xl tracking-tight">
               {orderData?.orderNumber || `Order #${id?.substring(0, 8)}`}
             </h1>
-            <div className="w-10"></div>
+            <button 
+              onClick={() => window.open(`tel:${storeInfo?.phone || '+911234567890'}`)}
+              className="w-10 h-10 flex items-center justify-center rounded-full bg-[#FFF5E1] hover:bg-[#D4AF37]/20 transition-colors text-[#D4AF37]"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            </button>
           </header>
 
           <main className="flex-1 px-5 pt-2">
@@ -160,9 +109,9 @@ export default function OrderTracking() {
                 <div className="absolute top-2 bottom-6 left-[23px] w-[3px] bg-gray-100 rounded-full" />
                 
                 {/* Vertical Progress Line */}
-                <div className="absolute top-2 left-[23px] w-[3px] rounded-full bg-[#FFB800]">
+                <div className="absolute top-2 left-[23px] w-[3px] rounded-full bg-[#D4AF37]">
                   <motion.div 
-                    className="w-full bg-[#FFB800] rounded-full origin-top"
+                    className="w-full bg-[#D4AF37] rounded-full origin-top"
                     initial={{ scaleY: 0 }}
                     animate={{ scaleY: currentStage / (STAGES.length - 1) }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
@@ -177,7 +126,7 @@ export default function OrderTracking() {
                     return (
                       <div key={stage.id} className="flex gap-5 relative z-10 items-center">
                         <div className={`w-[22px] h-[22px] rounded-full shrink-0 flex items-center justify-center z-10 transition-colors duration-300 ${
-                          isCompleted ? 'bg-[#FFB800] shadow-[0_0_0_4px_white]' : 'bg-gray-200 shadow-[0_0_0_4px_white]'
+                          isCompleted ? 'bg-[#D4AF37] shadow-[0_0_0_4px_white]' : 'bg-gray-200 shadow-[0_0_0_4px_white]'
                         }`}>
                           {isCompleted && (
                             <motion.div
@@ -188,7 +137,7 @@ export default function OrderTracking() {
                           )}
                           {isCurrent && (
                             <motion.div 
-                              className="absolute inset-0 rounded-full border-2 border-[#FFB800]"
+                              className="absolute inset-0 rounded-full border-2 border-[#D4AF37]"
                               animate={{ scale: [1, 1.8], opacity: [1, 0] }}
                               transition={{ repeat: Infinity, duration: 1.5 }}
                             />
@@ -209,8 +158,8 @@ export default function OrderTracking() {
             {/* Store & Order Context */}
             <div className="bg-white rounded-[32px] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 mb-6 flex flex-col gap-4">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#FFF5E1] flex items-center justify-center text-[#FFB800] shrink-0">
-                  <MapPin size={22} fill="currentColor" className="text-[#FFB800]/20" />
+                <div className="w-12 h-12 rounded-full bg-[#FFFBF2] flex items-center justify-center text-[#D4AF37] shrink-0">
+                  <MapPin size={22} fill="currentColor" className="text-[#D4AF37]/20" />
                 </div>
                 <div>
                   <h4 className="font-bold text-[15px] text-[#1A0B05]">
@@ -220,7 +169,7 @@ export default function OrderTracking() {
                     {storeInfo?.name || "POP O'BOB®"} | {storeInfo?.address || 'Film Nagar'}
                   </p>
                   {orderData?.tableNumber && (
-                    <p className="text-[#FFB800] font-bold text-sm mt-1">
+                    <p className="text-[#D4AF37] font-bold text-sm mt-1">
                       Table No. {orderData.tableNumber}
                     </p>
                   )}
@@ -240,6 +189,14 @@ export default function OrderTracking() {
             </div>
 
             <button 
+              onClick={() => navigate(`/receipt/${id}`)}
+              className="w-full py-4 bg-white border-2 border-gray-100 text-[#1A0B05] hover:border-[#D4AF37] hover:bg-[#FFFBF2] rounded-[16px] font-bold text-[15px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all mb-4 shadow-sm"
+            >
+              <FileText size={18} className="text-[#D4AF37]" />
+              View E-Receipt
+            </button>
+
+            <button 
               onClick={() => navigate('/menu')}
               className="w-full py-4 rounded-full border-2 border-gray-200 text-[#1A0B05] font-bold text-[15px] active:scale-[0.98] transition-transform hover:border-gray-300 hover:bg-gray-50"
             >
@@ -249,58 +206,7 @@ export default function OrderTracking() {
             <div className="h-8" />
           </main>
 
-          {/* Guest Reward Modal */}
-          <AnimatePresence>
-            {showGuestRewardModal && (
-              <>
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100]"
-                />
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                  className="fixed inset-0 z-[101] flex items-center justify-center p-4 pointer-events-none"
-                >
-                  <div className="bg-white w-full max-w-sm rounded-[32px] p-8 text-center shadow-2xl pointer-events-auto border border-gray-100">
-                    <div className="w-20 h-20 bg-[#FFF5E1] rounded-full mx-auto flex items-center justify-center mb-6 shadow-inner">
-                      <span className="text-4xl">🎁</span>
-                    </div>
-                    <h2 className="font-heading font-black text-2xl mb-2 text-[#1A0B05]">🎉 Congratulations!</h2>
-                    <p className="text-gray-500 font-medium mb-6">You earned:</p>
-                    <div className="bg-[#FFF5E1] rounded-[20px] py-4 px-6 mb-6 inline-block">
-                      <p className="font-black text-2xl text-[#FFB800] tracking-tight">
-                        ⭐ {guestRewardPoints} POP Points
-                      </p>
-                    </div>
-                    <p className="text-gray-600 text-[15px] font-medium leading-relaxed mb-8 px-2">
-                      Create your free account to unlock your rewards.
-                    </p>
-                    <div className="space-y-3 w-full">
-                      <button
-                        onClick={() => navigate('/profile')}
-                        className="w-full bg-[#FFB800] text-[#1A0B05] font-bold py-4 rounded-[16px] active:scale-[0.98] transition-transform shadow-[0_8px_24px_rgba(255,184,0,0.25)]"
-                      >
-                        Claim My Rewards
-                      </button>
-                      <button
-                        onClick={() => {
-                          localStorage.setItem(`guest_reward_dismissed_${id}`, 'true');
-                          setShowGuestRewardModal(false);
-                        }}
-                        className="w-full bg-white text-gray-500 font-bold py-4 rounded-[16px] active:scale-[0.98] transition-transform border border-gray-200"
-                      >
-                        Maybe Later
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              </>
-            )}
-          </AnimatePresence>
+
 
         </motion.div>
       )}

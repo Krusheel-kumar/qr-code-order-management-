@@ -36,6 +36,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/menu/**").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/ai/context").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/ai/recommend").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/admin/coupons").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/v2/admin/stores/*/blacklist/**").permitAll()
                 .requestMatchers("/api/auth/**", "/api/discovery/**", "/api/public/**", "/ws/**", "/api/loyalty/guest/**").permitAll()

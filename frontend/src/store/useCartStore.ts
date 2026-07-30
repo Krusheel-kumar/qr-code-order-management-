@@ -77,13 +77,6 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: 'popobob-cart',
-      partialize: (state) => ({
-        ...state,
-        items: state.items.map(item => ({
-          ...item,
-          product: { ...item.product, image: '' }
-        }))
-      }),
     }
   )
 );

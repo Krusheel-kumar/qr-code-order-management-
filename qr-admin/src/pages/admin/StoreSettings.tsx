@@ -6,6 +6,12 @@ import { STORES } from '../../data/stores';
 export default function StoreSettings() {
   const { storeSettings, updateStoreSettings, menuItems, customizationOptions, customizationGroups } = useAdminStore();
   
+  const [localSettings, setLocalSettings] = useState(storeSettings);
+  
+  useEffect(() => {
+    setLocalSettings(storeSettings);
+  }, [storeSettings]);
+
   const [selectedStoreId, setSelectedStoreId] = useState('1');
   const [blacklistedProductIds, setBlacklistedProductIds] = useState<string[]>([]);
   const [blacklistedOptionIds, setBlacklistedOptionIds] = useState<string[]>([]);
@@ -74,7 +80,7 @@ export default function StoreSettings() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await updateStoreSettings(storeSettings);
+      await updateStoreSettings(localSettings);
       alert('Store settings saved successfully!');
     } catch (err: any) {
       alert(`Failed to save settings: ${err.message}`);
@@ -100,7 +106,7 @@ export default function StoreSettings() {
             <div className="max-w-md">
               <div className="flex justify-between items-center mb-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-[#2A1B16]">Current Prep Time (Minutes)</label>
-                <span className="text-sm font-black text-[#B87A42]">{storeSettings.prepTime} mins</span>
+                <span className="text-sm font-black text-[#B87A42]">{localSettings.prepTime} mins</span>
               </div>
               <p className="text-xs text-[#8D6E63] font-medium mb-4">
                 Adjust this slider during busy hours. This time will be displayed to customers before they place an order.
@@ -110,8 +116,8 @@ export default function StoreSettings() {
                 min="5" 
                 max="90" 
                 step="5" 
-                value={storeSettings.prepTime}
-                onChange={(e) => updateStoreSettings({ prepTime: Number(e.target.value) })}
+                value={localSettings.prepTime}
+                onChange={(e) => setLocalSettings({ ...localSettings, prepTime: Number(e.target.value) })}
                 className="w-full h-2 bg-[#FAEDCD] rounded-lg appearance-none cursor-pointer accent-[#2A1B16]"
               />
               <div className="flex justify-between text-2xs text-[#8D6E63]/70 font-semibold mt-2">
@@ -141,8 +147,8 @@ export default function StoreSettings() {
                   type="number" 
                   min="0"
                   step="0.1"
-                  value={storeSettings.taxRate}
-                  onChange={(e) => updateStoreSettings({ taxRate: Number(e.target.value) })}
+                  value={localSettings.taxRate}
+                  onChange={(e) => setLocalSettings({ ...localSettings, taxRate: Number(e.target.value) })}
                   className="w-full border border-[#FAEDCD] rounded-xl bg-white/80 p-3 pr-8 text-sm text-[#2A1B16] outline-none focus:ring-4 focus:ring-[#FFD54F]/20 focus:border-[#FFD54F] transition-all font-medium placeholder-[#8D6E63]/30"
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#8D6E63] font-bold">%</span>
@@ -159,8 +165,8 @@ export default function StoreSettings() {
                 <input 
                   type="number" 
                   min="0"
-                  value={storeSettings.packingCharge}
-                  onChange={(e) => updateStoreSettings({ packingCharge: Number(e.target.value) })}
+                  value={localSettings.packingCharge}
+                  onChange={(e) => setLocalSettings({ ...localSettings, packingCharge: Number(e.target.value) })}
                   className="w-full border border-[#FAEDCD] rounded-xl bg-white/80 p-3 pl-8 text-sm text-[#2A1B16] outline-none focus:ring-4 focus:ring-[#FFD54F]/20 focus:border-[#FFD54F] transition-all font-medium placeholder-[#8D6E63]/30"
                 />
               </div>
@@ -176,8 +182,8 @@ export default function StoreSettings() {
                 <input 
                   type="number" 
                   min="0"
-                  value={storeSettings.deliveryFee}
-                  onChange={(e) => updateStoreSettings({ deliveryFee: Number(e.target.value) })}
+                  value={localSettings.deliveryFee}
+                  onChange={(e) => setLocalSettings({ ...localSettings, deliveryFee: Number(e.target.value) })}
                   className="w-full border border-[#FAEDCD] rounded-xl bg-white/80 p-3 pl-8 text-sm text-[#2A1B16] outline-none focus:ring-4 focus:ring-[#FFD54F]/20 focus:border-[#FFD54F] transition-all font-medium placeholder-[#8D6E63]/30"
                 />
               </div>

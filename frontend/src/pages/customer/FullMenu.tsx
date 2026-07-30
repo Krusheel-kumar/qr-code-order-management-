@@ -181,25 +181,169 @@ export default function FullMenu() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-32 animate-in fade-in duration-500 font-sans" ref={containerRef}>
+    <div className="min-h-screen bg-[#FDFCF9] pb-32 animate-in fade-in duration-500 font-sans max-w-[1440px] mx-auto" ref={containerRef}>
       
-      {/* Search Header */}
-      <div className="sticky top-0 z-30 bg-gray-50/90 backdrop-blur-xl px-4 pt-4 pb-2 border-b border-black/5">
-        <div className="relative mb-3">
-          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-            <Search size={20} className="text-foreground/40" />
+      {/* ========================================================================= */}
+      {/* MOBILE MENU VIEW */}
+      {/* ========================================================================= */}
+      <div className="lg:hidden">
+        {/* Search Header */}
+        <div className="sticky top-0 z-30 bg-[#FDFCF9]/95 backdrop-blur-xl px-4 pt-4 pb-2 border-b border-gray-100">
+          <div className="relative mb-3">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+              <Search size={20} className="text-gray-400" />
+            </div>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white border border-gray-200 rounded-2xl py-3 pl-12 pr-4 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] shadow-sm transition-all"
+              placeholder="Search our menu..."
+            />
           </div>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white border border-black/5 rounded-2xl py-3 pl-12 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/50 shadow-sm"
-            placeholder="Search our menu..."
-          />
+
+          {/* Main Category Switcher */}
+          <div className="flex bg-white border border-gray-100 p-1 rounded-2xl mb-4 overflow-x-auto hide-scrollbar shadow-sm">
+            {DYNAMIC_CATEGORIES.map(cat => (
+              <button
+                key={cat}
+                onClick={() => {
+                  setMainCategory(cat);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className={`flex-1 min-w-[100px] py-2.5 px-3 text-xs font-black rounded-xl transition-all text-center whitespace-nowrap ${
+                  mainCategory === cat
+                    ? 'bg-[#1A0B05] text-white shadow-md'
+                    : 'text-gray-500 hover:text-[#1A0B05]'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Scrollable Category Pills */}
+          <div className="flex overflow-x-auto hide-scrollbar gap-2 pb-2 -mx-4 px-4 snap-x">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => scrollToCategory(cat)}
+                className={`snap-center shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-all shadow-sm ${
+                  activeCategory === cat 
+                    ? 'bg-[#1A0B05] text-white shadow-md' 
+                    : 'bg-white text-gray-600 border border-gray-200 hover:border-[#D4AF37]/50'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Main Category Switcher */}
-        <div className="flex bg-gray-100 p-1 rounded-xl mb-4 overflow-x-auto hide-scrollbar">
+        {/* Menu Sections */}
+        <div className="px-4 mt-6 space-y-8">
+          {categories.map(cat => (
+            <div 
+              key={cat} 
+              ref={el => { if(el) categoryRefs.current[cat] = el; }}
+              className="scroll-mt-36"
+            >
+              <h2 className="text-xl font-black text-[#1A0B05] mb-3 sticky top-[120px] z-20 bg-[#FDFCF9]/95 backdrop-blur-md py-2 -mx-4 px-4 border-y border-gray-100">
+                {cat}
+              </h2>
+              
+              <div className="grid grid-cols-2 gap-4">
+                {groupedMenu[cat].map(product => {
+                  const isBlacklisted = blacklistedProductIds.includes(product.id);
+                  return (
+                    <div 
+                      key={product.id}
+                      onClick={() => !isBlacklisted && openCustomizer(product)}
+                      className={`bg-white p-3 rounded-[1.5rem] flex flex-col gap-3 border border-gray-100 shadow-sm transition-all cursor-pointer group hover:shadow-md hover:border-[#D4AF37]/30 ${isBlacklisted ? 'opacity-55 cursor-not-allowed' : 'active:scale-[0.98]'}`}
+                    >
+                      <div className="w-full aspect-square rounded-[1rem] overflow-hidden bg-gray-50 relative shadow-inner">
+                        {isBlacklisted ? (
+                          <div className="absolute top-2 left-2 z-10 bg-[#1A0B05] text-white text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md shadow-sm">
+                            Sold Out
+                          </div>
+                        ) : product.badge ? (
+                          <div className="absolute top-2 left-2 z-10 bg-[#1A0B05] text-[#D4AF37] text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md shadow-sm">
+                            {product.badge}
+                          </div>
+                        ) : null}
+                        <button 
+                          onClick={(e) => handleShare(e, product)}
+                          className="absolute top-2 right-2 z-10 bg-white/80 backdrop-blur-md hover:bg-white text-[#1A0B05] p-1.5 rounded-full shadow-sm transition-all active:scale-95"
+                        >
+                          <Share2 size={14} />
+                        </button>
+                        {product.image ? (
+                          <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-300">
+                            <ShoppingBag size={32} className="mb-2 opacity-50" />
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex flex-col justify-between flex-1 px-1">
+                        <h3 className="font-black text-[13px] text-[#1A0B05] leading-tight mb-1 line-clamp-2">{product.name}</h3>
+                        
+                        <div className="flex justify-between items-center mt-auto pt-2">
+                          <span className="font-black text-[14px] text-[#D4AF37]">₹{product.price.toFixed(0)}</span>
+                          <button className="bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] w-7 h-7 rounded-full flex items-center justify-center font-black text-lg transition-colors shadow-sm">
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+
+          {categories.length === 0 && (
+            <div className="py-20 text-center">
+              <h3 className="font-black text-[#1A0B05] text-lg mb-1">No items found</h3>
+              <p className="text-gray-500 text-sm font-medium">Try adjusting your search.</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* DESKTOP MENU VIEW (hidden lg:block) */}
+      {/* ========================================================================= */}
+      <div className="hidden lg:block max-w-[1440px] mx-auto px-8 xl:px-12 pt-10 pb-24">
+        
+        {/* Editorial Menu Header + Search Row */}
+        <div className="flex items-end justify-between mb-10 pb-8 border-b border-gray-200">
+          <div>
+            <span className="text-[11px] font-black tracking-[0.25em] uppercase text-[#D4AF37] block mb-2">
+              POP O'BOB® MENU
+            </span>
+            <h1 className="text-5xl font-black text-[#1A0B05] tracking-tight">
+              Our Menu
+            </h1>
+          </div>
+
+          <div className="w-96 relative">
+            <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+              <Search size={18} className="text-gray-400" />
+            </div>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white border border-gray-200 rounded-full py-3.5 pl-12 pr-6 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] shadow-sm transition-all"
+              placeholder="Search drinks, toppings, treats..."
+            />
+          </div>
+        </div>
+
+        {/* Main Category Pills */}
+        <div className="flex items-center gap-3 mb-8 overflow-x-auto hide-scrollbar">
           {DYNAMIC_CATEGORIES.map(cat => (
             <button
               key={cat}
@@ -207,10 +351,10 @@ export default function FullMenu() {
                 setMainCategory(cat);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className={`flex-1 min-w-[100px] py-2.5 px-3 text-xs font-bold rounded-lg transition-all text-center whitespace-nowrap ${
+              className={`px-7 py-3.5 rounded-full text-xs font-black uppercase tracking-widest transition-all ${
                 mainCategory === cat
-                  ? 'bg-white text-foreground shadow-sm'
-                  : 'text-foreground/50 hover:text-foreground/70'
+                  ? 'bg-[#1A0B05] text-[#D4AF37] shadow-lg scale-105'
+                  : 'bg-white hover:bg-[#FFFBF2] text-gray-700 hover:text-[#1A0B05] border border-gray-200 shadow-sm'
               }`}
             >
               {cat}
@@ -218,99 +362,124 @@ export default function FullMenu() {
           ))}
         </div>
 
-        {/* Scrollable Category Pills */}
-        <div className="flex overflow-x-auto hide-scrollbar gap-2 pb-2 -mx-4 px-4 snap-x">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => scrollToCategory(cat)}
-              className={`snap-center shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-all shadow-sm ${
-                activeCategory === cat 
-                  ? 'bg-foreground text-white shadow-md scale-105' 
-                  : 'bg-white text-foreground/70 hover:bg-gray-100 border border-black/5'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Menu Sections */}
-      <div className="px-4 mt-6 space-y-8">
-        {categories.map(cat => (
-          <div 
-            key={cat} 
-            ref={el => { if(el) categoryRefs.current[cat] = el; }}
-            className="scroll-mt-36" // Add margin for scroll offset
-          >
-            <h2 className="text-[19px] font-extrabold text-foreground mb-3 sticky top-[120px] z-20 bg-gray-50/95 backdrop-blur-md py-2 -mx-4 px-4 border-y border-black/5">
-              {cat}
-            </h2>
-            
-            {/* Visual Prominent Grid Layout for Premium Feel */}
-            <div className="grid grid-cols-2 gap-3.5">
-              {groupedMenu[cat].map(product => {
-                const isBlacklisted = blacklistedProductIds.includes(product.id);
-                return (
-                  <div 
-                    key={product.id}
-                    onClick={() => !isBlacklisted && openCustomizer(product)}
-                    className={`bg-white p-2 rounded-[1.2rem] flex flex-col gap-2 border border-black/5 shadow-sm transition-transform cursor-pointer group hover:shadow-md ${isBlacklisted ? 'opacity-55 cursor-not-allowed' : 'active:scale-[0.98]'}`}
-                  >
-                    <div className="w-full aspect-square rounded-[1rem] overflow-hidden bg-gray-100 relative shadow-inner">
-                      {isBlacklisted ? (
-                        <div className="absolute top-2 left-2 z-10 bg-red-600 text-white text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md shadow-sm">
-                          Sold Out
-                        </div>
-                      ) : product.badge ? (
-                        <div className="absolute top-2 left-2 z-10 bg-black/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-md shadow-sm">
-                          {product.badge}
-                        </div>
-                      ) : null}
-                    <button 
-                      onClick={(e) => handleShare(e, product)}
-                      className="absolute top-2 right-2 z-10 bg-white/60 backdrop-blur-md hover:bg-white/90 text-gray-800 p-1.5 rounded-full shadow-sm transition-all active:scale-95"
-                    >
-                      <Share2 size={14} />
-                    </button>
-                    {product.image ? (
-                      <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-50 to-primary/10 text-primary/40">
-                        <ShoppingBag size={32} className="mb-2 opacity-50" />
-                        <span className="text-[10px] font-bold uppercase tracking-widest opacity-50">POP O'BOB®</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex flex-col justify-between flex-1 px-1">
-                    <h3 className="font-bold text-[13px] text-foreground leading-tight mb-1 line-clamp-2">{product.name}</h3>
-                    
-                    <div className="flex justify-between items-center mt-auto pt-1.5">
-                      <span className="font-extrabold text-[13px] text-foreground">₹{product.price.toFixed(2)}</span>
-                      <button className="bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground w-7 h-7 rounded-full flex items-center justify-center font-bold text-base transition-colors shadow-sm">
-                        +
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-            </div>
-          </div>
-        ))}
-
-        {categories.length === 0 && (
-          <div className="py-20 text-center">
-            <h3 className="font-bold text-foreground text-lg mb-1">No items found</h3>
-            <p className="text-foreground/50 text-sm">Try adjusting your search.</p>
+        {/* Subcategory Chips */}
+        {categories.length > 1 && (
+          <div className="flex items-center gap-2 mb-12 pb-6 border-b border-gray-200 flex-wrap">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => scrollToCategory(cat)}
+                className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
+                  activeCategory === cat
+                    ? 'bg-[#1A0B05] text-white font-black shadow-md'
+                    : 'bg-white text-gray-600 border border-gray-200 hover:border-[#D4AF37]/50'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
         )}
+
+        {/* Desktop Luxury Menu Sections */}
+        <div className="space-y-16">
+          {categories.map(cat => (
+            <div 
+              key={cat} 
+              ref={el => { if(el) categoryRefs.current[cat] = el; }}
+              className="scroll-mt-36"
+            >
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-3xl font-black text-[#1A0B05] tracking-tight">
+                  {cat}
+                </h2>
+                <span className="text-xs font-extrabold uppercase tracking-widest text-gray-400">
+                  {groupedMenu[cat].length} {groupedMenu[cat].length === 1 ? 'creation' : 'creations'}
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-4 xl:grid-cols-5 gap-8">
+                {groupedMenu[cat].map(product => {
+                  const isBlacklisted = blacklistedProductIds.includes(product.id);
+                  return (
+                    <div 
+                      key={product.id}
+                      onClick={() => !isBlacklisted && openCustomizer(product)}
+                      className={`bg-white p-5 rounded-[2.2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:border-[#D4AF37]/40 transition-all duration-300 overflow-hidden flex flex-col justify-between group cursor-pointer ${
+                        isBlacklisted ? 'opacity-55 cursor-not-allowed' : 'hover:-translate-y-1'
+                      }`}
+                    >
+                      <div>
+                        <div className="w-full aspect-[4/3] rounded-[1.6rem] overflow-hidden bg-gray-50 relative mb-5 shadow-inner">
+                          {isBlacklisted ? (
+                            <div className="absolute top-4 left-4 z-10 bg-[#1A0B05] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-md">
+                              Sold Out
+                            </div>
+                          ) : product.badge ? (
+                            <div className="absolute top-4 left-4 z-10 bg-[#1A0B05] text-[#D4AF37] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-md">
+                              {product.badge}
+                            </div>
+                          ) : null}
+                          <button 
+                            onClick={(e) => handleShare(e, product)}
+                            className="absolute top-4 right-4 z-10 bg-white/80 backdrop-blur-md hover:bg-white text-[#1A0B05] p-2.5 rounded-full shadow-sm transition-all opacity-0 group-hover:opacity-100"
+                            title="Share"
+                          >
+                            <Share2 size={14} />
+                          </button>
+                          {product.image ? (
+                            <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+                          ) : (
+                            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-300">
+                              <ShoppingBag size={40} className="mb-2 opacity-50" />
+                            </div>
+                          )}
+                        </div>
+
+                        {product.category && (
+                          <span className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37] block mb-1">
+                            {product.category}
+                          </span>
+                        )}
+                        <h3 className="text-lg font-black text-[#1A0B05] tracking-tight mb-2 group-hover:text-[#D4AF37] transition-colors line-clamp-1">
+                          {product.name}
+                        </h3>
+                        <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed mb-6 font-medium">
+                          {product.story || ''}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                        <span className="text-2xl font-black text-[#1A0B05]">
+                          ₹{product.price.toFixed(0)}
+                        </span>
+                        
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!isBlacklisted) openCustomizer(product);
+                          }}
+                          className="bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 active:scale-95"
+                        >
+                          <span>+ Add to Bag</span>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+
+          {categories.length === 0 && (
+            <div className="py-28 text-center">
+              <h3 className="font-black text-[#1A0B05] text-2xl mb-2">No menu items found</h3>
+              <p className="text-gray-500 font-medium text-sm">Try adjusting your search query or selecting another category.</p>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Smart Sticky Cart removed - now handled globally by FloatingCartButton in MainLayout */}
-      {/* Unified Bottom Sheet Customizer */}
       <CustomizerSheet 
         product={selectedProduct} 
         isOpen={selectedProduct !== null} 

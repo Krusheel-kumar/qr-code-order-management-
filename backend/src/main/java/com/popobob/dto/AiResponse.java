@@ -1,22 +1,24 @@
 package com.popobob.dto;
 
+import java.util.List;
+
 public class AiResponse {
-    private String productId;
+    private List<String> productIds;
     private String reason;
 
     public AiResponse() {}
 
-    public AiResponse(String productId, String reason) {
-        this.productId = productId;
+    public AiResponse(List<String> productIds, String reason) {
+        this.productIds = productIds;
         this.reason = reason;
     }
 
-    public String getProductId() {
-        return productId;
+    public List<String> getProductIds() {
+        return productIds;
     }
 
-    public void setProductId(String productId) {
-        this.productId = productId;
+    public void setProductIds(List<String> productIds) {
+        this.productIds = productIds;
     }
 
     public String getReason() {

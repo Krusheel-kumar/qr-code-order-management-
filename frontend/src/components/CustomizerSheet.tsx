@@ -206,91 +206,75 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed top-0 left-0 w-full h-[100dvh] bg-white z-[100001] flex flex-col overflow-hidden"
+            drag={window.innerWidth < 1024 ? "y" : false}
+            dragConstraints={{ top: 0 }}
+            dragElastic={0.2}
+            onDragEnd={(e, { offset, velocity }) => {
+              if (offset.y > 150 || velocity.y > 500) {
+                onClose();
+              }
+            }}
+            className="fixed top-0 left-0 w-full h-[100dvh] lg:h-auto lg:max-h-[85vh] lg:max-w-5xl lg:rounded-[2rem] lg:inset-0 lg:m-auto lg:border lg:border-white/50 lg:shadow-[0_35px_100px_rgba(0,0,0,0.35)] bg-[#FDFCF9] z-[100001] flex flex-col lg:flex-row overflow-hidden"
           >
-            {/* Scrollable Content */}
-            <div className="flex-1 min-h-0 overflow-y-auto hide-scrollbar relative flex flex-col bg-white">
+            {/* Split Content Container */}
+            <div className="flex-1 min-h-0 relative flex flex-col lg:flex-row bg-[#FDFCF9] w-full mt-2 lg:mt-0 rounded-t-[2rem] lg:rounded-none overflow-hidden">
               
-              {step === 'details' ? (
-                <>
-                  {/* Floating Header Buttons */}
-                  <div className="absolute top-0 w-full z-50 flex justify-end p-5 pointer-events-none">
-                    <div className="flex items-center gap-3 pointer-events-auto">
-                      <button 
-                        onClick={handleShare}
-                        className="w-11 h-11 bg-white/90 backdrop-blur-xl rounded-full flex items-center justify-center text-gray-800 shadow-lg hover:bg-white active:scale-95 transition-all shrink-0 border border-white/20"
-                      >
-                        <Share2 size={18} />
-                      </button>
-                      <button 
-                        onClick={onClose}
-                        className="w-11 h-11 bg-white/90 backdrop-blur-xl rounded-full flex items-center justify-center text-gray-800 shadow-lg hover:bg-white active:scale-95 transition-all shrink-0 border border-white/20"
-                      >
-                        <X size={20} />
-                      </button>
-                    </div>
+              {/* Drag Handle (Mobile Only) */}
+              <div className="lg:hidden absolute top-0 w-full h-8 flex items-center justify-center z-50 pointer-events-none">
+                <div className="w-12 h-1.5 bg-white/50 backdrop-blur-md rounded-full mt-2" />
+              </div>
+
+              {/* LEFT COLUMN: Image & Header Buttons */}
+              <div className="w-full lg:w-[45%] shrink-0 relative lg:h-auto bg-[#FFFBF2] flex flex-col">
+                {/* Floating Header Buttons */}
+                <div className="absolute top-0 w-full z-50 flex justify-end p-4 lg:p-5 pointer-events-none">
+                  <div className="flex items-center gap-3 pointer-events-auto">
+                    <button 
+                      onClick={handleShare}
+                      className="w-10 h-10 lg:w-11 lg:h-11 bg-white/90 backdrop-blur-xl rounded-full flex items-center justify-center text-[#1A0B05] shadow-md hover:bg-white active:scale-95 transition-all shrink-0 border border-black/5"
+                    >
+                      <Share2 size={18} />
+                    </button>
+                    <button 
+                      onClick={onClose}
+                      className="w-10 h-10 lg:w-11 lg:h-11 bg-white/90 backdrop-blur-xl rounded-full flex items-center justify-center text-[#1A0B05] shadow-md hover:bg-white active:scale-95 transition-all shrink-0 border border-black/5"
+                    >
+                      <X size={20} />
+                    </button>
                   </div>
+                </div>
 
-                  {/* Full Width Hero Image */}
-                  {product.image ? (
-                    <div className="w-full h-[50vh] bg-gray-100 shrink-0 relative">
-                      <img src={product.image} className="w-full h-full object-cover" alt={product.name} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                    </div>
-                  ) : (
-                    <div className="w-full h-[50vh] bg-orange-50 text-orange-300 flex items-center justify-center shrink-0">
-                      <ShoppingBag size={64}/>
-                    </div>
-                  )}
+                {/* Hero Image */}
+                {product.image ? (
+                  <div className="w-full h-[40vh] lg:h-full lg:min-h-[400px] shrink-0 relative">
+                    <img src={product.image} className="w-full h-full object-cover" alt={product.name} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent lg:hidden"></div>
+                  </div>
+                ) : (
+                  <div className="w-full h-[40vh] lg:h-full lg:min-h-[400px] bg-orange-50 text-orange-300 flex items-center justify-center shrink-0">
+                    <ShoppingBag size={64}/>
+                  </div>
+                )}
+              </div>
 
-                  <div className="p-6 space-y-6 flex-1 bg-white relative -mt-8 rounded-t-[2rem] z-20 shadow-[0_-8px_30px_rgba(0,0,0,0.1)]">
-                    <div className="flex justify-between items-start gap-4">
-                      <div className="flex-1">
-                        <h3 className="font-heading font-extrabold text-3xl text-[#1A0B05] leading-tight mb-1 tracking-tight">{product.name}</h3>
-                        <span className="font-black text-2xl text-[#FF9800]">₹{product.price}</span>
-                      </div>
-                      <button 
-                        onClick={() => setStep('customize')}
-                        className="shrink-0 bg-[#1A0B05] text-white px-5 py-3 rounded-full font-bold text-sm shadow-[0_8px_20px_rgba(0,0,0,0.15)] hover:scale-105 active:scale-95 transition-all mt-1"
-                      >
-                        Customize
-                      </button>
-                    </div>
-                    <p className="text-base text-gray-500 leading-relaxed bg-gray-50 p-4 rounded-2xl italic border border-gray-100">
+              {/* RIGHT COLUMN: Info & Customization (Scrollable) */}
+              <div className="flex-1 overflow-y-auto hide-scrollbar flex flex-col relative z-20 -mt-8 lg:mt-0 bg-[#FDFCF9] rounded-t-[2rem] lg:rounded-none">
+                
+                {/* Product Header Info */}
+                <div className="p-6 pb-2">
+                  <div className="flex flex-col mb-1">
+                    <h3 className="font-heading font-black text-2xl lg:text-3xl text-[#1A0B05] leading-tight tracking-tight mb-2">{product.name}</h3>
+                    <span className="font-black text-2xl text-[#D4AF37]">₹{product.price}</span>
+                  </div>
+                  {product.story?.trim() && (
+                    <p className="text-sm lg:text-base text-gray-500 mt-4 leading-relaxed bg-gray-50 p-4 rounded-2xl italic border border-gray-100">
                       "{product.story}"
                     </p>
-                  </div>
-                </>
-              ) : (
-                <div className="flex flex-col flex-1">
-                  {/* Header with Small Image */}
-                  <div className="sticky top-0 bg-white/95 backdrop-blur-xl px-6 py-4 flex items-center gap-4 border-b border-gray-100 z-50 shrink-0">
-                    {product.image ? (
-                      <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border-2 border-gray-100 shadow-sm">
-                        <img src={product.image} className="w-full h-full object-cover" />
-                      </div>
-                    ) : (
-                      <div className="w-14 h-14 rounded-full overflow-hidden shrink-0 border-2 border-gray-100 shadow-sm bg-orange-50 text-orange-300 flex items-center justify-center">
-                        <ShoppingBag size={20}/>
-                      </div>
-                    )}
-                    
-                    <div className="flex-1">
-                      <h3 className="font-heading font-extrabold text-xl text-foreground line-clamp-1">{product.name}</h3>
-                      <span className="font-bold text-primary">₹{product.price}</span>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button 
-                        onClick={() => setStep('details')}
-                        className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-foreground/70 hover:bg-gray-200 active:scale-95 transition-all shrink-0 font-bold"
-                      >
-                        <span className="transform -scale-x-100 block">➔</span>
-                      </button>
-                    </div>
-                  </div>
+                  )}
+                </div>
 
-                  <div className="p-6 space-y-8 flex-1">
-                    {/* Dynamic Customization Groups */}
+                {/* Customization Options */}
+                <div className="p-6 pt-2 space-y-8 flex-1">
                     {product.customizationGroups?.map(group => {
                       const selected = selections[group.id] || [];
                       const error = groupErrors[group.id];
@@ -301,12 +285,12 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
                           className={`p-4 -mx-4 rounded-2xl border transition-all duration-300 ${error ? 'bg-red-50/50 border-red-200 shadow-sm' : 'border-transparent'}`}
                         >
                           <div className="flex justify-between items-start mb-1">
-                            <h4 className="font-bold text-[#1A0B05] uppercase tracking-widest text-sm flex items-center gap-1">
+                            <h4 className="font-black text-[#D4AF37] uppercase tracking-[0.2em] text-[11px] block mb-3 flex items-center gap-1">
                               {group.name}
                               {group.isRequired && <span className="text-red-500">*</span>}
                             </h4>
                             {group.freeSelectionsLimit > 0 && (
-                              <span className="text-xs text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-md">
+                              <span className="text-[10px] text-[#1A0B05] font-black bg-[#FFC461] px-2 py-0.5 rounded-md mt-[-8px]">
                                 First {group.freeSelectionsLimit} Free
                               </span>
                             )}
@@ -333,12 +317,12 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
                                   key={option.id}
                                   disabled={!isAvailable}
                                   onClick={() => handleSelectOption(group, option)}
-                                  className={`relative w-full p-3 rounded-2xl border-2 transition-all flex items-start justify-between gap-3 text-left overflow-hidden ${
+                                  className={`relative w-full p-3 rounded-xl border transition-all flex items-start justify-between gap-3 text-left overflow-hidden ${
                                     !isAvailable
                                       ? 'border-gray-100 bg-gray-50/50 text-gray-400 cursor-not-allowed'
                                       : isSelected
-                                      ? 'border-[#FFD54F] bg-[#FFF8E8] shadow-sm ring-2 ring-[#FFD54F]/20'
-                                      : 'border-[#FAEDCD] bg-white hover:border-[#FFD54F]/50 hover:bg-[#FFF8E8]/50 hover:shadow-sm'
+                                      ? 'bg-[#FFFBF2] border-[#D4AF37] shadow-sm ring-1 ring-[#D4AF37]'
+                                      : 'bg-white border-gray-200 text-gray-600 hover:border-[#D4AF37]/50 hover:bg-[#FFFBF2]'
                                   }`}
                                 >
                                   <div className="flex flex-col items-start gap-1 flex-1 min-w-0">
@@ -346,7 +330,7 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
                                       <BadgeChip type={option.badgeType} color={option.badgeColor} icon={option.badgeIcon} />
                                     )}
                                     <div className="flex items-center gap-2 mt-0.5 w-full">
-                                      <span className={`font-black text-[15px] leading-tight truncate ${isSelected ? 'text-[#2A1B16]' : 'text-gray-800'}`}>
+                                      <span className={`font-black text-[15px] leading-tight truncate text-[#1A0B05]`}>
                                         {option.name}
                                       </span>
                                       {!isAvailable && (
@@ -358,17 +342,17 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
                                   </div>
                                   <div className="flex flex-col items-end gap-1.5 shrink-0 mt-0.5">
                                     {option.defaultPrice > 0 ? (
-                                      <span className={`font-black text-[14px] ${isSelected ? 'text-[#B87A42]' : 'text-gray-500'}`}>
+                                      <span className={`font-black text-[14px] ${isSelected ? 'text-[#D4AF37]' : 'text-gray-500'}`}>
                                         +₹{option.defaultPrice}
                                       </span>
                                     ) : (
-                                      <span className={`font-black text-[12px] uppercase tracking-wider ${isSelected ? 'text-[#2A1B16]' : 'text-gray-400'}`}>
+                                      <span className={`font-black text-[12px] uppercase tracking-wider ${isSelected ? 'text-[#D4AF37]' : 'text-gray-400'}`}>
                                         Free
                                       </span>
                                     )}
                                     {isSelected && (
-                                      <div className="bg-[#2A1B16] text-[#FFD54F] p-1 rounded-full shadow-sm mt-0.5">
-                                        <Check size={12} strokeWidth={4} />
+                                      <div className="bg-[#1A0B05] text-[#D4AF37] p-0.5 rounded-full shadow-sm mt-0.5">
+                                        <Check size={14} strokeWidth={4} />
                                       </div>
                                     )}
                                   </div>
@@ -379,24 +363,21 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
                         </div>
                       );
                     })}
-                  </div>
                 </div>
-              )}
-            </div>
+                
+                {/* Footer Add To Cart Button */}
+                <div className="shrink-0 p-4 lg:p-6 bg-[#FDFCF9]/95 backdrop-blur-xl border-t border-gray-100 sticky bottom-0 z-50 mt-auto">
+                  <button
+                    onClick={handleAddToCart}
+                    className="w-full bg-[#D4AF37] hover:bg-[#FFC461] text-[#1A0B05] py-4 lg:py-5 rounded-full font-black text-[15px] shadow-[0_8px_20px_rgba(212,175,55,0.3)] active:scale-[0.98] transition-all flex justify-between items-center px-8 border border-[#1A0B05]/10 uppercase tracking-widest"
+                  >
+                    <span>Add to Bag</span>
+                    <span className="text-xl font-black">₹{totalPrice}</span>
+                  </button>
+                </div>
 
-            {/* Footer Add To Cart Button */}
-            {step === 'customize' && (
-              <div className="shrink-0 p-4 bg-white/95 backdrop-blur-xl border-t border-gray-100 z-50">
-                <button
-                  onClick={handleAddToCart}
-                  className="w-full text-white py-4 rounded-2xl font-bold text-lg bg-[#1A0B05] hover:bg-[#2A150C] shadow-[0_8px_20px_rgba(0,0,0,0.15)] active:scale-[0.98] transition-all flex justify-between items-center px-6 border border-black/10"
-                >
-                  <span className="uppercase tracking-widest text-sm">Add to Cart</span>
-                  <span className="opacity-90 text-[17px] tracking-tight font-extrabold text-primary">₹{totalPrice}</span>
-                </button>
               </div>
-            )}
-
+            </div>
           </motion.div>
         </>
       )}

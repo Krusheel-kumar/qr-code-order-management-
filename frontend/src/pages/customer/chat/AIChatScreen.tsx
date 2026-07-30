@@ -22,7 +22,7 @@ interface ChatMessage {
   sender: MessageSender;
   text: string;
   options?: string[];
-  productRecommendationId?: string;
+  productRecommendationIds?: string[];
   isTyping?: boolean;
 }
 
@@ -53,8 +53,8 @@ export default function AIChatScreen() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const addAiMessage = (text: string, options?: string[], productRecommendationId?: string) => {
-    setMessages(prev => [...prev, { id: `msg-${Date.now()}`, sender: 'ai', text, options, productRecommendationId }]);
+  const addAiMessage = (text: string, options?: string[], productRecommendationIds?: string[]) => {
+    setMessages(prev => [...prev, { id: `msg-${Date.now()}`, sender: 'ai', text, options, productRecommendationIds }]);
   };
 
   const addUserMessage = (text: string) => {
@@ -139,7 +139,7 @@ export default function AIChatScreen() {
         
         // Generate recommendation
         const rec = getLocalRecommendation(selectedCategory!, selectedSubFlavor!, topping);
-        addAiMessage(rec.reason, ["Go to Menu", "Go to POB AI Hub", "Start over"], rec.productId);
+        addAiMessage(rec.reason, ["Go to Menu", "Go to POB AI Hub", "Start over"], rec.productIds);
       }, 1500);
       return;
     }
@@ -182,7 +182,7 @@ export default function AIChatScreen() {
     try {
       const rec = await getLlmRecommendation(query);
       setMessages(prev => prev.filter(m => m.id !== typingId));
-      addAiMessage(rec.reason, ["Go to Menu", "Go to POB AI Hub", "Start over"], rec.productId);
+      addAiMessage(rec.reason, ["Go to Menu", "Go to POB AI Hub", "Start over"], rec.productIds);
     } catch (err) {
       setMessages(prev => prev.filter(m => m.id !== typingId));
       addAiMessage("Oops! My brain is a little cloudy right now. Let's try again, or you can browse the menu or visit the POB AI Hub.", ["Go to Menu", "Go to POB AI Hub"]);
@@ -242,9 +242,9 @@ export default function AIChatScreen() {
                   </div>
                 )}
 
-                {/* Rich Product Recommendation */}
-                {msg.productRecommendationId && (
-                  <ProductRecommendationCard productId={msg.productRecommendationId} />
+                {/* Recommendation Carousel inside Chat */}
+                {(msg.productRecommendationIds?.length || msg.productRecommendationId) && (
+                  <ProductCarousel productIds={msg.productRecommendationIds || (msg.productRecommendationId ? [msg.productRecommendationId] : [])} />
                 )}
 
                 {/* Quick Reply Options */}
@@ -296,58 +296,162 @@ export default function AIChatScreen() {
   );
 }
 
-// Sub-component for displaying a product inside the chat
-function ProductRecommendationCard({ productId }: { productId: string }) {
+// Product Recommendation Carousel Component
+function ProductCarousel({ productIds }: { productIds: string[] }) {
   const { menuItems: MENU } = useMenuStore();
-  const product = MENU.find(p => 
-    p.id === productId || 
-    p.name.toLowerCase() === productId.toLowerCase() || 
-    p.id === 'p-' + productId.toLowerCase().replace(/ /g, '-') ||
-    p.name.toLowerCase().includes(productId.toLowerCase().replace('boba tea', '').trim())
-  );
+  const navigate = useNavigate();
   const cartStore = useCartStore();
-  const [added, setAdded] = useState(false);
-  
-  if (!product) return null;
 
-  const handleAddToCart = () => {
-    cartStore.addItem({
-      product,
-      customization: 'Regular • As recommended by POB AI',
-      price: product.price,
-      quantity: 1
-    });
-    setAdded(true);
-    if (navigator.vibrate) navigator.vibrate(50);
-    setTimeout(() => setAdded(false), 2000);
-  };
+  const products = productIds
+    .map(id => {
+      // 1. Exact ID match
+      let match = MENU.find(p => p.id === id);
+      if (match) return match;
+      
+      // 2. Exact Name match
+      match = MENU.find(p => p.name.toLowerCase() === id.toLowerCase());
+      if (match) return match;
+      
+      // 3. Fuzzy match: extract keywords from ID (e.g., 'p-matcha-green-tea' -> ['matcha', 'green', 'tea'])
+      const keywords = id.toLowerCase().replace(/^p-/, '').split('-');
+      
+      let bestMatch = null;
+      let maxScore = 0;
+      
+      MENU.forEach(p => {
+        const productName = p.name.toLowerCase();
+        let score = 0;
+        keywords.forEach(kw => {
+          if (kw.length > 2 && productName.includes(kw)) score++;
+        });
+        if (score > maxScore) {
+          maxScore = score;
+          bestMatch = p;
+        }
+      });
+      
+      return bestMatch && maxScore > 0 ? bestMatch : undefined;
+    })
+    .filter((p): p is NonNullable<typeof p> => p !== undefined);
 
+  if (products.length === 0) return null;
+
+  // Single featured card
+  if (products.length === 1) {
+    const product = products[0];
+    return (
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-4 w-full bg-white/70 backdrop-blur-md border border-[#F7C948]/30 rounded-[24px] overflow-hidden shadow-[0_8px_30px_rgba(212,175,55,0.15)] flex flex-col"
+      >
+        <div className="w-full h-[160px] bg-gradient-to-br from-[#FFFBF4] to-[#FDF3DE] relative p-4 flex items-center justify-center border-b border-[#F7C948]/10">
+          {product.image ? (
+            <img src={product.image} alt={product.name} className="h-full object-contain drop-shadow-xl" />
+          ) : (
+            <span className="text-5xl drop-shadow-md">🧋</span>
+          )}
+          {product.rating && (
+            <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 shadow-sm border border-[#F7C948]/20">
+              <span className="text-xs">⭐</span>
+              <span className="text-[11px] font-black text-[#4A3B32]">{product.rating}</span>
+            </div>
+          )}
+        </div>
+        <div className="p-4 flex flex-col gap-2">
+          <div>
+            <h3 className="font-heading font-black text-[16px] text-[#1A0B05] leading-tight">{product.name}</h3>
+            {product.story && (
+              <p className="text-xs text-[#8B7355] mt-1 line-clamp-2 leading-relaxed">{product.story}</p>
+            )}
+          </div>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-[#D4AF37] font-black text-lg">₹{product.price}</span>
+          </div>
+          <div className="flex gap-2 mt-2">
+            <button 
+              onClick={() => {
+                cartStore.addItem({
+                  product,
+                  customization: 'Regular • As recommended by POB AI',
+                  price: product.price,
+                  quantity: 1
+                });
+                if (navigator.vibrate) navigator.vibrate(50);
+              }}
+              className="flex-1 bg-gradient-to-r from-[#1A0B05] to-[#3A2B25] text-white font-bold py-2.5 text-xs rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-all shadow-md"
+            >
+              Add to Cart
+            </button>
+            <button 
+              onClick={() => navigate(`/product/${product.id}`)}
+              className="px-4 bg-white text-[#1A0B05] border border-[#1A0B05]/20 font-bold py-2.5 text-xs rounded-xl flex items-center justify-center active:scale-95 transition-all hover:bg-gray-50"
+            >
+              Details
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // Multiple products swipeable carousel
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="mt-4 w-[280px] bg-white border border-gray-100 rounded-[1.5rem] overflow-hidden shadow-md flex flex-col"
-    >
-      <div className="w-full h-[180px] bg-[var(--color-cream)] relative p-4 flex items-center justify-center">
-        {product.image ? (
-          <img src={product.image} alt={product.name} className="h-full object-contain drop-shadow-xl" />
-        ) : (
-          <div className="w-20 h-24 bg-gray-200 rounded-2xl opacity-50" />
-        )}
+    <div className="mt-4 w-full -mx-5 px-5 overflow-x-auto hide-scrollbar pb-4">
+      <div className="flex gap-3 w-max">
+        {products.map((product, idx) => (
+          <motion.div 
+            key={product.id}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: idx * 0.1 }}
+            className="w-[200px] bg-white/80 backdrop-blur-md border border-[#F7C948]/20 rounded-[20px] overflow-hidden shadow-[0_4px_15px_rgba(212,175,55,0.08)] flex flex-col shrink-0"
+          >
+            <div className="w-full h-[120px] bg-gradient-to-br from-[#FFFBF4] to-[#FDF3DE] relative p-3 flex items-center justify-center border-b border-[#F7C948]/10">
+              {product.image ? (
+                <img src={product.image} alt={product.name} className="h-full object-contain drop-shadow-lg" />
+              ) : (
+                <span className="text-4xl drop-shadow-sm">🧋</span>
+              )}
+              {product.rating && (
+                <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm border border-[#F7C948]/20">
+                  <span className="text-[10px]">⭐</span>
+                  <span className="text-[10px] font-black text-[#4A3B32]">{product.rating}</span>
+                </div>
+              )}
+            </div>
+            <div className="p-3 flex flex-col gap-1.5 flex-1">
+              <h3 className="font-heading font-black text-[14px] text-[#1A0B05] leading-tight truncate">{product.name}</h3>
+              <p className="text-[11px] text-[#8B7355] line-clamp-2 leading-snug flex-1">{product.story || 'A delicious choice!'}</p>
+              <div className="flex items-center justify-between mt-0.5">
+                <span className="text-[#D4AF37] font-black text-[15px]">₹{product.price}</span>
+              </div>
+              <div className="flex gap-1.5 mt-1.5">
+                <button 
+                  onClick={() => {
+                    cartStore.addItem({
+                      product,
+                      customization: 'Regular • As recommended by POB AI',
+                      price: product.price,
+                      quantity: 1
+                    });
+                    if (navigator.vibrate) navigator.vibrate(50);
+                  }}
+                  className="flex-1 bg-gradient-to-r from-[#1A0B05] to-[#3A2B25] text-white font-bold py-2 text-[11px] rounded-lg flex items-center justify-center active:scale-95 transition-all shadow-sm"
+                >
+                  Add
+                </button>
+                <button 
+                  onClick={() => navigate(`/product/${product.id}`)}
+                  className="px-2.5 bg-white text-[#1A0B05] border border-[#1A0B05]/20 font-bold py-2 text-[11px] rounded-lg flex items-center justify-center active:scale-95 transition-all hover:bg-gray-50"
+                >
+                  View
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        ))}
       </div>
-      <div className="p-4 flex flex-col gap-2">
-        <h3 className="font-heading font-extrabold text-lg leading-tight">{product.name}</h3>
-        <span className="text-primary font-extrabold text-lg">₹{product.price}</span>
-        
-        <button 
-          onClick={handleAddToCart}
-          className={`mt-2 w-full font-bold py-3 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-all ${
-            added ? 'bg-green-500 text-white' : 'bg-gray-900 text-white hover:bg-black'
-          }`}
-        >
-          {added ? 'Added to Cart ✓' : 'Add to Cart'}
-        </button>
-      </div>
-    </motion.div>
+    </div>
   );
 }

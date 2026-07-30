@@ -26,7 +26,7 @@ interface ChatMessage {
   sender: 'ai' | 'user';
   text: string;
   options?: string[];
-  productRecommendationId?: string;
+  productRecommendationIds?: string[];
   isTyping?: boolean;
 }
 
@@ -60,16 +60,9 @@ export default function POPBuddyHome() {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Initialize the guided chat flow on mount
+  // Removed static welcome message as per user request to only show user-selected queries
   useEffect(() => {
-    setMessages([
-      {
-        id: 'msg-welcome',
-        sender: 'ai',
-        text: "👋 Welcome to POP O'BOB®! I'm POB AI, your personal bubble tea assistant.\n\nHave you tried bubble tea before?",
-        options: ["Yes, I know what I want", "No, it's my first time"]
-      }
-    ]);
+    // Initial state is empty, chat starts when user triggers an action
   }, []);
 
   useEffect(() => {
@@ -96,8 +89,8 @@ export default function POPBuddyHome() {
   const funFact = data?.funFact;
   isGuest = customer?.guest ?? true;
 
-  const addAiMessage = (text: string, options?: string[], productRecommendationId?: string) => {
-    setMessages(prev => [...prev, { id: `msg-${Date.now()}`, sender: 'ai', text, options, productRecommendationId }]);
+  const addAiMessage = (text: string, options?: string[], productRecommendationIds?: string[]) => {
+    setMessages(prev => [...prev, { id: `msg-${Date.now()}`, sender: 'ai', text, options, productRecommendationIds }]);
   };
 
   const addUserMessage = (text: string) => {
@@ -171,7 +164,7 @@ export default function POPBuddyHome() {
       setTimeout(() => {
         setMessages(prev => prev.filter(m => m.id !== typingId));
         const rec = getLocalRecommendation(selectedCategory!, selectedSubFlavor!, topping);
-        addAiMessage(rec.reason, ["Go to Menu", "Start over"], rec.productId);
+        addAiMessage(rec.reason, ["Go to Menu", "Start over"], rec.productIds);
       }, 1500);
       return;
     }
@@ -216,196 +209,115 @@ export default function POPBuddyHome() {
     try {
       const rec = await getLlmRecommendation(query);
       setMessages(prev => prev.filter(m => m.id !== typingId));
-      addAiMessage(rec.reason, ["Go to Menu", "Start over"], rec.productId);
+      addAiMessage(rec.reason, ["Go to Menu", "Start over"], rec.productIds);
     } catch (err) {
       setMessages(prev => prev.filter(m => m.id !== typingId));
       addAiMessage("Oops! My brain is a little cloudy right now. Let's try again, or you can browse our menu.", ["Go to Menu"]);
     }
   };
 
-  const pointsProgress = Math.min(100, (((wallet?.points || 0) / (wallet?.nextTierPoints || 100)) * 100));
-
+  // const pointsProgress = Math.min(100, (((wallet?.points || 0) / (wallet?.nextTierPoints || 100)) * 100));
   return (
-    <div className="min-h-screen bg-[#FFF9EE] flex flex-col font-sans relative text-[#1A0B05]">
+    <div className="min-h-screen bg-gradient-to-br from-[#FFFDF8] via-[#FFF9EE] to-[#FDF3DE] flex flex-col font-sans relative text-[#4A3B32]">
       
-      {/* Dark Slate Header */}
-      <header className="bg-[#0F172A] text-white px-5 py-5 flex items-center justify-between z-10">
+      {/* Premium Glass Header */}
+      <header className="bg-white/30 backdrop-blur-md border-b border-white/40 text-[#4A3B32] px-5 py-5 flex items-center justify-between z-10 sticky top-0">
         <button 
           onClick={() => navigate(-1)} 
-          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 active:scale-95 transition-all text-white"
+          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/40 active:scale-95 transition-all text-[#4A3B32] shadow-[0_2px_10px_rgba(0,0,0,0.02)]"
         >
           <ChevronLeft size={24} strokeWidth={2.5} />
         </button>
-        <div className="flex flex-col items-center">
-          <h1 className="font-heading font-black text-[17px] tracking-tight">POB AI</h1>
-          <div className="flex items-center gap-1.5 mt-0.5">
-            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-sm" />
-            <span className="text-[10px] text-gray-400 font-extrabold uppercase tracking-widest">Online</span>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-white/70 shadow-sm border border-[#F7C948]/30 flex items-center justify-center p-1 overflow-hidden">
+            <img src="/Brand%20Emblem.png" alt="POB" className="w-full h-full object-contain" />
           </div>
+          <h1 className="font-heading font-black text-[18px] tracking-tight bg-gradient-to-r from-[#D4AF37] to-[#F7C948] bg-clip-text text-transparent">POB AI</h1>
         </div>
-        <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 active:scale-95 text-white">
+        <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/40 active:scale-95 text-[#4A3B32] shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
           <Menu size={22} />
         </button>
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col pb-[110px] relative z-0">
+      <main className="flex-1 flex flex-col pb-[130px] relative z-0">
         
-        {/* Rounded Mockup Main Container */}
-        <div className="bg-white rounded-t-[36px] mt-[-24px] pt-7 px-5 flex-1 flex flex-col">
+        {/* Transparent Main Container */}
+        <div className="px-6 flex-1 flex flex-col justify-center pb-10">
           
           {/* Greeting */}
-          <div className="mb-6">
-            <h2 className="text-[25px] font-heading font-black text-[#1A0B05] leading-tight flex items-center gap-1">
-              Good Afternoon,
+          <div className="mb-10 text-center flex flex-col items-center">
+            <div className="w-20 h-20 rounded-full flex items-center justify-center mb-4 shadow-[0_8px_25px_rgba(247,201,72,0.2)] bg-white/70 backdrop-blur-md border border-[#F7C948]/30 relative overflow-hidden p-2">
+              <img src="/Brand%20Emblem.png" alt="Pop O Bob Emblem" className="w-full h-full object-contain" />
+            </div>
+            <h2 className="text-[22px] font-heading font-black text-[#4A3B32] leading-tight">
+              {new Date().getHours() < 12 ? 'Good Morning' : new Date().getHours() < 18 ? 'Good Afternoon' : 'Good Evening'}, {isGuest ? 'Guest' : (customer?.name || 'Friend')}
             </h2>
-            <h2 className="text-[25px] font-heading font-black text-[#1A0B05] leading-tight">
-              {isGuest ? 'Guest' : (customer?.name || 'Friend')}! 👋
-            </h2>
-            <p className="text-gray-400 text-sm font-semibold mt-1">
-              Here's what's happening while you wait! ✨
+            <p className="text-[#8B7355] text-[15px] font-medium mt-1.5">
+              What are you craving today?
             </p>
           </div>
 
-          {/* POP Points Card */}
-          <motion.div 
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-            onClick={() => isGuest ? navigate('/ai/join', { state }) : setActiveModal('rewards')}
-            className="bg-white rounded-[24px] p-5 shadow-[0_8px_30px_rgba(0,0,0,0.03)] border border-gray-100/50 flex flex-col gap-4 mb-6 cursor-pointer"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[#E8DDFF] text-[#7E57C2]">
-                  <Compass size={22} />
-                </div>
-                <div>
-                  <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Your POP Points</p>
-                  <h3 className="font-heading font-black text-2xl text-[#1A0B05] leading-none">
-                    {isGuest ? '0' : (wallet?.points || 0)}
-                  </h3>
-                </div>
-              </div>
-              <ChevronRight size={20} className="text-gray-400" />
-            </div>
-
-            {/* Custom Progress Bar inside card */}
-            <div className="space-y-2">
-              <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
-                <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${isGuest ? 0 : pointsProgress}%` }}
-                  transition={{ duration: 1, ease: "easeOut" }}
-                  className="h-full bg-[#FFA000] rounded-full" 
-                />
-              </div>
-              <p className="text-[11px] font-black text-gray-400 tracking-wider">
-                {isGuest ? 'Start exploring to earn points!' : `${(wallet?.nextTierPoints || 500) - (wallet?.points || 0)} pts away from Free Drink`}
-              </p>
-            </div>
-          </motion.div>
-
           {/* Active Order Status (If Placed) */}
           {orderId && order && order.status && (
-            <div className="mb-6">
+            <div className="mb-8">
               <OrderStatusCard orderId={order.id} orderNumber={order.orderNumber} status={order.status} />
             </div>
           )}
 
-          {/* List Items (5 rows matching mockup) */}
-          <div className="flex-1 flex flex-col justify-between">
-            <div className="space-y-1.5">
-              
-              {/* Row 1: My Rewards */}
-              <motion.div 
+          {/* Premium Light Chips (Glassmorphism) */}
+          <div className="flex flex-wrap justify-center gap-2.5 mb-8">
+            {[
+              { icon: '🔥', title: 'Best Sellers', query: 'Show me your best sellers' },
+              { icon: '✨', title: 'Recommend for Me', query: 'Recommend something for me' },
+              { icon: '🆕', title: "What's New", query: 'What are the newest drinks?' },
+              { icon: '🎲', title: 'Surprise Me', query: 'Surprise me with a random drink' }
+            ].map((action, i) => (
+              <motion.button
+                key={i}
+                whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => isGuest ? navigate('/ai/join', { state }) : setActiveModal('rewards')}
-                className="flex items-center justify-between py-4 border-b border-gray-100 cursor-pointer"
+                onClick={() => handleFreeTextSubmit(action.query)}
+                className="bg-white/70 backdrop-blur-md border border-[#F7C948]/30 rounded-full px-4 py-2.5 flex items-center gap-2 shadow-[0_4px_15px_rgba(0,0,0,0.03)] hover:border-[#F7C948] hover:shadow-[0_8px_20px_rgba(247,201,72,0.15)] transition-all"
               >
-                <div className="flex items-center gap-4">
-                  <div className="text-2xl w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">🎁</div>
-                  <div>
-                    <h4 className="font-extrabold text-[15px] text-[#1A0B05]">My Rewards</h4>
-                    <p className="text-[12px] text-gray-400 font-semibold">View points, offers & gifts</p>
-                  </div>
-                </div>
-                <ChevronRight size={18} className="text-gray-300" />
-              </motion.div>
+                <span className="text-[14px] text-[#D4AF37]">{action.icon}</span>
+                <span className="font-bold text-[#4A3B32] text-[13px] tracking-wide">{action.title}</span>
+              </motion.button>
+            ))}
+          </div>
 
-              {/* Row 2: Recommended For You */}
-              <motion.div 
-                whileTap={{ scale: 0.98 }}
-                onClick={() => { setIsChatOpen(true); addAiMessage("Let's build your perfect cup! What flavor profiles do you like?", ["Tea", "Fruit", "Chocolate", "Coffee"]); }}
-                className="flex items-center justify-between py-4 border-b border-gray-100 cursor-pointer"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="text-2xl w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center">🧋</div>
-                  <div>
-                    <h4 className="font-extrabold text-[15px] text-[#1A0B05]">Recommended For You</h4>
-                    <p className="text-[12px] text-gray-400 font-semibold">Drinks you'll love</p>
-                  </div>
-                </div>
-                <ChevronRight size={18} className="text-gray-300" />
-              </motion.div>
-
-              {/* Row 3: Trending Today */}
-              <motion.div 
-                whileTap={{ scale: 0.98 }}
-                onClick={() => { setIsChatOpen(true); handleFreeTextSubmit("What are the trending bubble teas today?"); }}
-                className="flex items-center justify-between py-4 border-b border-gray-100 cursor-pointer"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="text-2xl w-10 h-10 rounded-xl bg-yellow-50 flex items-center justify-center">🔥</div>
-                  <div>
-                    <h4 className="font-extrabold text-[15px] text-[#1A0B05]">Trending Today</h4>
-                    <p className="text-[12px] text-gray-400 font-semibold">What's popular right now</p>
-                  </div>
-                </div>
-                <ChevronRight size={18} className="text-gray-300" />
-              </motion.div>
-
-              {/* Row 4: Today's Mission */}
-              <motion.div 
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setActiveModal('missions')}
-                className="flex items-center justify-between py-4 border-b border-gray-100 cursor-pointer"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="text-2xl w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">🎮</div>
-                  <div>
-                    <h4 className="font-extrabold text-[15px] text-[#1A0B05]">Today's Mission</h4>
-                    <p className="text-[12px] text-gray-400 font-semibold">Fun tasks, big rewards</p>
-                  </div>
-                </div>
-                <ChevronRight size={18} className="text-gray-300" />
-              </motion.div>
-
-              {/* Row 5: Fun Facts */}
-              <motion.div 
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setActiveModal('funfacts')}
-                className="flex items-center justify-between py-4 cursor-pointer"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="text-2xl w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">📖</div>
-                  <div>
-                    <h4 className="font-extrabold text-[15px] text-[#1A0B05]">Fun Facts</h4>
-                    <p className="text-[12px] text-gray-400 font-semibold">Boba tea & more</p>
-                  </div>
-                </div>
-                <ChevronRight size={18} className="text-gray-300" />
-              </motion.div>
-
+          {/* Suggestion Chips */}
+          <div className="mb-4">
+            <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide -mx-6 px-6">
+              {[
+                { icon: '🥭', label: 'Fruity' },
+                { icon: '🧋', label: 'Milk Tea' },
+                { icon: '🍫', label: 'Chocolate' },
+                { icon: '💚', label: 'Low Sugar' },
+                { icon: '💰', label: 'Under ₹200' },
+                { icon: '⚡', label: 'Energy' }
+              ].map((chip, i) => (
+                <motion.button
+                  key={i}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handleFreeTextSubmit(`I'm looking for ${chip.label.toLowerCase()} drinks`)}
+                  className="whitespace-nowrap flex items-center gap-2 px-4 py-2 bg-white/40 backdrop-blur-md border border-white/60 rounded-full text-[13px] font-bold text-gray-700 shadow-sm hover:border-[#F7C948]/50 hover:bg-white/60 transition-all shrink-0"
+                >
+                  <span>{chip.icon}</span>
+                  {chip.label}
+                </motion.button>
+              ))}
             </div>
           </div>
         </div>
       </main>
 
-      {/* Sticky Dark Slate Bottom Input Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0F172A] rounded-t-[30px] p-5 shadow-[0_-8px_30px_rgba(0,0,0,0.1)] max-w-md mx-auto">
+      {/* Premium Apple Intelligence-style Light Chat Input */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 p-5 pb-8 bg-gradient-to-t from-[#FDF3DE] via-[#FDF3DE]/95 to-transparent pointer-events-none max-w-md mx-auto">
         <form 
           onSubmit={(e) => { e.preventDefault(); handleFreeTextSubmit(); }}
-          className="flex items-center justify-between gap-3 bg-white/10 border border-white/5 rounded-full px-2 py-2 focus-within:bg-white/15 transition-colors"
+          className="pointer-events-auto flex items-center justify-between gap-3 bg-white/90 backdrop-blur-xl border border-white rounded-[28px] px-3 py-3 shadow-[0_8px_30px_rgba(212,175,55,0.15)] focus-within:shadow-[0_8px_30px_rgba(247,201,72,0.25)] transition-all"
         >
           <input 
             type="text" 
@@ -413,14 +325,14 @@ export default function POPBuddyHome() {
             onChange={(e) => setChatInput(e.target.value)}
             onFocus={() => { if (!isChatOpen) setIsChatOpen(true); }}
             placeholder="Ask POB AI anything..."
-            className="flex-1 bg-transparent border-none outline-none px-4 text-[14px] text-white placeholder:text-gray-400 font-medium"
+            className="flex-1 bg-transparent border-none outline-none px-4 text-[16px] text-[#4A3B32] placeholder:text-gray-400 font-medium"
           />
           <button 
             type="submit"
             disabled={!chatInput.trim()}
-            className="w-10 h-10 rounded-full flex items-center justify-center bg-[#7E57C2] text-white shadow-md active:scale-95 transition-all shrink-0"
+            className="w-12 h-12 rounded-full flex items-center justify-center bg-gradient-to-br from-[#F7C948] to-[#D4AF37] text-white shadow-lg active:scale-95 transition-all shrink-0 disabled:opacity-50 disabled:from-gray-200 disabled:to-gray-300 disabled:text-gray-400 disabled:shadow-none"
           >
-            <Send size={16} className="ml-0.5" />
+            <Send size={20} className="ml-0.5 -mt-0.5 drop-shadow-sm" />
           </button>
         </form>
       </div>
@@ -433,21 +345,21 @@ export default function POPBuddyHome() {
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed inset-0 bg-[#FFF9EE] z-50 flex flex-col max-w-md mx-auto"
+            className="fixed inset-0 bg-gradient-to-br from-[#FFFDF8] via-[#FFF9EE] to-[#FDF3DE] z-50 flex flex-col max-w-md mx-auto"
           >
             {/* Drawer Header */}
-            <header className="bg-white/80 backdrop-blur-xl border-b border-black/5 px-4 py-4 flex items-center justify-between sticky top-0 z-10">
+            <header className="bg-white/30 backdrop-blur-md border-b border-white/40 px-4 py-4 flex items-center justify-between sticky top-0 z-10 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
               <button 
                 onClick={() => setIsChatOpen(false)} 
-                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 active:scale-95 transition-all text-gray-700"
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/40 active:scale-95 transition-all text-[#4A3B32]"
               >
                 <ChevronLeft size={24} strokeWidth={2.5} />
               </button>
               <div className="flex-1 flex justify-center items-center gap-2 pr-10">
-                <div className="w-7 h-7 rounded-full bg-gray-100 p-0.5 overflow-hidden">
-                  <img src="/assets/mascotpob.png" alt="POB" className="w-full h-full object-contain" />
+                <div className="w-8 h-8 rounded-full bg-white/70 border border-[#F7C948]/30 p-1 flex items-center justify-center overflow-hidden shadow-sm">
+                  <img src="/Brand%20Emblem.png" alt="POB" className="w-full h-full object-contain" />
                 </div>
-                <h1 className="font-heading font-extrabold text-md text-gray-900">POB AI</h1>
+                <h1 className="font-heading font-black text-[17px] tracking-tight bg-gradient-to-r from-[#D4AF37] to-[#F7C948] bg-clip-text text-transparent">POB AI</h1>
               </div>
             </header>
 
@@ -459,23 +371,23 @@ export default function POPBuddyHome() {
                   className={`flex w-full ${msg.sender === 'user' ? 'justify-end' : 'justify-start gap-2.5'}`}
                 >
                   {msg.sender === 'ai' && (
-                    <div className="w-8 h-8 rounded-full bg-white border border-gray-100 flex items-center justify-center shrink-0 shadow-sm overflow-hidden mt-1">
-                      <img src="/assets/mascotpob.png" alt="POB" className="w-5 h-5 object-contain" />
+                    <div className="w-8 h-8 rounded-full bg-white border border-[#F7C948]/30 p-1 flex items-center justify-center shrink-0 shadow-sm overflow-hidden mt-1">
+                      <img src="/Brand%20Emblem.png" alt="POB" className="w-full h-full object-contain" />
                     </div>
                   )}
 
                   <div className={`flex flex-col max-w-[80%] ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
                     {msg.isTyping ? (
-                      <div className="bg-gray-100 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5 h-[40px]">
-                        <motion.div animate={{y:[0,-3,0]}} transition={{repeat:Infinity, duration:0.6}} className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
-                        <motion.div animate={{y:[0,-3,0]}} transition={{repeat:Infinity, duration:0.6, delay:0.2}} className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
-                        <motion.div animate={{y:[0,-3,0]}} transition={{repeat:Infinity, duration:0.6, delay:0.4}} className="w-1.5 h-1.5 bg-gray-400 rounded-full" />
+                      <div className="bg-white/80 border border-[#F7C948]/20 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5 h-[40px] shadow-sm">
+                        <motion.div animate={{y:[0,-3,0]}} transition={{repeat:Infinity, duration:0.6}} className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full" />
+                        <motion.div animate={{y:[0,-3,0]}} transition={{repeat:Infinity, duration:0.6, delay:0.2}} className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full" />
+                        <motion.div animate={{y:[0,-3,0]}} transition={{repeat:Infinity, duration:0.6, delay:0.4}} className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full" />
                       </div>
                     ) : (
-                      <div className={`px-4 py-3 shadow-[0_2px_8px_rgba(0,0,0,0.02)] text-[14px] leading-relaxed whitespace-pre-line font-medium ${
+                      <div className={`px-4 py-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)] text-[14px] leading-relaxed whitespace-pre-line font-medium ${
                         msg.sender === 'user' 
-                          ? 'bg-[#1A0B05] text-white rounded-[20px] rounded-tr-sm' 
-                          : 'bg-white text-gray-800 border border-gray-100/50 rounded-[20px] rounded-tl-sm'
+                          ? 'bg-gradient-to-r from-[#F7C948] to-[#F9D46C] text-[#4A3B32] rounded-[20px] rounded-tr-sm border border-[#F7C948]/20' 
+                          : 'bg-white text-[#4A3B32] border border-gray-100/80 rounded-[20px] rounded-tl-sm'
                       }`}>
                         {msg.text}
                       </div>
@@ -488,7 +400,7 @@ export default function POPBuddyHome() {
                           <button
                             key={option}
                             onClick={() => handleOptionClick(option)}
-                            className="bg-white border border-gray-200 hover:border-[#FFB800] text-[#1A0B05] font-bold text-xs px-4 py-2.5 rounded-full active:scale-[0.98] transition-all shadow-sm"
+                            className="bg-white border border-[#F7C948] hover:bg-[#F7C948]/10 text-[#4A3B32] font-bold text-xs px-4 py-2.5 rounded-full active:scale-[0.98] transition-all shadow-[0_2px_10px_rgba(247,201,72,0.1)]"
                           >
                             {option}
                           </button>
@@ -496,9 +408,9 @@ export default function POPBuddyHome() {
                       </div>
                     )}
 
-                    {/* Recommendation Card inside Chat */}
-                    {msg.productRecommendationId && (
-                      <ProductRecommendationCard productId={msg.productRecommendationId} />
+                    {/* Recommendation Carousel inside Chat */}
+                    {(msg.productRecommendationIds?.length || msg.productRecommendationId) && (
+                      <ProductCarousel productIds={msg.productRecommendationIds || (msg.productRecommendationId ? [msg.productRecommendationId] : [])} />
                     )}
                   </div>
                 </div>
@@ -507,24 +419,24 @@ export default function POPBuddyHome() {
             </div>
 
             {/* Input Bar in Drawer */}
-            <div className="p-4 bg-white border-t border-gray-100 shadow-[0_-8px_30px_rgba(0,0,0,0.05)]">
+            <div className="p-4 bg-white/80 backdrop-blur-xl border-t border-white/50 shadow-[0_-8px_30px_rgba(212,175,55,0.05)]">
               <form 
                 onSubmit={(e) => { e.preventDefault(); handleFreeTextSubmit(); }}
-                className="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-full px-2 py-1.5"
+                className="flex items-center gap-2 bg-white border border-[#F7C948]/30 rounded-full px-2 py-1.5 shadow-[0_2px_15px_rgba(247,201,72,0.1)]"
               >
                 <input 
                   type="text" 
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   placeholder="Ask POB AI anything..."
-                  className="flex-1 bg-transparent border-none outline-none px-4 text-[14px] text-[#1A0B05] placeholder:text-gray-400 font-medium"
+                  className="flex-1 bg-transparent border-none outline-none px-4 text-[14px] text-[#4A3B32] placeholder:text-[#8B7355]/60 font-medium"
                 />
                 <button 
                   type="submit"
                   disabled={!chatInput.trim()}
-                  className="w-9 h-9 rounded-full flex items-center justify-center bg-[#7E57C2] text-white active:scale-95 shrink-0"
+                  className="w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br from-[#F7C948] to-[#D4AF37] text-white shadow-md active:scale-95 shrink-0 disabled:opacity-50"
                 >
-                  <Send size={15} className="ml-0.5" />
+                  <Send size={16} className="ml-0.5 -mt-0.5" />
                 </button>
               </form>
             </div>
@@ -630,59 +542,162 @@ export default function POPBuddyHome() {
   );
 }
 
-// Product Recommendation Component
-function ProductRecommendationCard({ productId }: { productId: string }) {
+// Product Recommendation Carousel Component
+function ProductCarousel({ productIds }: { productIds: string[] }) {
   const { menuItems: MENU } = useMenuStore();
-  const product = MENU.find(p => 
-    p.id === productId || 
-    p.name.toLowerCase() === productId.toLowerCase() || 
-    p.id === 'p-' + productId.toLowerCase().replace(/ /g, '-') ||
-    p.name.toLowerCase().includes(productId.toLowerCase().replace('boba tea', '').trim())
-  );
-  
+  const navigate = useNavigate();
   const cartStore = useCartStore();
-  const [added, setAdded] = useState(false);
-  
-  if (!product) return null;
 
-  const handleAddToCart = () => {
-    cartStore.addItem({
-      product,
-      customization: 'Regular • As recommended by POB AI',
-      price: product.price,
-      quantity: 1
-    });
-    setAdded(true);
-    if (navigator.vibrate) navigator.vibrate(50);
-    setTimeout(() => setAdded(false), 2000);
-  };
+  const products = productIds
+    .map(id => {
+      // 1. Exact ID match
+      let match = MENU.find(p => p.id === id);
+      if (match) return match;
+      
+      // 2. Exact Name match
+      match = MENU.find(p => p.name.toLowerCase() === id.toLowerCase());
+      if (match) return match;
+      
+      // 3. Fuzzy match: extract keywords from ID (e.g., 'p-matcha-green-tea' -> ['matcha', 'green', 'tea'])
+      const keywords = id.toLowerCase().replace(/^p-/, '').split('-');
+      
+      let bestMatch = null;
+      let maxScore = 0;
+      
+      MENU.forEach(p => {
+        const productName = p.name.toLowerCase();
+        let score = 0;
+        keywords.forEach(kw => {
+          if (kw.length > 2 && productName.includes(kw)) score++;
+        });
+        if (score > maxScore) {
+          maxScore = score;
+          bestMatch = p;
+        }
+      });
+      
+      return bestMatch && maxScore > 0 ? bestMatch : undefined;
+    })
+    .filter((p): p is NonNullable<typeof p> => p !== undefined);
 
+  if (products.length === 0) return null;
+
+  // Single featured card
+  if (products.length === 1) {
+    const product = products[0];
+    return (
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mt-4 w-full bg-white/70 backdrop-blur-md border border-[#F7C948]/30 rounded-[24px] overflow-hidden shadow-[0_8px_30px_rgba(212,175,55,0.15)] flex flex-col"
+      >
+        <div className="w-full h-[160px] bg-gradient-to-br from-[#FFFBF4] to-[#FDF3DE] relative p-4 flex items-center justify-center border-b border-[#F7C948]/10">
+          {product.image ? (
+            <img src={product.image} alt={product.name} className="h-full object-contain drop-shadow-xl" />
+          ) : (
+            <span className="text-5xl drop-shadow-md">🧋</span>
+          )}
+          {product.rating && (
+            <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 shadow-sm border border-[#F7C948]/20">
+              <span className="text-xs">⭐</span>
+              <span className="text-[11px] font-black text-[#4A3B32]">{product.rating}</span>
+            </div>
+          )}
+        </div>
+        <div className="p-4 flex flex-col gap-2">
+          <div>
+            <h3 className="font-heading font-black text-[16px] text-[#1A0B05] leading-tight">{product.name}</h3>
+            {product.story && (
+              <p className="text-xs text-[#8B7355] mt-1 line-clamp-2 leading-relaxed">{product.story}</p>
+            )}
+          </div>
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-[#D4AF37] font-black text-lg">₹{product.price}</span>
+          </div>
+          <div className="flex gap-2 mt-2">
+            <button 
+              onClick={() => {
+                cartStore.addItem({
+                  product,
+                  customization: 'Regular • As recommended by POB AI',
+                  price: product.price,
+                  quantity: 1
+                });
+                if (navigator.vibrate) navigator.vibrate(50);
+              }}
+              className="flex-1 bg-gradient-to-r from-[#1A0B05] to-[#3A2B25] text-white font-bold py-2.5 text-xs rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-all shadow-md"
+            >
+              Add to Cart
+            </button>
+            <button 
+              onClick={() => navigate(`/product/${product.id}`)}
+              className="px-4 bg-white text-[#1A0B05] border border-[#1A0B05]/20 font-bold py-2.5 text-xs rounded-xl flex items-center justify-center active:scale-95 transition-all hover:bg-gray-50"
+            >
+              Details
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // Multiple products swipeable carousel
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="mt-4 w-[220px] bg-white border border-gray-100 rounded-[20px] overflow-hidden shadow-md flex flex-col"
-    >
-      <div className="w-full h-[120px] bg-[#FFFBF4] relative p-3 flex items-center justify-center">
-        {product.image ? (
-          <img src={product.image} alt={product.name} className="h-full object-contain drop-shadow-md" />
-        ) : (
-          <span className="text-3xl">🧋</span>
-        )}
+    <div className="mt-4 w-full -mx-5 px-5 overflow-x-auto hide-scrollbar pb-4">
+      <div className="flex gap-3 w-max">
+        {products.map((product, idx) => (
+          <motion.div 
+            key={product.id}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: idx * 0.1 }}
+            className="w-[200px] bg-white/80 backdrop-blur-md border border-[#F7C948]/20 rounded-[20px] overflow-hidden shadow-[0_4px_15px_rgba(212,175,55,0.08)] flex flex-col shrink-0"
+          >
+            <div className="w-full h-[120px] bg-gradient-to-br from-[#FFFBF4] to-[#FDF3DE] relative p-3 flex items-center justify-center border-b border-[#F7C948]/10">
+              {product.image ? (
+                <img src={product.image} alt={product.name} className="h-full object-contain drop-shadow-lg" />
+              ) : (
+                <span className="text-4xl drop-shadow-sm">🧋</span>
+              )}
+              {product.rating && (
+                <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 rounded-full flex items-center gap-0.5 shadow-sm border border-[#F7C948]/20">
+                  <span className="text-[10px]">⭐</span>
+                  <span className="text-[10px] font-black text-[#4A3B32]">{product.rating}</span>
+                </div>
+              )}
+            </div>
+            <div className="p-3 flex flex-col gap-1.5 flex-1">
+              <h3 className="font-heading font-black text-[14px] text-[#1A0B05] leading-tight truncate">{product.name}</h3>
+              <p className="text-[11px] text-[#8B7355] line-clamp-2 leading-snug flex-1">{product.story || 'A delicious choice!'}</p>
+              <div className="flex items-center justify-between mt-0.5">
+                <span className="text-[#D4AF37] font-black text-[15px]">₹{product.price}</span>
+              </div>
+              <div className="flex gap-1.5 mt-1.5">
+                <button 
+                  onClick={() => {
+                    cartStore.addItem({
+                      product,
+                      customization: 'Regular • As recommended by POB AI',
+                      price: product.price,
+                      quantity: 1
+                    });
+                    if (navigator.vibrate) navigator.vibrate(50);
+                  }}
+                  className="flex-1 bg-gradient-to-r from-[#1A0B05] to-[#3A2B25] text-white font-bold py-2 text-[11px] rounded-lg flex items-center justify-center active:scale-95 transition-all shadow-sm"
+                >
+                  Add
+                </button>
+                <button 
+                  onClick={() => navigate(`/product/${product.id}`)}
+                  className="px-2.5 bg-white text-[#1A0B05] border border-[#1A0B05]/20 font-bold py-2 text-[11px] rounded-lg flex items-center justify-center active:scale-95 transition-all hover:bg-gray-50"
+                >
+                  View
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        ))}
       </div>
-      <div className="p-3 flex flex-col gap-1.5">
-        <h3 className="font-extrabold text-[13px] text-[#1A0B05] leading-tight truncate">{product.name}</h3>
-        <span className="text-[#FFB800] font-black text-sm">₹{product.price}</span>
-        
-        <button 
-          onClick={handleAddToCart}
-          className={`mt-1 w-full font-bold py-2 text-xs rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-all ${
-            added ? 'bg-emerald-500 text-white' : 'bg-[#1A0B05] text-white hover:bg-black'
-          }`}
-        >
-          {added ? 'Added ✓' : 'Add to Cart'}
-        </button>
-      </div>
-    </motion.div>
+    </div>
   );
 }

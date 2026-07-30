@@ -83,10 +83,6 @@ public class OrderService {
             item.setSpecialInstructions(itemDto.getSpecialInstructions());
 
             BigDecimal expectedItemPrice = product.getPrice();
-            if (itemDto.getCustomizations() != null && itemDto.getCustomizations().contains("Size: Large")) {
-                BigDecimal addOn = product.getLargePriceAddOn() != null ? product.getLargePriceAddOn() : new BigDecimal("30");
-                expectedItemPrice = expectedItemPrice.add(addOn);
-            }
             List<OrderItemCustomization> customizationsList = new ArrayList<>();
 
             // Structured Customizations & Price Recalculation

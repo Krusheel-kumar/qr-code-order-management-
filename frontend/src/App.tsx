@@ -13,7 +13,9 @@ import OffersHub from './pages/customer/OffersHub';
 import FullMenu from './pages/customer/FullMenu';
 import Cart from './pages/customer/Cart';
 import OrderTracking from './pages/customer/OrderTracking';
+import OrderCenter from './pages/customer/OrderCenter';
 import Profile from './pages/customer/Profile';
+import OrderReceipt from './pages/customer/OrderReceipt';
 
 import AIChatScreen from './pages/customer/chat/AIChatScreen';
 
@@ -26,17 +28,22 @@ import POPBuddyHome from './pages/customer/ai/POPBuddyHome';
 
 import BottomNavigation from './components/ui/BottomNavigation';
 import FloatingCartButton from './components/ui/FloatingCartButton';
-import FloatingAIButton from './components/ui/FloatingAIButton';
-import SocialWidgets from './components/ui/SocialWidgets';
+import OrderStatusPill from './components/ui/OrderStatusPill';
 
-// Layout with Bottom Navigation
+
+import DesktopNavbar from './components/ui/DesktopNavbar';
+
+// Layout with Responsive Navigation
 const MainLayout = () => (
-  <div className="min-h-[100dvh] bg-[var(--color-background)] font-sans relative pb-[80px]">
+  <div className="min-h-[100dvh] bg-[var(--color-background)] font-sans relative pb-[80px] lg:pb-0 lg:pt-[104px]">
+    <DesktopNavbar />
     <Outlet />
-    <SocialWidgets />
-    <FloatingCartButton />
-    <FloatingAIButton />
-    <BottomNavigation />
+
+    <div className="lg:hidden">
+      <FloatingCartButton />
+      <OrderStatusPill />
+      <BottomNavigation />
+    </div>
   </div>
 );
 
@@ -143,8 +150,9 @@ function App() {
           {/* AI Chatbot Flow */}
           <Route path="/quiz" element={<AIChatScreen />} />
           
-          {/* Screen 18 */}
+          {/* Order Lifecycle */}
           <Route path="/tracking/:id" element={<OrderTracking />} />
+          <Route path="/receipt/:id" element={<OrderReceipt />} />
 
           {/* AI Engagement Layer Screens */}
           <Route path="/ai/welcome" element={<POPBuddyWelcome />} />
@@ -152,6 +160,7 @@ function App() {
           <Route path="/ai/join" element={<POPBuddyJoin />} />
           <Route path="/ai/maybe-later" element={<POPBuddyMaybeLater />} />
           <Route path="/ai/home" element={<POPBuddyHome />} />
+          <Route path="/order-center" element={<OrderCenter />} />
 
         </Routes>
       </Router>

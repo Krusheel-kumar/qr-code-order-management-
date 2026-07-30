@@ -1,14 +1,17 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingBag } from 'lucide-react';
 import { useCartStore } from '../../store/useCartStore';
 
 export default function FloatingCartButton() {
   const navigate = useNavigate();
+  const location = useLocation();
   const cartStore = useCartStore();
   
   const cartCount = cartStore.items.reduce((total, item) => total + item.quantity, 0);
   const cartTotal = cartStore.getSubtotal();
+
+  if (location.pathname === '/cart') return null;
 
   return (
     <AnimatePresence>

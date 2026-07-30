@@ -14,6 +14,9 @@ import SearchModal from '../../components/ui/SearchModal';
 import AuthModal from '../../components/ui/AuthModal';
 import ProfileSheet from '../../components/ui/ProfileSheet';
 import GlassHeader from '../../components/ui/GlassHeader';
+import DesktopDiscoveryHome from './DesktopDiscoveryHome';
+import SocialWidgets from '../../components/ui/SocialWidgets';
+import OrderStatusCard from '../../components/ui/OrderStatusCard';
 
 import { useCartStore } from '../../store/useCartStore';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -151,37 +154,67 @@ export default function DiscoveryHome() {
   return (
     <div className="min-h-[100dvh] bg-[var(--color-background)] font-sans">
       
-      {/* Glassmorphism Header Trial */}
-      <GlassHeader 
-        onOpenProfile={() => setIsProfileOpen(true)} 
-        onOpenSearch={() => setIsSearchOpen(true)} 
-        onOpenAuth={() => setIsAuthOpen(true)} 
-      />
+      {/* ========================================================================= */}
+      {/* 1. LUXURY DESKTOP EXPERIENCE (>= lg) */}
+      {/* ========================================================================= */}
+      <div className="hidden lg:block">
+        <DesktopDiscoveryHome
+          campaigns={campaigns}
+          stories={stories}
+          discoverySections={discoverySections}
+          MENU={MENU}
+          featuredProduct={featuredProduct}
+          combos={combos}
+          onProductClick={handleProductClick}
+          onStoryClick={(storyId) => setSelectedStory(storyId)}
+          onOpenSearch={() => setIsSearchOpen(true)}
+          onOpenAI={() => navigate('/ai/home', {
+            state: {
+              customerName: user?.username || null,
+              isGuest: !user
+            }
+          })}
+          onOpenCart={() => navigate('/cart')}
+        />
+      </div>
+
+      {/* ========================================================================= */}
+      {/* 2. EXCELLENT MOBILE EXPERIENCE (< lg) */}
+      {/* ========================================================================= */}
+      <div className="lg:hidden">
+        {/* Glassmorphism Header Trial */}
+        <GlassHeader 
+          onOpenProfile={() => setIsProfileOpen(true)} 
+          onOpenSearch={() => setIsSearchOpen(true)} 
+          onOpenAuth={() => setIsAuthOpen(true)} 
+        />
+
+        <OrderStatusCard />
 
       {/* Skeletons while loading empty initial state */}
       {isLoading && campaigns.length === 0 && stories.length === 0 && discoverySections.length === 0 && (
         <div className="animate-in fade-in duration-500">
-          <section className="mb-8 mt-1 px-4">
-            <div className="w-[85vw] aspect-[16/9] sm:aspect-[21/9] bg-gray-200 animate-pulse rounded-[1.25rem] shadow-sm" />
+          <section className="mb-10 mt-2 px-0">
+            <div className="w-[92vw] mx-auto aspect-[16/9] sm:aspect-[21/9] bg-gray-200/50 animate-pulse rounded-[2rem] shadow-sm" />
           </section>
 
-          <section className="mb-8 pl-4">
-            <div className="w-1/3 h-5 bg-gray-200 animate-pulse rounded mb-4" />
-            <div className="flex gap-4 overflow-x-hidden">
+          <section className="mb-10 pl-5">
+            <div className="w-1/3 h-5 bg-gray-200/50 animate-pulse rounded mb-5" />
+            <div className="flex gap-5 overflow-x-hidden">
               {[1, 2, 3, 4, 5].map(i => (
-                <div key={i} className="flex flex-col items-center gap-1.5 shrink-0">
-                  <div className="w-[72px] h-[72px] bg-gray-200 animate-pulse rounded-full" />
-                  <div className="w-12 h-2.5 bg-gray-200 animate-pulse rounded" />
+                <div key={i} className="flex flex-col items-center gap-2 shrink-0">
+                  <div className="w-[76px] h-[76px] bg-gray-200/50 animate-pulse rounded-full" />
+                  <div className="w-12 h-2 bg-gray-200/50 animate-pulse rounded" />
                 </div>
               ))}
             </div>
           </section>
 
-          <section className="mb-10 pl-4">
-            <div className="w-1/2 h-6 bg-gray-200 animate-pulse rounded mb-4" />
-            <div className="flex gap-4 overflow-hidden">
+          <section className="mb-12 pl-5">
+            <div className="w-1/2 h-6 bg-gray-200/50 animate-pulse rounded mb-5" />
+            <div className="flex gap-5 overflow-hidden">
               {[1, 2].map(i => (
-                <div key={i} className="w-[280px] h-[120px] bg-gray-200 animate-pulse rounded-2xl shrink-0" />
+                <div key={i} className="w-[280px] h-[120px] bg-gray-200/50 animate-pulse rounded-[1.5rem] shrink-0" />
               ))}
             </div>
           </section>
@@ -190,17 +223,17 @@ export default function DiscoveryHome() {
 
       {/* Screen 02: Hero Campaign Carousel */}
       {campaigns.length > 0 && (
-        <section className="mb-8 mt-1">
-          <div ref={carouselRef} className="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory gap-4 px-4 pb-2 scroll-smooth">
+        <section className="mb-10 mt-2">
+          <div ref={carouselRef} className="flex overflow-x-auto hide-scrollbar snap-x snap-mandatory gap-4 px-4 pb-4 scroll-smooth">
           {campaigns.map((campaign, idx) => {
             return (
               <div 
                 key={idx}
-                className="relative shrink-0 snap-center w-[85vw] aspect-[16/9] sm:aspect-[21/9] rounded-[1.25rem] overflow-hidden shadow-sm bg-gray-100 cursor-pointer transition-transform"
+                className="relative shrink-0 snap-center w-[92vw] aspect-[16/9] sm:aspect-[21/9] rounded-[2rem] overflow-hidden shadow-[0_12px_24px_-10px_rgba(0,0,0,0.1)] bg-gray-100 cursor-pointer transition-transform duration-300"
               >
                 <img 
                   src={campaign.image} 
-                  className="w-full h-full object-cover active:scale-[0.98]" 
+                  className="w-full h-full object-cover active:scale-95 transition-transform duration-300" 
                   onClick={() => {
                     if (campaign.link) {
                       // Support internal routing and query params like /menu?category=Barista
@@ -239,9 +272,9 @@ export default function DiscoveryHome() {
                       }
                     );
                   }}
-                  className="absolute top-4 right-4 z-10 bg-white/60 backdrop-blur-md hover:bg-white/90 text-gray-800 p-2 rounded-full shadow-md transition-all active:scale-95"
+                  className="absolute top-4 right-4 z-10 bg-white/70 backdrop-blur-xl hover:bg-white text-black p-2.5 rounded-full shadow-[0_8px_16px_rgba(0,0,0,0.1)] transition-all active:scale-90"
                 >
-                  <Share2 size={16} />
+                  <Share2 size={18} />
                 </button>
               </div>
             );
@@ -317,52 +350,48 @@ export default function DiscoveryHome() {
       <section className="px-4 mb-8">
         <div className="flex justify-between items-center mb-4">
           <h3 className="font-black text-2xl tracking-tighter text-[#1A0B05]">
-            Drink Of The <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF9800] to-[#FFC461]">Week</span>
+            Drink Of The <span className="text-[#D4AF37]">Week</span>
           </h3>
         </div>
         
-        <div className="bg-white rounded-[2rem] shadow-[0_12px_40px_rgba(0,0,0,0.06)] border border-gray-100 relative overflow-hidden flex flex-col">
-          {/* Big Image Top Half - Fixed Cropping */}
-          <div className="w-full relative h-72 bg-gray-100 overflow-hidden flex items-center justify-center">
-             {/* Blurred Background Layer for Context */}
-             <img 
-               src={featuredProduct?.image || 'https://images.unsplash.com/photo-1558857563-b37102e95cb4?auto=format&fit=crop&q=80&w=800'} 
-               className="absolute inset-0 w-full h-full object-cover blur-[20px] opacity-40 scale-110" 
-             />
-             {/* Actual Uncropped Image */}
-             <img 
-               src={featuredProduct?.image || 'https://images.unsplash.com/photo-1558857563-b37102e95cb4?auto=format&fit=crop&q=80&w=800'} 
-               className="relative w-full h-full object-contain p-4 hover:scale-105 transition-transform duration-500 z-10 drop-shadow-2xl" 
-             />
-             <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-md text-[#FF9800] text-[10px] font-black uppercase tracking-[0.15em] px-3 py-1.5 rounded-full shadow-md z-20">
-                Spotlight
-             </div>
+        <div 
+          className="rounded-[2rem] bg-gradient-to-r from-[#5A3825] to-[#3E2312] text-white overflow-hidden shadow-xl flex flex-col group cursor-pointer border border-white/10" 
+          onClick={() => featuredProduct && setSelectedProduct(featuredProduct)}
+        >
+          {/* Top: Image (Full width) */}
+          <div className="w-full h-56 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[#D4AF37]/10 mix-blend-overlay z-10 pointer-events-none"></div>
+            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#3E2312] to-transparent z-10 pointer-events-none"></div>
+            
+            <img 
+              src={featuredProduct?.image || 'https://images.unsplash.com/photo-1558857563-b37102e95cb4?auto=format&fit=crop&q=80&w=800'} 
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+            />
+            
+            <div className="absolute top-4 left-4 bg-white/20 backdrop-blur-md border border-white/20 text-white text-[9px] font-black uppercase tracking-[0.15em] px-3 py-1.5 rounded-full shadow-sm z-20">
+               Spotlight
+            </div>
           </div>
           
-          {/* Content Bottom Half */}
-          <div className="w-full p-5 flex flex-col bg-white relative z-20 -mt-6 rounded-t-[2rem]">
-            <div className="flex justify-between items-start mb-2">
-              <h4 className="font-black text-xl leading-tight tracking-tight text-[#1A0B05] max-w-[70%]">
-                {featuredProduct?.name}
-              </h4>
-              <span className="font-black text-xl text-[#FF9800]">₹{featuredProduct?.price}</span>
-            </div>
+          {/* Bottom: Content */}
+          <div className="p-5 relative z-20 flex flex-col -mt-4">
+            <h4 className="font-black text-2xl leading-tight tracking-tight text-white mb-1">
+              {featuredProduct?.name}
+            </h4>
             
-            <div className="flex items-center gap-1.5 text-[#FF9800] text-[12px] font-bold mb-3">
+            <div className="flex items-center gap-1.5 text-[#FFC461] text-[12px] font-bold mb-3">
               <span>★</span> {featuredProduct?.rating} 
-              <span className="text-gray-400 font-medium">({featuredProduct?.ordersToday || '1.2k'} reviews)</span>
+              <span className="text-white/60 font-medium">({featuredProduct?.ordersToday || '1.2k'})</span>
             </div>
             
-            <p className="text-gray-500 text-[13px] line-clamp-2 mb-5 font-medium leading-relaxed">
-              {featuredProduct?.story}
-            </p>
-            
-            <button 
-              onClick={() => featuredProduct && setSelectedProduct(featuredProduct)} 
-              className="bg-[#1A0B05] text-white w-full py-3.5 rounded-[1rem] flex items-center justify-center gap-2 font-black text-[14px] shadow-md hover:bg-[#FF9800] hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
-            >
-              Order Now <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </button>
+            <div className="flex items-center justify-between mt-2">
+              <span className="font-black text-2xl text-white">₹{featuredProduct?.price}</span>
+              <button 
+                className="bg-[#D4AF37] hover:bg-white text-[#1A0B05] px-6 py-2.5 rounded-full font-black text-[11px] uppercase tracking-widest shadow-lg transition-all"
+              >
+                Order
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -391,8 +420,8 @@ export default function DiscoveryHome() {
         </section>
       )}
       
-      {/* AI Recommender Intercept - Gen Z Vibrant Holographic */}
-      <section className="px-4 mb-4">
+      {/* AI Recommender Intercept - Premium Brand Aligned */}
+      <section className="px-4 mb-8">
         <motion.div 
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
@@ -402,40 +431,36 @@ export default function DiscoveryHome() {
               isGuest: !user
             }
           })}
-          className="relative rounded-[2rem] p-5 overflow-hidden shadow-[0_15px_40px_rgba(255,152,0,0.2)] cursor-pointer group flex flex-col gap-3"
+          className="bg-gradient-to-r from-[#8E5E35] to-[#5A3825] rounded-[2rem] p-6 relative overflow-hidden shadow-xl cursor-pointer flex flex-col gap-5 group border border-white/10"
         >
-          {/* Vibrant Holographic Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#FF9800] via-[#FF512F] to-[#F09819] z-0"></div>
-          {/* Animated Mesh Blobs */}
-          <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#FFD700] rounded-full mix-blend-overlay filter blur-[30px] opacity-80 animate-pulse z-0"></div>
-          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-[#FF007F] rounded-full mix-blend-overlay filter blur-[30px] opacity-60 z-0"></div>
+          {/* Subtle Gold Blur */}
+          <div className="absolute -right-10 -top-10 w-40 h-40 bg-[#D4AF37]/20 rounded-full blur-3xl mix-blend-screen pointer-events-none"></div>
           
-          <div className="relative z-10 flex items-center justify-between">
-            <div className="bg-white/20 backdrop-blur-md border border-white/40 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
-              <span className="text-[14px]">🤖</span>
-              <span className="text-white text-[10px] font-black tracking-[0.15em] uppercase">POB AI Assistant</span>
+          <div className="flex items-center justify-between relative z-10">
+            <div className="bg-white/20 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full flex items-center gap-2 shadow-sm">
+              <span className="text-sm">🪄</span>
+              <span className="text-white text-[10px] font-black tracking-[0.2em] uppercase">POB AI Assistant</span>
             </div>
-            
-            <div className="w-8 h-8 bg-white text-[#FF512F] rounded-full flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
-               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            <div className="w-10 h-10 bg-white text-[#5A3825] rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+               <span className="text-xl drop-shadow-sm">🤖</span>
             </div>
           </div>
 
-          <div className="relative z-10 mt-1">
-            <h4 className="font-black text-[22px] leading-[1.1] tracking-tighter text-white drop-shadow-md">
-              First timer? <br/>
-              <span className="text-[#FFD700]">Not sure what to order?</span> 🧋✨
+          <div className="relative z-10">
+            <h4 className="font-black text-[20px] leading-tight tracking-tight text-white mb-2">
+              Not sure what to order? 
             </h4>
-            <p className="text-white/90 text-[13px] font-bold mt-2 flex items-center gap-2">
-              Let AI build your perfect cup <span className="inline-block animate-bounce">👇</span>
+            <p className="text-[#FFC461] text-[12px] font-bold flex items-center gap-1.5 uppercase tracking-wide">
+              Ask AI Assistant <span className="group-hover:translate-x-1 transition-transform">➔</span>
             </p>
           </div>
-          
-          {/* Floating Elements for Gen Z Vibe */}
-          <span className="absolute bottom-4 right-4 text-3xl opacity-20 transform rotate-12 z-0 group-hover:scale-125 transition-transform duration-500">🪄</span>
-          <span className="absolute top-1/2 right-12 text-2xl opacity-20 transform -rotate-12 z-0 group-hover:scale-125 transition-transform duration-500 delay-100">🔮</span>
         </motion.div>
       </section>
+
+      {/* Community & Socials (Only shown on Discovery) */}
+      <SocialWidgets />
+      
+      </div>
 
       {/* Fullscreen Story Modal (Screen 03 details) */}
       <AnimatePresence>

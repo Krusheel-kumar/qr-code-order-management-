@@ -143,12 +143,29 @@ export default function StoryModal({ storyId, onClose }: StoryModalProps) {
 
   return (
     <>
+    {/* Desktop Background Backdrop */}
     <motion.div
-      initial={{ opacity: 0, y: '100%' }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: '100%' }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[99999] bg-black/95 backdrop-blur-xl hidden md:block"
+      onClick={() => onCloseRef.current()}
+    />
+
+    {/* Desktop Global Close Button */}
+    <button 
+      onClick={() => onCloseRef.current()} 
+      className="fixed top-6 right-6 lg:top-10 lg:right-10 z-[100001] w-12 h-12 items-center justify-center text-white bg-white/10 hover:bg-white/20 rounded-full backdrop-blur-md hidden md:flex transition-colors cursor-pointer"
+    >
+      <X size={24} />
+    </button>
+
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.9, y: 20 }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="fixed inset-0 z-[100000] bg-black flex flex-col select-none"
+      className="fixed inset-0 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-[100000] bg-black md:bg-zinc-900 md:w-[420px] md:h-[90vh] md:max-h-[850px] md:rounded-[2.5rem] flex flex-col select-none overflow-hidden md:shadow-[0_0_60px_rgba(0,0,0,0.5)] border-0 md:border md:border-white/10"
       onContextMenu={(e) => e.preventDefault()} // Prevent right-click menu on long press
     >
       {/* Progress Bars */}
@@ -174,13 +191,13 @@ export default function StoryModal({ storyId, onClose }: StoryModalProps) {
         <div className="flex items-center gap-2 pointer-events-auto">
           <button 
             onClick={handleShare} 
-            className="w-8 h-8 flex items-center justify-center text-white bg-black/20 rounded-full backdrop-blur-md pointer-events-auto active:scale-95"
+            className="w-8 h-8 flex items-center justify-center text-white bg-black/20 hover:bg-black/40 rounded-full backdrop-blur-md pointer-events-auto active:scale-95 transition-colors"
           >
             <Share2 size={16} />
           </button>
           <button 
             onClick={() => onCloseRef.current()} 
-            className="w-8 h-8 flex items-center justify-center text-white bg-black/20 rounded-full backdrop-blur-md pointer-events-auto active:scale-95"
+            className="w-8 h-8 flex md:hidden items-center justify-center text-white bg-black/20 hover:bg-black/40 rounded-full backdrop-blur-md pointer-events-auto active:scale-95 transition-colors"
           >
             <X size={20} />
           </button>
@@ -191,13 +208,13 @@ export default function StoryModal({ storyId, onClose }: StoryModalProps) {
       <div className="flex-1 bg-zinc-900 relative overflow-hidden flex items-center justify-center">
         {/* Tap areas for prev/next */}
         <div 
-          className="absolute inset-y-0 left-0 w-1/3 z-30" 
+          className="absolute inset-y-0 left-0 w-1/3 z-30 cursor-pointer" 
           onPointerDown={handlePointerDown}
           onPointerUp={() => handlePointerUp('prev')}
           onPointerLeave={handlePointerLeave}
         />
         <div 
-          className="absolute inset-y-0 right-0 w-2/3 z-30" 
+          className="absolute inset-y-0 right-0 w-2/3 z-30 cursor-pointer" 
           onPointerDown={handlePointerDown}
           onPointerUp={() => handlePointerUp('next')}
           onPointerLeave={handlePointerLeave}
@@ -218,7 +235,7 @@ export default function StoryModal({ storyId, onClose }: StoryModalProps) {
         {/* Order Now Floating Button */}
         <div className={`absolute bottom-10 left-0 right-0 flex justify-center z-40 pointer-events-none transition-opacity duration-200 ${isPaused ? 'opacity-0' : 'opacity-100'}`}>
           <button 
-            className="bg-primary text-[var(--color-primary-foreground)] px-10 py-3.5 rounded-full font-extrabold text-[15px] shadow-xl pointer-events-auto flex items-center gap-2"
+            className="bg-[#D4AF37] hover:bg-[#FFC461] text-[#1A0B05] px-10 py-3.5 rounded-full font-extrabold text-[15px] shadow-xl pointer-events-auto flex items-center gap-2 transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               onCloseRef.current();
