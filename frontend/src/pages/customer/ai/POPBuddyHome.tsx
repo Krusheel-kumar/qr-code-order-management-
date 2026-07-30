@@ -5,10 +5,8 @@ import { useAIContext } from './hooks/useAIContext';
 import OrderStatusCard from './components/OrderStatusCard';
 import { 
   ChevronLeft, 
-  ChevronRight, 
   Menu, 
   Send, 
-  Compass, 
   X
 } from 'lucide-react';
 import { 
@@ -409,8 +407,8 @@ export default function POPBuddyHome() {
                     )}
 
                     {/* Recommendation Carousel inside Chat */}
-                    {(msg.productRecommendationIds?.length || msg.productRecommendationId) && (
-                      <ProductCarousel productIds={msg.productRecommendationIds || (msg.productRecommendationId ? [msg.productRecommendationId] : [])} />
+                    {msg.productRecommendationIds && (
+                      <ProductCarousel productIds={msg.productRecommendationIds} />
                     )}
                   </div>
                 </div>

@@ -243,8 +243,8 @@ export default function AIChatScreen() {
                 )}
 
                 {/* Recommendation Carousel inside Chat */}
-                {(msg.productRecommendationIds?.length || msg.productRecommendationId) && (
-                  <ProductCarousel productIds={msg.productRecommendationIds || (msg.productRecommendationId ? [msg.productRecommendationId] : [])} />
+                {msg.productRecommendationIds && (
+                  <ProductCarousel productIds={msg.productRecommendationIds} />
                 )}
 
                 {/* Quick Reply Options */}

@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Clock, Award, Mail, Lock, User as UserIcon, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { LogOut, Clock, Award, Mail, Lock, User as UserIcon, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useOrderStore } from '../../store/useOrderStore';
-import { getUserOrders, loginUser, registerUser } from '../../api';
+import { loginUser, registerUser } from '../../api';
 
 export default function Profile() {
   const navigate = useNavigate();
