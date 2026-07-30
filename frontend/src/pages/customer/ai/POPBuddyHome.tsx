@@ -80,7 +80,6 @@ export default function POPBuddyHome() {
   }
 
   const customer = data?.customer;
-  const wallet = data?.wallet;
   const order = data?.order;
   const rewards = data?.rewards || [];
   const missions = data?.missions || [];

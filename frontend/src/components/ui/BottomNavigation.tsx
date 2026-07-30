@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Grid, Gift, ShoppingCart, User, Bot } from 'lucide-react';
+import { Home, Grid, ShoppingCart, User, Bot } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useCartStore } from '../../store/useCartStore';
 

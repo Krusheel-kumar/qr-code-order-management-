@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Share2, Sparkles, ArrowRight } from 'lucide-react';
+import { Share2, ArrowRight } from 'lucide-react';
 import type { MenuItem } from '../../data/menu';
 import type { Campaign, Story, DiscoverySection, Combo } from '../../data/models';
 import { shareContent } from '../../utils/shareUtils';

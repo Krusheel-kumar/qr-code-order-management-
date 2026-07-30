@@ -20,6 +20,7 @@ export default function Cart() {
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [couponsList, setCouponsList] = useState<any[]>([]);
+  const [notes, setNotes] = useState('');
   
   useEffect(() => {
     getStoreSettings().then(setStoreSettings).catch(console.error);
@@ -381,8 +382,8 @@ export default function Cart() {
               <input
                 type="text"
                 placeholder="e.g. Less ice, extra hot"
-                value={cartStore.notes}
-                onChange={(e) => cartStore.setNotes(e.target.value)}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
                 className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-semibold text-sm"
               />
             </div>

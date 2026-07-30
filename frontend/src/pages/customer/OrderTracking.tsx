@@ -1,11 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { MapPin, Bell, ChevronLeft, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { STORES } from '../../data/stores';
-import { useAuthStore } from '../../store/useAuthStore';
 import { useOrderStore } from '../../store/useOrderStore';
-import { getGuestRewardByOrderId } from '../../api';
 
 const STAGES = [
   { id: 'PLACED', label: 'Order Confirmed' },
@@ -18,10 +16,7 @@ export default function OrderTracking() {
   const { id } = useParams();
   const [currentStage, setCurrentStage] = useState(0); 
   const [orderData, setOrderData] = useState<any>(null);
-  const [isExiting, setIsExiting] = useState(false);
-  const { user } = useAuthStore();
-  const hasTriggeredAI = useRef(false);
-
+  const [isExiting] = useState(false);
   useEffect(() => {
     if (!id) return;
     

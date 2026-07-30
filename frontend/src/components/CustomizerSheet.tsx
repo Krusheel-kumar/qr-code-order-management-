@@ -18,7 +18,7 @@ interface CustomizerSheetProps {
 export default function CustomizerSheet({ product, isOpen, onClose }: CustomizerSheetProps) {
   const cartStore = useCartStore();
 
-  const [step, setStep] = useState<'details' | 'customize'>('details');
+
   
   // Customizations state: maps groupId -> list of selected options
   const [selections, setSelections] = useState<Record<string, CustomizationOption[]>>({});
@@ -40,7 +40,6 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
   // Reset selections state when product changes
   useEffect(() => {
     if (product) {
-      setStep('details');
       setGroupErrors({});
       
       const initialSelections: Record<string, CustomizationOption[]> = {};
@@ -209,7 +208,7 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
             drag={window.innerWidth < 1024 ? "y" : false}
             dragConstraints={{ top: 0 }}
             dragElastic={0.2}
-            onDragEnd={(e, { offset, velocity }) => {
+            onDragEnd={(_, { offset, velocity }) => {
               if (offset.y > 150 || velocity.y > 500) {
                 onClose();
               }

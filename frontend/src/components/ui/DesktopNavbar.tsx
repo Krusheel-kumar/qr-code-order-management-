@@ -185,7 +185,7 @@ export default function DesktopNavbar() {
                               setIsLocationMenuOpen(false);
                             }}
                             className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11px] font-bold transition-all ${
-                              orderType === 'DELIVERY' ? 'bg-white text-[#1A0B05] shadow-sm border border-gray-100' : 'text-gray-500 hover:text-[#1A0B05]'
+                              (orderType as string) === 'DELIVERY' ? 'bg-white text-[#1A0B05] shadow-sm border border-gray-100' : 'text-gray-500 hover:text-[#1A0B05]'
                             }`}
                           >
                             <HomeIcon size={14} /> Delivery
