@@ -269,6 +269,7 @@ export default function DesktopDiscoveryHome({
                       </div>
 
                       <div className="flex items-center justify-between pt-4 border-t border-black/5">
+                        <div>
                           <span className="text-2xl font-black text-[#1A0B05]">
                             ₹{Math.round(Number(product.price))}
                           </span>
