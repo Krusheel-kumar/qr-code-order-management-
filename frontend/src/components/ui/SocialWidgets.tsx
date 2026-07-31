@@ -278,7 +278,7 @@ export default function SocialWidgets() {
               <img src="/assets/logo 2.png" alt="POP O'BOB® Logo" className="w-full h-full object-cover scale-110" />
             </div>
             
-            <h2 className="text-2xl font-black tracking-tighter mb-6 text-[#1A0B05] uppercase">POP O'BOB® RESERVE</h2>
+            <h2 className="text-2xl font-black tracking-tighter mb-6 text-[#1A0B05] uppercase">POP O'BOB®</h2>
             
             <div className="flex items-center gap-8 mb-8">
               <button onClick={() => navigate('/menu')} className="text-xs font-bold text-gray-600 hover:text-[#1A0B05] uppercase tracking-widest transition-colors">Menu</button>
@@ -293,9 +293,6 @@ export default function SocialWidgets() {
             <div className="flex flex-col items-center gap-1 opacity-75">
               <p className="text-[11px] font-black tracking-[0.25em] uppercase text-gray-500">
                 © 2026 POP O'BOB® TEA CO. ALL RIGHTS RESERVED.
-              </p>
-              <p className="text-[11px] font-semibold tracking-[0.15em] uppercase text-gray-400 mt-1">
-                DESIGNED FOR THE DISCERNING PALATE • CRAFTED WITH LUXURY PRECISION
               </p>
             </div>
           </footer>
