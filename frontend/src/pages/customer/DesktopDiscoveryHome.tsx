@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Share2, ArrowRight } from 'lucide-react';
@@ -35,8 +35,15 @@ export default function DesktopDiscoveryHome({
   const [activeCampaignIdx, setActiveCampaignIdx] = useState(0);
   const activeCampaign = campaigns[activeCampaignIdx] || null;
 
-  // Use featuredProduct fallback or first item
   const spotlightProduct = featuredProduct || MENU[0];
+
+  useEffect(() => {
+    if (!campaigns || campaigns.length <= 1) return;
+    const interval = setInterval(() => {
+      setActiveCampaignIdx((prev) => (prev + 1) % campaigns.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [campaigns]);
 
   const handleCampaignClick = (campaign: Campaign | null) => {
     if (!campaign) {
