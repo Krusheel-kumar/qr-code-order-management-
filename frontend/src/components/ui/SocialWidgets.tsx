@@ -38,15 +38,10 @@ export default function SocialWidgets() {
             <span className="text-[10px] font-black tracking-[0.2em] uppercase bg-clip-text text-transparent bg-gradient-to-r from-[#FF9800] to-[#FD1D1D]">Community</span>
           </div>
           <h3 className="font-black text-4xl text-[#1A0B05] mb-3 tracking-tighter leading-[1.1]">
-            Join the <br/>
-            <span className="relative inline-block">
-              <span className="relative z-10 italic pr-2">POP O'BOB®</span>
-              <span className="absolute bottom-2 left-0 w-full h-3 bg-[#FFC461]/40 -z-10 rounded-full transform -rotate-1"></span>
-            </span>
-            Fam
+            Connect With Us
           </h3>
           <p className="text-sm font-semibold text-gray-600 max-w-[250px]">
-            Exclusive drops, secret menus, and daily boba aesthetics ✨
+            Follow us on social media or reach out for quick support.
           </p>
         </div>
         
@@ -65,8 +60,8 @@ export default function SocialWidgets() {
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
               </div>
               <div className="flex flex-col items-start text-left">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Follow our journey</span>
-                <span className="text-xl font-black text-gray-900 tracking-tight leading-none mt-1">@POP O'BOB®</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Instagram</span>
+                <span className="text-xl font-black text-gray-900 tracking-tight leading-none mt-1">@POPOBOB</span>
               </div>
               <div className="ml-auto w-8 h-8 rounded-full bg-white/80 flex items-center justify-center group-hover:translate-x-1 transition-transform flex-shrink-0 shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="text-gray-800"><polyline points="9 18 15 12 9 6"></polyline></svg>
@@ -87,7 +82,7 @@ export default function SocialWidgets() {
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
               </div>
               <div className="flex flex-col items-start text-left">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Quick Support</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500">Support</span>
                 <span className="text-xl font-black text-gray-900 tracking-tight leading-none mt-1">WhatsApp Chat</span>
               </div>
               <div className="ml-auto w-8 h-8 rounded-full bg-white/80 flex items-center justify-center group-hover:translate-x-1 transition-transform flex-shrink-0 shadow-sm">
@@ -154,15 +149,12 @@ export default function SocialWidgets() {
             {/* Editorial Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 border-b border-black/5 pb-8 gap-6">
               <div>
-                <span className="text-xs font-black tracking-[0.25em] uppercase text-[#D4AF37] block mb-2">
-                  ✦ RESERVE COMMUNITY & DELIVERY
-                </span>
                 <h3 className="text-4xl xl:text-5xl font-black text-[#1A0B05] tracking-tight leading-[1.05]">
-                  Connected Across Every Platform.
+                  Connect With Us
                 </h3>
               </div>
               <p className="text-sm font-semibold text-gray-500 max-w-sm leading-relaxed">
-                Connect with our community for secret drops, support, and 30-minute delivery.
+                Stay updated, order online, or get support instantly.
               </p>
             </div>
 
@@ -183,14 +175,14 @@ export default function SocialWidgets() {
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
                   </div>
                   <span className="bg-[#E1306C]/10 text-[#E1306C] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
-                    Official Page
+                    Social Media
                   </span>
                 </div>
 
                 <div className="relative z-10">
                   <span className="text-gray-400 text-xs font-bold uppercase tracking-[0.2em] block mb-1">Instagram</span>
-                  <span className="text-[#1A0B05] font-black text-2xl tracking-tight block group-hover:text-[#E1306C] transition-colors">@POP O'BOB®</span>
-                  <span className="text-xs font-semibold text-gray-500 mt-2 block">Daily editorial drops & secret menu stories</span>
+                  <span className="text-[#1A0B05] font-black text-2xl tracking-tight block group-hover:text-[#E1306C] transition-colors">@POPOBOB</span>
+                  <span className="text-xs font-semibold text-gray-500 mt-2 block">Follow us for updates and news</span>
                 </div>
               </motion.button>
 
@@ -208,14 +200,14 @@ export default function SocialWidgets() {
                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                   </div>
                   <span className="bg-[#25D366]/10 text-[#25D366] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
-                    Concierge
+                    Support
                   </span>
                 </div>
 
                 <div className="relative z-10">
                   <span className="text-gray-400 text-xs font-bold uppercase tracking-[0.2em] block mb-1">WhatsApp</span>
                   <span className="text-[#1A0B05] font-black text-2xl tracking-tight block group-hover:text-[#25D366] transition-colors">Instant Chat</span>
-                  <span className="text-xs font-semibold text-gray-500 mt-2 block">Direct support & instant table reservations</span>
+                  <span className="text-xs font-semibold text-gray-500 mt-2 block">Reach out to us for any help</span>
                 </div>
               </motion.button>
 
@@ -233,14 +225,14 @@ export default function SocialWidgets() {
                     S
                   </div>
                   <span className="bg-[#FC8019]/10 text-[#FC8019] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
-                    30-Min Delivery
+                    Delivery
                   </span>
                 </div>
 
                 <div className="relative z-10">
                   <span className="text-gray-400 text-xs font-bold uppercase tracking-[0.2em] block mb-1">Order On</span>
-                  <span className="text-[#1A0B05] font-black text-2xl tracking-tight block group-hover:text-[#FC8019] transition-colors">Swiggy Gourmet</span>
-                  <span className="text-xs font-semibold text-gray-500 mt-2 block">Priority thermal delivery to your doorstep</span>
+                  <span className="text-[#1A0B05] font-black text-2xl tracking-tight block group-hover:text-[#FC8019] transition-colors">Swiggy</span>
+                  <span className="text-xs font-semibold text-gray-500 mt-2 block">Order online for quick delivery</span>
                 </div>
               </motion.button>
 
@@ -258,14 +250,14 @@ export default function SocialWidgets() {
                     Z
                   </div>
                   <span className="bg-[#E23744]/10 text-[#E23744] text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
-                    Gold Dining
+                    Delivery
                   </span>
                 </div>
 
                 <div className="relative z-10">
                   <span className="text-gray-400 text-xs font-bold uppercase tracking-[0.2em] block mb-1">Order On</span>
-                  <span className="text-[#1A0B05] font-black text-2xl tracking-tight block group-hover:text-[#E23744] transition-colors">Zomato Gold</span>
-                  <span className="text-xs font-semibold text-gray-500 mt-2 block">Exclusive reserve perks & live delivery tracking</span>
+                  <span className="text-[#1A0B05] font-black text-2xl tracking-tight block group-hover:text-[#E23744] transition-colors">Zomato</span>
+                  <span className="text-xs font-semibold text-gray-500 mt-2 block">Order online and track live</span>
                 </div>
               </motion.button>
 
@@ -274,12 +266,6 @@ export default function SocialWidgets() {
             {/* Desktop Reviews Block inside Container */}
             <div className="mt-16 pt-12 border-t border-black/5">
               <div className="flex flex-col items-center">
-                <span className="text-xs font-black tracking-[0.25em] uppercase text-[#FF9800] mb-2">
-                  ✦ DISCOVER WHAT TASTEMAKERS SAY
-                </span>
-                <h4 className="text-3xl font-black text-[#1A0B05] tracking-tight mb-8">
-                  Loved by Over 10,000+ Tea Artisans
-                </h4>
                 <div className="elfsight-app-a2d34f5a-63af-43a9-9dd6-98e16050776d w-full max-w-5xl" data-elfsight-app-lazy></div>
               </div>
             </div>

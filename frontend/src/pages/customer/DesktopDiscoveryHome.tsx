@@ -131,9 +131,6 @@ export default function DesktopDiscoveryHome({
           {/* Header */}
           <div className="flex items-end justify-between mb-8 xl:mb-10">
             <div>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37] block mb-2">
-                Discover
-              </span>
               <h2 className="text-3xl xl:text-4xl font-black text-[#1A0B05] tracking-tight">
                 Highlights
               </h2>
@@ -272,9 +269,8 @@ export default function DesktopDiscoveryHome({
                       </div>
 
                       <div className="flex items-center justify-between pt-4 border-t border-black/5">
-                        <div>
                           <span className="text-2xl font-black text-[#1A0B05]">
-                            ₹{product.price}
+                            ₹{Math.round(Number(product.price))}
                           </span>
                           {product.rating && (
                             <span className="text-[11px] font-bold text-gray-400 block mt-0.5">
@@ -326,7 +322,7 @@ export default function DesktopDiscoveryHome({
                 <div className="flex-1 py-1">
                   <h4 className="font-black text-lg text-[#1A0B05] leading-tight mb-1">{combo.title}</h4>
                   <p className="text-xs text-gray-500 mb-2">Combo</p>
-                  <span className="font-black text-xl text-[#1A0B05]">₹{combo.price}</span>
+                  <span className="font-black text-xl text-[#1A0B05]">₹{Math.round(Number(combo.price))}</span>
                 </div>
                 <button
                   className="bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold shrink-0 transition-colors shadow-sm"
@@ -357,14 +353,9 @@ export default function DesktopDiscoveryHome({
               Drink Of The <span className="text-[#D4AF37]">Week</span>
             </h2>
 
-            <h3 className="text-2xl font-bold text-[#FFC461] mb-4">
+            <h3 className="text-2xl font-bold text-[#FFC461] mb-8">
               {spotlightProduct?.name}
             </h3>
-
-            <div className="flex items-center gap-1.5 text-[#D4AF37] text-sm font-bold mb-6">
-              <span>★</span> {spotlightProduct?.rating || '4.9'} 
-              <span className="text-white/60 font-medium">({spotlightProduct?.ordersToday || '1.2k'} reviews)</span>
-            </div>
 
             <p className="text-white/80 text-base leading-relaxed max-w-xl mb-10 font-medium">
               {spotlightProduct?.story}
@@ -372,7 +363,7 @@ export default function DesktopDiscoveryHome({
 
             <div className="flex items-center gap-8">
               <span className="text-4xl font-black text-white block">
-                ₹{spotlightProduct?.price || 349}
+                ₹{Math.round(Number(spotlightProduct?.price || 349))}
               </span>
 
               <button

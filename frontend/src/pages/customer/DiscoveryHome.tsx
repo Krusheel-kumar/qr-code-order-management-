@@ -142,7 +142,7 @@ export default function DiscoveryHome() {
         <span className="text-[12px] font-medium text-gray-400 mb-2 uppercase tracking-wider">{product.category.replace('cat_', '')}</span>
         
         <div className="flex justify-between items-center mt-auto">
-          <span className="font-extrabold text-[17px] text-black tracking-tight">₹{product.price}</span>
+          <span className="font-extrabold text-[17px] text-black tracking-tight">₹{Math.round(Number(product.price))}</span>
           <button className="bg-primary text-black hover:bg-[#FF9800] hover:text-white w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold leading-none pb-0.5 transition-colors shadow-sm">
             +
           </button>
@@ -375,17 +375,12 @@ export default function DiscoveryHome() {
           
           {/* Bottom: Content */}
           <div className="p-5 relative z-20 flex flex-col -mt-4">
-            <h4 className="font-black text-2xl leading-tight tracking-tight text-white mb-1">
+            <h4 className="font-black text-2xl leading-tight tracking-tight text-white mb-6">
               {featuredProduct?.name}
             </h4>
             
-            <div className="flex items-center gap-1.5 text-[#FFC461] text-[12px] font-bold mb-3">
-              <span>★</span> {featuredProduct?.rating} 
-              <span className="text-white/60 font-medium">({featuredProduct?.ordersToday || '1.2k'})</span>
-            </div>
-            
             <div className="flex items-center justify-between mt-2">
-              <span className="font-black text-2xl text-white">₹{featuredProduct?.price}</span>
+              <span className="font-black text-2xl text-white">₹{Math.round(Number(featuredProduct?.price || 0))}</span>
               <button 
                 className="bg-[#D4AF37] hover:bg-white text-[#1A0B05] px-6 py-2.5 rounded-full font-black text-[11px] uppercase tracking-widest shadow-lg transition-all"
               >
@@ -409,7 +404,7 @@ export default function DiscoveryHome() {
                  <div className="flex-1 py-1">
                    <h4 className="font-bold text-sm leading-tight mb-1">{combo.title}</h4>
                    <p className="text-xs text-gray-500 mb-2">Combo</p>
-                   <span className="font-bold text-sm">${combo.price}</span>
+                   <span className="font-bold text-sm">₹{Math.round(Number(combo.price))}</span>
                  </div>
                  <button className="bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold shrink-0 transition-colors">
                     +
@@ -457,10 +452,10 @@ export default function DiscoveryHome() {
         </motion.div>
       </section>
 
-      {/* Community & Socials (Only shown on Discovery) */}
-      <SocialWidgets />
-      
       </div>
+      
+      {/* Community & Socials (Responsive: shows mobile & desktop layouts respectively) */}
+      <SocialWidgets />
 
       {/* Fullscreen Story Modal (Screen 03 details) */}
       <AnimatePresence>

@@ -58,10 +58,12 @@ export default function DesktopNavbar() {
   return (
     <>
       {/* ========================================================================= */}
-      {/* LUXURY FLOATING PILL NAVBAR (Matches Mockup) */}
+      {/* LUXURY U-SHAPED NAVBAR */}
       {/* ========================================================================= */}
-      <header className={`hidden lg:block fixed left-1/2 -translate-x-1/2 w-[calc(100%-3rem)] max-w-[1440px] z-[100] transition-all duration-500 ${isScrolled ? 'top-4' : 'top-6'}`}>
-        <div className="relative bg-[#FCFAF8] backdrop-blur-3xl rounded-[3rem] px-4 xl:px-5 py-2.5 xl:py-3 shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-white flex items-center justify-between gap-4">
+      <header className={`hidden lg:block fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-[1440px] z-[100] transition-all duration-500`}>
+        <div className={`relative backdrop-blur-2xl rounded-b-[2.5rem] px-6 xl:px-10 shadow-[0_12px_40px_rgba(0,0,0,0.05)] border-b border-white/60 flex items-center justify-between gap-4 transition-all duration-500 ${
+          isScrolled ? 'bg-white/95 py-2.5 xl:py-3.5' : 'bg-white/80 py-4 xl:py-5'
+        }`}>
           
           {/* ========================================================================= */}
           {/* LEFT ZONE: Logo */}
@@ -90,22 +92,32 @@ export default function DesktopNavbar() {
                 <Link 
                   key={link.path}
                   to={link.path}
-                  className="relative flex items-center gap-1.5 py-1 group"
+                  className="relative flex items-center gap-1.5 py-2 group"
                 >
-                  {link.icon && <link.icon size={16} className={link.isHighlight ? 'text-[#EAB308]' : 'text-gray-400 group-hover:text-[#1A0B05]'} />}
-                  <span className={`text-sm font-semibold transition-colors ${
-                    isActive 
-                      ? 'text-[#1A0B05]' 
-                      : link.isHighlight 
-                        ? 'text-[#EAB308]' 
-                        : 'text-gray-500 group-hover:text-[#1A0B05]'
-                  }`}>
-                    {link.label}
-                  </span>
+                  {link.isHighlight ? (
+                    <>
+                      <link.icon size={16} className="text-[#EAB308]" />
+                      <span className="text-[15px] font-bold bg-gradient-to-r from-yellow-600 to-orange-500 bg-clip-text text-transparent">
+                        {link.label}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      {link.icon && <link.icon size={16} className="text-gray-400 group-hover:text-[#1A0B05] transition-colors" />}
+                      <span className={`text-[15px] font-semibold transition-colors z-10 ${
+                        isActive 
+                          ? 'text-[#1A0B05]' 
+                          : 'text-gray-500 group-hover:text-[#1A0B05]'
+                      }`}>
+                        {link.label}
+                      </span>
+                    </>
+                  )}
+
                   {isActive && (
                     <motion.div 
-                      layoutId="nav-underline"
-                      className="absolute -bottom-1.5 left-0 right-0 h-0.5 bg-[#EAB308] rounded-full"
+                      layoutId="nav-indicator"
+                      className="absolute -bottom-1 left-0 right-0 h-[3px] bg-[#1A0B05] rounded-t-full"
                       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                     />
                   )}
@@ -122,7 +134,7 @@ export default function DesktopNavbar() {
             {/* Search Button */}
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="w-10 h-10 xl:w-11 xl:h-11 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center hover:bg-gray-50 transition-colors"
+              className="w-10 h-10 xl:w-11 xl:h-11 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center hover:bg-gray-50 hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-300"
               title="Search menu (⌘K)"
             >
               <Search size={18} className="text-gray-700" />
@@ -133,11 +145,13 @@ export default function DesktopNavbar() {
               <div className="relative">
                 <button 
                   onClick={() => setIsLocationMenuOpen(!isLocationMenuOpen)}
-                  className={`flex items-center gap-3 bg-white border rounded-full px-4 py-2 shadow-sm transition-all group ${
-                    isLocationMenuOpen ? 'border-[#EAB308]/40 shadow-md' : 'border-gray-100 hover:border-gray-200'
+                  className={`flex items-center gap-3 bg-white border rounded-full px-4 py-2 shadow-sm transition-all duration-300 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] group ${
+                    isLocationMenuOpen ? 'border-[#EAB308]/40 shadow-md ring-2 ring-[#EAB308]/10' : 'border-gray-100 hover:border-gray-200'
                   }`}
                 >
-                  <MapPin size={16} className="text-gray-600 group-hover:text-[#1A0B05]" />
+                  <div className="w-6 h-6 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+                    <MapPin size={14} className="text-gray-600 group-hover:text-[#1A0B05]" />
+                  </div>
                   <div className="flex flex-col items-start text-left">
                     <span className="text-[10px] font-medium text-gray-500 leading-tight">
                       {orderType === 'PICKUP' ? 'Pickup at' : 'Delivery to'}
@@ -218,7 +232,7 @@ export default function DesktopNavbar() {
             {user ? (
               <button
                 onClick={() => setIsProfileOpen(true)}
-                className="w-10 h-10 xl:w-11 xl:h-11 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:bg-gray-50 transition-colors"
+                className="w-10 h-10 xl:w-11 xl:h-11 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:bg-gray-50 hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-300"
                 title={user.username}
               >
                 <span className="font-bold text-[#1A0B05] text-sm">{user.username.charAt(0).toUpperCase()}</span>
@@ -226,7 +240,7 @@ export default function DesktopNavbar() {
             ) : (
               <button
                 onClick={() => setIsAuthOpen(true)}
-                className="w-10 h-10 xl:w-11 xl:h-11 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center hover:bg-gray-50 transition-colors"
+                className="w-10 h-10 xl:w-11 xl:h-11 rounded-full bg-white border border-gray-100 shadow-sm flex items-center justify-center hover:bg-gray-50 hover:shadow-md hover:scale-105 active:scale-95 transition-all duration-300"
                 title="Sign In"
               >
                 <User size={18} className="text-gray-700" />
@@ -236,12 +250,13 @@ export default function DesktopNavbar() {
             {/* Cart Button */}
             <button
               onClick={() => navigate('/cart')}
-              className="bg-[#1A0B05] hover:bg-black text-white rounded-full px-5 xl:px-6 py-2.5 xl:py-3 flex items-center gap-2 shadow-md transition-colors relative"
+              className="bg-[#1A0B05] hover:bg-black text-white rounded-full px-5 xl:px-6 py-2.5 xl:py-3 flex items-center gap-2 shadow-[0_4px_12px_rgba(26,11,5,0.2)] hover:shadow-[0_8px_20px_rgba(26,11,5,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 relative group overflow-hidden"
             >
-              <ShoppingBag size={18} />
-              <span className="font-bold text-sm">Cart</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+              <ShoppingBag size={18} className="relative z-10" />
+              <span className="font-bold text-sm relative z-10">Cart</span>
               {cartItemCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-[22px] h-[22px] rounded-full bg-[#EAB308] text-white text-[10px] font-bold flex items-center justify-center border-[2.5px] border-[#FCFAF8]">
+                <span className="absolute -top-1.5 -right-1.5 w-[22px] h-[22px] rounded-full bg-[#EAB308] text-white text-[10px] font-bold flex items-center justify-center border-[2.5px] border-[#FCFAF8] shadow-sm z-20">
                   {cartItemCount}
                 </span>
               )}
