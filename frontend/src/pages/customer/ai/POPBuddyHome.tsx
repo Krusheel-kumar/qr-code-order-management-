@@ -240,7 +240,8 @@ export default function POPBuddyHome() {
       <main className="flex-1 flex flex-col pb-[130px] relative z-0">
         
         {/* Transparent Main Container */}
-        <div className="px-6 flex-1 flex flex-col justify-center pb-10">
+        {messages.length === 0 ? (
+          <div className="px-6 flex-1 flex flex-col justify-center items-center pb-10 max-w-3xl mx-auto w-full">
           
           {/* Greeting */}
           <div className="mb-10 text-center flex flex-col items-center">
@@ -284,8 +285,8 @@ export default function POPBuddyHome() {
           </div>
 
           {/* Suggestion Chips */}
-          <div className="mb-4">
-            <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide -mx-6 px-6">
+          <div className="mb-4 flex justify-center w-full">
+            <div className="flex flex-wrap justify-center gap-2 w-full">
               {[
                 { icon: '🥭', label: 'Fruity' },
                 { icon: '🧋', label: 'Milk Tea' },
@@ -299,7 +300,7 @@ export default function POPBuddyHome() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => handleFreeTextSubmit(`I'm looking for ${chip.label.toLowerCase()} drinks`)}
-                  className="whitespace-nowrap flex items-center gap-2 px-4 py-2 bg-white/40 backdrop-blur-md border border-white/60 rounded-full text-[13px] font-bold text-gray-700 shadow-sm hover:border-[#F7C948]/50 hover:bg-white/60 transition-all shrink-0"
+                  className="flex items-center gap-2 px-4 py-2 bg-white/40 backdrop-blur-md border border-white/60 rounded-full text-[13px] font-bold text-gray-700 shadow-sm hover:border-[#F7C948]/50 hover:bg-white/60 transition-all"
                 >
                   <span>{chip.icon}</span>
                   {chip.label}
@@ -308,19 +309,73 @@ export default function POPBuddyHome() {
             </div>
           </div>
         </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-6 hide-scrollbar max-w-3xl mx-auto w-full mt-2">
+            {messages.map((msg) => (
+              <div 
+                key={msg.id} 
+                className={`flex w-full ${msg.sender === 'user' ? 'justify-end' : 'justify-start gap-2.5'}`}
+              >
+                {msg.sender === 'ai' && (
+                  <div className="w-8 h-8 rounded-full bg-white border border-[#F7C948]/30 p-1 flex items-center justify-center shrink-0 shadow-sm overflow-hidden mt-1">
+                    <img src="/Brand%20Emblem.png" alt="POB" className="w-full h-full object-contain" />
+                  </div>
+                )}
+
+                <div className={`flex flex-col max-w-[80%] ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
+                  {msg.isTyping ? (
+                    <div className="bg-white/80 border border-[#F7C948]/20 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5 h-[40px] shadow-sm">
+                      <motion.div animate={{y:[0,-3,0]}} transition={{repeat:Infinity, duration:0.6}} className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full" />
+                      <motion.div animate={{y:[0,-3,0]}} transition={{repeat:Infinity, duration:0.6, delay:0.2}} className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full" />
+                      <motion.div animate={{y:[0,-3,0]}} transition={{repeat:Infinity, duration:0.6, delay:0.4}} className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full" />
+                    </div>
+                  ) : (
+                    <div className={`px-4 py-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)] text-[14px] leading-relaxed whitespace-pre-line font-medium ${
+                      msg.sender === 'user' 
+                        ? 'bg-gradient-to-r from-[#F7C948] to-[#F9D46C] text-[#4A3B32] rounded-[20px] rounded-tr-sm border border-[#F7C948]/20' 
+                        : 'bg-white text-[#4A3B32] border border-gray-100/80 rounded-[20px] rounded-tl-sm'
+                    }`}>
+                      {msg.text}
+                    </div>
+                  )}
+
+                  {/* Chat Options */}
+                  {msg.options && (
+                    <div className="flex flex-wrap gap-2 mt-3 w-full">
+                      {msg.options.map((option) => (
+                        <button
+                          key={option}
+                          onClick={() => handleOptionClick(option)}
+                          className="bg-white border border-[#F7C948] hover:bg-[#F7C948]/10 text-[#4A3B32] font-bold text-xs px-4 py-2.5 rounded-full active:scale-[0.98] transition-all shadow-[0_2px_10px_rgba(247,201,72,0.1)]"
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Recommendation Carousel inside Chat */}
+                  {msg.productRecommendationIds && (
+                    <ProductCarousel productIds={msg.productRecommendationIds} />
+                  )}
+                </div>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+        )}
       </main>
 
       {/* Premium Apple Intelligence-style Light Chat Input */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 p-5 pb-8 bg-gradient-to-t from-[#FDF3DE] via-[#FDF3DE]/95 to-transparent pointer-events-none max-w-md mx-auto">
+      <div className="fixed bottom-0 left-0 right-0 z-40 p-5 pb-8 bg-gradient-to-t from-[#FDF3DE] via-[#FDF3DE]/95 to-transparent pointer-events-none flex justify-center">
         <form 
           onSubmit={(e) => { e.preventDefault(); handleFreeTextSubmit(); }}
-          className="pointer-events-auto flex items-center justify-between gap-3 bg-white/90 backdrop-blur-xl border border-white rounded-[28px] px-3 py-3 shadow-[0_8px_30px_rgba(212,175,55,0.15)] focus-within:shadow-[0_8px_30px_rgba(247,201,72,0.25)] transition-all"
+          className="pointer-events-auto flex items-center justify-between gap-3 bg-white/90 backdrop-blur-xl border border-white rounded-[28px] px-3 py-3 shadow-[0_8px_30px_rgba(212,175,55,0.15)] focus-within:shadow-[0_8px_30px_rgba(247,201,72,0.25)] transition-all w-full max-w-3xl"
         >
           <input 
             type="text" 
             value={chatInput}
             onChange={(e) => setChatInput(e.target.value)}
-            onFocus={() => { if (!isChatOpen) setIsChatOpen(true); }}
             placeholder="Ask POB AI anything..."
             className="flex-1 bg-transparent border-none outline-none px-4 text-[16px] text-[#4A3B32] placeholder:text-gray-400 font-medium"
           />
@@ -334,112 +389,7 @@ export default function POPBuddyHome() {
         </form>
       </div>
 
-      {/* ── Slide-up POB AI Chat Drawer ─────────────────────────────────── */}
-      <AnimatePresence>
-        {isChatOpen && (
-          <motion.div 
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed inset-0 bg-gradient-to-br from-[#FFFDF8] via-[#FFF9EE] to-[#FDF3DE] z-50 flex flex-col max-w-md mx-auto"
-          >
-            {/* Drawer Header */}
-            <header className="bg-white/30 backdrop-blur-md border-b border-white/40 px-4 py-4 flex items-center justify-between sticky top-0 z-10 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-              <button 
-                onClick={() => setIsChatOpen(false)} 
-                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/40 active:scale-95 transition-all text-[#4A3B32]"
-              >
-                <ChevronLeft size={24} strokeWidth={2.5} />
-              </button>
-              <div className="flex-1 flex justify-center items-center gap-2 pr-10">
-                <div className="w-8 h-8 rounded-full bg-white/70 border border-[#F7C948]/30 p-1 flex items-center justify-center overflow-hidden shadow-sm">
-                  <img src="/Brand%20Emblem.png" alt="POB" className="w-full h-full object-contain" />
-                </div>
-                <h1 className="font-heading font-black text-[17px] tracking-tight bg-gradient-to-r from-[#D4AF37] to-[#F7C948] bg-clip-text text-transparent">POB AI</h1>
-              </div>
-            </header>
 
-            {/* Conversation Messages */}
-            <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-6 hide-scrollbar">
-              {messages.map((msg) => (
-                <div 
-                  key={msg.id} 
-                  className={`flex w-full ${msg.sender === 'user' ? 'justify-end' : 'justify-start gap-2.5'}`}
-                >
-                  {msg.sender === 'ai' && (
-                    <div className="w-8 h-8 rounded-full bg-white border border-[#F7C948]/30 p-1 flex items-center justify-center shrink-0 shadow-sm overflow-hidden mt-1">
-                      <img src="/Brand%20Emblem.png" alt="POB" className="w-full h-full object-contain" />
-                    </div>
-                  )}
-
-                  <div className={`flex flex-col max-w-[80%] ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
-                    {msg.isTyping ? (
-                      <div className="bg-white/80 border border-[#F7C948]/20 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5 h-[40px] shadow-sm">
-                        <motion.div animate={{y:[0,-3,0]}} transition={{repeat:Infinity, duration:0.6}} className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full" />
-                        <motion.div animate={{y:[0,-3,0]}} transition={{repeat:Infinity, duration:0.6, delay:0.2}} className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full" />
-                        <motion.div animate={{y:[0,-3,0]}} transition={{repeat:Infinity, duration:0.6, delay:0.4}} className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full" />
-                      </div>
-                    ) : (
-                      <div className={`px-4 py-3 shadow-[0_2px_8px_rgba(0,0,0,0.03)] text-[14px] leading-relaxed whitespace-pre-line font-medium ${
-                        msg.sender === 'user' 
-                          ? 'bg-gradient-to-r from-[#F7C948] to-[#F9D46C] text-[#4A3B32] rounded-[20px] rounded-tr-sm border border-[#F7C948]/20' 
-                          : 'bg-white text-[#4A3B32] border border-gray-100/80 rounded-[20px] rounded-tl-sm'
-                      }`}>
-                        {msg.text}
-                      </div>
-                    )}
-
-                    {/* Chat Options */}
-                    {msg.options && (
-                      <div className="flex flex-wrap gap-2 mt-3 w-full">
-                        {msg.options.map((option) => (
-                          <button
-                            key={option}
-                            onClick={() => handleOptionClick(option)}
-                            className="bg-white border border-[#F7C948] hover:bg-[#F7C948]/10 text-[#4A3B32] font-bold text-xs px-4 py-2.5 rounded-full active:scale-[0.98] transition-all shadow-[0_2px_10px_rgba(247,201,72,0.1)]"
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Recommendation Carousel inside Chat */}
-                    {msg.productRecommendationIds && (
-                      <ProductCarousel productIds={msg.productRecommendationIds} />
-                    )}
-                  </div>
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input Bar in Drawer */}
-            <div className="p-4 bg-white/80 backdrop-blur-xl border-t border-white/50 shadow-[0_-8px_30px_rgba(212,175,55,0.05)]">
-              <form 
-                onSubmit={(e) => { e.preventDefault(); handleFreeTextSubmit(); }}
-                className="flex items-center gap-2 bg-white border border-[#F7C948]/30 rounded-full px-2 py-1.5 shadow-[0_2px_15px_rgba(247,201,72,0.1)]"
-              >
-                <input 
-                  type="text" 
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="Ask POB AI anything..."
-                  className="flex-1 bg-transparent border-none outline-none px-4 text-[14px] text-[#4A3B32] placeholder:text-[#8B7355]/60 font-medium"
-                />
-                <button 
-                  type="submit"
-                  disabled={!chatInput.trim()}
-                  className="w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br from-[#F7C948] to-[#D4AF37] text-white shadow-md active:scale-95 shrink-0 disabled:opacity-50"
-                >
-                  <Send size={16} className="ml-0.5 -mt-0.5" />
-                </button>
-              </form>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* ── Detail Modals (Rewards / Missions / Fun Facts) ────────────────── */}
       <AnimatePresence>
