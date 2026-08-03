@@ -18,6 +18,8 @@ import {
 } from '../../../lib/recommendationEngine';
 import { useCartStore } from '../../../store/useCartStore';
 import { useMenuStore } from '../../../store/useMenuStore';
+import CustomizerSheet from '../../../components/CustomizerSheet';
+import { type MenuItem } from '../../../data/menu';
 
 interface ChatMessage {
   id: string;
@@ -49,6 +51,7 @@ export default function POPBuddyHome() {
   const [chatInput, setChatInput] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [activeModal, setActiveModal] = useState<'rewards' | 'missions' | 'funfacts' | null>(null);
+  const [customizingProduct, setCustomizingProduct] = useState<MenuItem | null>(null);
   
   // Guided flow state machine
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -213,7 +216,6 @@ export default function POPBuddyHome() {
     }
   };
 
-  // const pointsProgress = Math.min(100, (((wallet?.points || 0) / (wallet?.nextTierPoints || 100)) * 100));
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFFDF8] via-[#FFF9EE] to-[#FDF3DE] flex flex-col font-sans relative text-[#4A3B32]">
       
@@ -356,7 +358,7 @@ export default function POPBuddyHome() {
 
                   {/* Recommendation Carousel inside Chat */}
                   {msg.productRecommendationIds && (
-                    <ProductCarousel productIds={msg.productRecommendationIds} />
+                    <ProductCarousel productIds={msg.productRecommendationIds} onAddClick={(p) => setCustomizingProduct(p)} />
                   )}
                 </div>
               </div>
@@ -485,15 +487,19 @@ export default function POPBuddyHome() {
         )}
       </AnimatePresence>
 
+      <CustomizerSheet 
+        product={customizingProduct} 
+        isOpen={!!customizingProduct} 
+        onClose={() => setCustomizingProduct(null)} 
+      />
     </div>
   );
 }
 
 // Product Recommendation Carousel Component
-function ProductCarousel({ productIds }: { productIds: string[] }) {
+function ProductCarousel({ productIds, onAddClick }: { productIds: string[], onAddClick: (product: MenuItem) => void }) {
   const { menuItems: MENU } = useMenuStore();
   const navigate = useNavigate();
-  const cartStore = useCartStore();
 
   const products = productIds
     .map(id => {
@@ -564,12 +570,7 @@ function ProductCarousel({ productIds }: { productIds: string[] }) {
           <div className="flex gap-2 mt-2">
             <button 
               onClick={() => {
-                cartStore.addItem({
-                  product,
-                  customization: 'Regular • As recommended by POB AI',
-                  price: product.price,
-                  quantity: 1
-                });
+                onAddClick(product);
                 if (navigator.vibrate) navigator.vibrate(50);
               }}
               className="flex-1 bg-gradient-to-r from-[#1A0B05] to-[#3A2B25] text-white font-bold py-2.5 text-xs rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-all shadow-md"
@@ -622,12 +623,7 @@ function ProductCarousel({ productIds }: { productIds: string[] }) {
               <div className="flex gap-1.5 mt-1.5">
                 <button 
                   onClick={() => {
-                    cartStore.addItem({
-                      product,
-                      customization: 'Regular • As recommended by POB AI',
-                      price: product.price,
-                      quantity: 1
-                    });
+                    onAddClick(product);
                     if (navigator.vibrate) navigator.vibrate(50);
                   }}
                   className="flex-1 bg-gradient-to-r from-[#1A0B05] to-[#3A2B25] text-white font-bold py-2 text-[11px] rounded-lg flex items-center justify-center active:scale-95 transition-all shadow-sm"
