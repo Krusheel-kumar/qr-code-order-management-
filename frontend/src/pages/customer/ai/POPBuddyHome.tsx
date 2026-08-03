@@ -16,7 +16,6 @@ import {
   type SubFlavor,
   type ToppingPreference
 } from '../../../lib/recommendationEngine';
-import { useCartStore } from '../../../store/useCartStore';
 import { useMenuStore } from '../../../store/useMenuStore';
 import CustomizerSheet from '../../../components/CustomizerSheet';
 import { type MenuItem } from '../../../data/menu';
