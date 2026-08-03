@@ -344,103 +344,109 @@ export default function DesktopDiscoveryHome({
       )}
 
       {/* ========================================================================= */}
-      {/* 5. DRINK OF THE WEEK (Exact Mobile Content) */}
+      {/* 5. DRINK OF THE WEEK & AI RECOMMENDER (Side-by-Side Grid)               */}
       {/* ========================================================================= */}
       <section className="max-w-[1440px] mx-auto px-8 xl:px-12 mb-20">
-        <div className="rounded-[3rem] bg-gradient-to-r from-[#5A3825] to-[#3E2312] text-white overflow-hidden shadow-2xl relative flex flex-col lg:flex-row group border border-white/10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8 h-[350px]">
           
-          {/* Left: Content (60%) */}
-          <div className="lg:w-[60%] p-10 xl:p-14 flex flex-col justify-center relative z-20">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10 mb-6 w-fit shadow-sm">
-              <span className="text-[10px] font-black uppercase tracking-[0.25em] text-[#D4AF37]">
-                Spotlight
-              </span>
+          {/* DRINK OF THE WEEK (Left Card) */}
+          <motion.div 
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ y: -4, transition: { duration: 0.2 } }}
+            className="rounded-[2.5rem] bg-white text-[#1A0B05] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.05)] relative flex flex-col sm:flex-row group border border-black/5 h-full"
+          >
+            
+            {/* Content (Left side of card on desktop/tablet) */}
+            <div className="sm:w-1/2 p-8 xl:p-10 flex flex-col justify-center relative z-20 h-full bg-white">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1A0B05]/5 border border-[#1A0B05]/10 mb-4 w-fit shadow-sm">
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#D4AF37]">
+                  Spotlight
+                </span>
+              </div>
+
+              <h2 className="text-3xl font-black text-[#1A0B05] tracking-tight leading-[1.1] mb-1">
+                Drink Of The <span className="text-[#D4AF37]">Week</span>
+              </h2>
+
+              <h3 className="text-lg font-bold text-gray-700 mb-2">
+                {spotlightProduct?.name}
+              </h3>
+
+              <div className="flex items-center gap-4 mt-auto pt-4 border-t border-black/5">
+                <span className="text-2xl font-black text-[#1A0B05] block">
+                  ₹{Math.round(Number(spotlightProduct?.price || 349))}
+                </span>
+
+                <button
+                  onClick={() => spotlightProduct && onProductClick(spotlightProduct)}
+                  className="bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] px-6 py-2.5 rounded-full font-black text-[11px] uppercase tracking-widest shadow-md transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center gap-1.5 ml-auto"
+                >
+                  <span>Order</span>
+                  <ArrowRight size={14} />
+                </button>
+              </div>
             </div>
 
-            <h2 className="text-4xl xl:text-5xl font-black text-white tracking-tight leading-[1.1] mb-2">
-              Drink Of The <span className="text-[#D4AF37]">Week</span>
-            </h2>
+            {/* Image (Right side of card) */}
+            <div className="sm:w-1/2 relative min-h-[200px] sm:min-h-full">
+              <div className="absolute inset-0 bg-black/5 mix-blend-overlay z-10 pointer-events-none"></div>
+              
+              {/* Fade gradient */}
+              <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-white to-transparent z-10 hidden sm:block pointer-events-none"></div>
+              <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-white to-transparent z-10 sm:hidden pointer-events-none"></div>
 
-            <h3 className="text-2xl font-bold text-[#FFC461] mb-8">
-              {spotlightProduct?.name}
-            </h3>
-
-            <p className="text-white/80 text-base leading-relaxed max-w-xl mb-10 font-medium">
-              {spotlightProduct?.story}
-            </p>
-
-            <div className="flex items-center gap-8">
-              <span className="text-4xl font-black text-white block">
-                ₹{Math.round(Number(spotlightProduct?.price || 349))}
-              </span>
-
-              <button
+              <img
+                src={spotlightProduct?.image || 'https://images.unsplash.com/photo-1558857563-b37102e95cb4?auto=format&fit=crop&q=80&w=800'}
+                alt={spotlightProduct?.name}
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 cursor-pointer"
                 onClick={() => spotlightProduct && onProductClick(spotlightProduct)}
-                className="bg-[#D4AF37] hover:bg-white text-[#1A0B05] px-8 py-4 rounded-full font-black text-sm uppercase tracking-widest shadow-xl transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center gap-2"
-              >
-                <span>Order Now</span>
-                <ArrowRight size={16} />
-              </button>
+              />
             </div>
-          </div>
+          </motion.div>
 
-          {/* Right: Image (40% Full Bleed) */}
-          <div className="lg:w-[40%] relative min-h-[400px] lg:min-h-full">
-            <div className="absolute inset-0 bg-[#D4AF37]/10 mix-blend-overlay z-10 pointer-events-none"></div>
-            
-            {/* Desktop Gradient Fade to blend the straight edge */}
-            <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#3E2312] to-transparent z-10 hidden lg:block pointer-events-none"></div>
-            
-            {/* Mobile Gradient Fade */}
-            <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#3E2312] to-transparent z-10 lg:hidden pointer-events-none"></div>
+          {/* AI RECOMMENDER BANNER (Right Card) */}
+          <motion.div 
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ y: -4, transition: { duration: 0.2 } }}
+            whileTap={{ scale: 0.99 }}
+            onClick={onOpenAI}
+            className="rounded-[2.5rem] bg-white text-[#1A0B05] p-8 xl:p-12 overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.05)] cursor-pointer group flex flex-col justify-center border border-black/5 h-full relative"
+          >
+            {/* Subtle Gold Blur Background */}
+            <div className="absolute -right-10 -top-10 w-80 h-80 bg-[#D4AF37]/10 rounded-full blur-[60px] pointer-events-none" />
 
-            <img
-              src={spotlightProduct?.image || 'https://images.unsplash.com/photo-1558857563-b37102e95cb4?auto=format&fit=crop&q=80&w=800'}
-              alt={spotlightProduct?.name}
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 cursor-pointer"
-              onClick={() => spotlightProduct && onProductClick(spotlightProduct)}
-            />
-          </div>
+            <div className="flex items-center justify-between w-full relative z-10 h-full">
+              {/* Left: Content & Headline */}
+              <div className="flex flex-col justify-center gap-4 flex-1">
+                <div className="bg-[#1A0B05]/5 border border-[#1A0B05]/10 px-4 py-1.5 rounded-full flex items-center gap-2 shadow-sm w-fit">
+                  <span className="text-base">🪄</span>
+                  <span className="text-[#1A0B05] text-[10px] font-black tracking-[0.2em] uppercase">POB AI Assistant</span>
+                </div>
 
+                <h2 className="text-4xl font-black text-[#1A0B05] tracking-tight leading-[1.1]">
+                  Not sure what to order?
+                </h2>
+
+                <p className="text-gray-500 text-xs font-bold flex items-center gap-1.5 uppercase tracking-widest mt-2 group-hover:text-[#D4AF37] transition-colors">
+                  Let AI build your perfect cup <span className="group-hover:translate-x-1 transition-transform">➔</span>
+                </p>
+              </div>
+
+              {/* Right: Interactive Action Button */}
+              <div className="pl-8 flex items-center">
+                <div className="w-20 h-20 bg-white border border-[#1A0B05]/10 rounded-full flex items-center justify-center shadow-lg group-hover:border-[#D4AF37] group-hover:shadow-[0_10px_30px_rgba(212,175,55,0.3)] group-hover:scale-110 transition-all flex-shrink-0 overflow-hidden">
+                  <img src="/assets/logo 2.png" alt="Brand Logo" className="w-full h-full object-cover scale-110" />
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 6. AI RECOMMENDER BANNER (Exact Mobile Content & Wording) */}
-      {/* ========================================================================= */}
-      <section className="max-w-[1440px] mx-auto px-8 xl:px-12 mb-20">
-        <motion.div 
-          whileHover={{ scale: 1.01, y: -3 }}
-          whileTap={{ scale: 0.99 }}
-          onClick={onOpenAI}
-          className="relative rounded-[2.5rem] p-10 xl:p-12 overflow-hidden shadow-2xl cursor-pointer group flex items-center justify-between bg-gradient-to-r from-[#8E5E35] to-[#5A3825] border border-white/10"
-        >
-          {/* Subtle Gold Blur Background */}
-          <div className="absolute -right-20 -top-20 w-80 h-80 bg-[#D4AF37]/20 rounded-full blur-[60px] pointer-events-none" />
-
-          {/* Left: Content & Headline */}
-          <div className="relative z-10 flex flex-col gap-3">
-            <div className="bg-white/20 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full flex items-center gap-2 shadow-sm w-fit">
-              <span className="text-base">🪄</span>
-              <span className="text-white text-[11px] font-black tracking-[0.2em] uppercase">POB AI Assistant</span>
-            </div>
-
-            <h2 className="text-3xl xl:text-4xl font-black text-white tracking-tight leading-[1.1] mt-2">
-              Not sure what to order?
-            </h2>
-
-            <p className="text-[#FFC461] text-sm font-bold flex items-center gap-2 uppercase tracking-widest mt-1">
-              Let AI build your perfect cup <span className="group-hover:translate-x-1 transition-transform">➔</span>
-            </p>
-          </div>
-
-          {/* Right: Interactive Action Button */}
-          <div className="relative z-10 flex items-center gap-6">
-            <div className="w-16 h-16 xl:w-20 xl:h-20 bg-white text-[#5A3825] rounded-full flex items-center justify-center shadow-xl group-hover:scale-110 transition-all">
-              <span className="text-4xl drop-shadow-sm">🤖</span>
-            </div>
-          </div>
-        </motion.div>
       </section>
 
     </div>
