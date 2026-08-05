@@ -129,11 +129,17 @@ export default function DiscoveryHome() {
       className="snap-start shrink-0 w-[160px] bg-white rounded-[1.5rem] border border-black/[0.03] shadow-[0_8px_24px_rgba(0,0,0,0.04)] relative group hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] transition-all cursor-pointer flex flex-col overflow-hidden"
     >
       <div className="w-full aspect-[4/5] bg-gray-50 relative overflow-hidden">
-        {badgeText && (
-          <div className="absolute top-2.5 left-2.5 z-10 bg-white/90 backdrop-blur-md text-black text-[8px] font-extrabold px-2.5 py-1 rounded-full shadow-sm uppercase tracking-widest border border-white/50">
-            {badgeText}
+        {/* Minimalist Independence Day Badge */}
+        <div className="absolute top-2.5 left-2.5 z-10 bg-white/85 backdrop-blur-md px-2 py-1 rounded-md border border-white/60 shadow-sm flex items-center gap-1.5">
+          <div className="flex flex-col w-3 h-[8px] rounded-[1px] overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.1)]">
+            <div className="h-1/3 w-full bg-[#FF9933]"></div>
+            <div className="h-1/3 w-full bg-white relative flex items-center justify-center">
+              <div className="w-[1px] h-[1px] bg-[#000080] rounded-full"></div>
+            </div>
+            <div className="h-1/3 w-full bg-[#138808]"></div>
           </div>
-        )}
+          <span className="text-[8px] font-bold tracking-widest text-[#1A0B05] uppercase mt-[1px]">Special</span>
+        </div>
         <img src={product.image || 'https://images.unsplash.com/photo-1558857563-b37102e95cb4?auto=format&fit=crop&q=80&w=800'} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
       </div>
       

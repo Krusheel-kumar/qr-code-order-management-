@@ -1,43 +1,16 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Clock, Award, Mail, Lock, User as UserIcon, ArrowRight } from 'lucide-react';
+import { LogOut, Clock, Award, ArrowRight } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useOrderStore } from '../../store/useOrderStore';
-import { loginUser, registerUser } from '../../api';
+import AuthModal from '../../components/ui/AuthModal';
 
 export default function Profile() {
   const navigate = useNavigate();
   const { user, setUser, getLoyaltyTier } = useAuthStore();
   const { orders: guestOrders } = useOrderStore();
   
-  // Auth State
-  const [isLogin, setIsLogin] = useState(true);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [loadingAuth, setLoadingAuth] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleAuthSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoadingAuth(true);
-    setError('');
-
-    try {
-      if (isLogin) {
-        const response = await loginUser({ email, password });
-        setUser(response.user);
-      } else {
-        const response = await registerUser({ name, email, password, phoneNumber });
-        setUser(response.user);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Authentication failed. Please try again.');
-    } finally {
-      setLoadingAuth(false);
-    }
-  };
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleLogout = () => {
     setUser(null);
@@ -49,103 +22,22 @@ export default function Profile() {
         <div className="mb-10 text-center">
           <img src="/assets/horizontal_logo.png" alt="POP O'BOB Logo" className="h-10 w-auto mx-auto mb-6" />
           <h2 className="font-heading font-black text-3xl text-[#1A0B05] mb-2 tracking-tight">
-            {isLogin ? 'Welcome Back' : "Join POP O'BOB®"}
+            Welcome to POP O'BOB®
           </h2>
           <p className="text-sm font-medium text-gray-500">
-            {isLogin ? 'Log in to earn points and reorder your favorites.' : 'Sign up to earn Boba points on every order!'}
+            Log in to earn points and reorder your favorites.
           </p>
         </div>
 
-        {error && (
-          <div className="mb-6 text-xs font-bold text-red-600 bg-red-50 border border-red-100 px-4 py-3 rounded-xl flex items-center gap-2">
-            <span>⚠️</span> {error}
-          </div>
-        )}
+        <button 
+          onClick={() => setShowAuthModal(true)}
+          className="mt-4 w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-full py-4 text-[15px] shadow-lg hover:shadow-[0_8px_24px_rgba(212,175,55,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group"
+        >
+          <span>Log In / Sign Up</span>
+          <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+        </button>
 
-        <form onSubmit={handleAuthSubmit} className="flex flex-col gap-4">
-          {!isLogin && (
-            <div className="flex flex-col gap-4">
-                <div className="relative">
-                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                  <input
-                    type="text"
-                    placeholder="Your Name"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] outline-none text-sm font-semibold text-[#1A0B05] placeholder:text-gray-400 transition-all"
-                  />
-                </div>
-                <div className="relative">
-                  <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                  <input
-                    type="tel"
-                    placeholder="Mobile Number (Optional)"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] outline-none text-sm font-semibold text-[#1A0B05] placeholder:text-gray-400 transition-all"
-                  />
-                </div>
-            </div>
-          )}
-          
-          <div className="relative">
-            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input
-              type="email"
-              placeholder="Email Address"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] outline-none text-sm font-semibold text-[#1A0B05] placeholder:text-gray-400 transition-all"
-            />
-          </div>
-
-          <div className="relative">
-            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input
-              type="password"
-              placeholder="Password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] outline-none text-sm font-semibold text-[#1A0B05] placeholder:text-gray-400 transition-all"
-            />
-          </div>
-
-          <button 
-            disabled={loadingAuth}
-            type="submit" 
-            className="mt-4 w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-full py-4 text-[15px] shadow-lg hover:shadow-[0_8px_24px_rgba(212,175,55,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-60 group"
-          >
-            {loadingAuth ? (
-              <span className="flex items-center gap-2">
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                </svg>
-                Processing...
-              </span>
-            ) : (
-              <>
-                <span>{isLogin ? 'Log In' : 'Create Account'}</span>
-                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-              </>
-            )}
-          </button>
-        </form>
-
-        <div className="mt-8 text-center">
-          <span className="text-sm text-gray-500 font-medium">
-            {isLogin ? "Don't have an account? " : "Already a member? "}
-            <button 
-              onClick={() => { setIsLogin(!isLogin); setError(''); }} 
-              className="text-[#D4AF37] hover:text-[#1A0B05] font-black ml-1 transition-colors"
-            >
-              {isLogin ? 'Sign Up' : 'Log In'}
-            </button>
-          </span>
-        </div>
+        <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
         
         {guestOrders.length > 0 && (
           <div className="mt-12 pt-8 border-t border-gray-100">
@@ -181,7 +73,7 @@ export default function Profile() {
         </div>
         <div>
           <h2 className="font-heading font-black text-2xl text-[#1A0B05] tracking-tight">{user?.username || 'Guest'}</h2>
-          <p className="text-gray-500 text-sm font-medium">{user?.email || 'user@example.com'}</p>
+          <p className="text-gray-500 text-sm font-medium">{user?.phoneNumber || 'No phone number'}</p>
         </div>
       </div>
 

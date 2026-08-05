@@ -241,11 +241,17 @@ export default function DesktopDiscoveryHome({
                     className="bg-white rounded-[2.2rem] border border-gray-100 shadow-[0_12px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_70px_rgba(0,0,0,0.09)] transition-all duration-500 overflow-hidden flex flex-col justify-between group cursor-pointer"
                   >
                     <div className="w-full aspect-[4/3] bg-gradient-to-b from-[#FFFDF8] to-[#F5EBE0]/60 relative overflow-hidden">
-                      {badgeText && (
-                        <div className="absolute top-4 left-4 z-10 bg-[#1A0B05] text-[#FFC461] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-md">
-                          {badgeText}
+                      {/* Minimalist Independence Day Badge */}
+                      <div className="absolute top-3 left-3 z-10 bg-white/85 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/60 shadow-sm flex items-center gap-1.5">
+                        <div className="flex flex-col w-[14px] h-[9px] rounded-[1px] overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.1)]">
+                          <div className="h-1/3 w-full bg-[#FF9933]"></div>
+                          <div className="h-1/3 w-full bg-white relative flex items-center justify-center">
+                            <div className="w-[1.5px] h-[1.5px] bg-[#000080] rounded-full"></div>
+                          </div>
+                          <div className="h-1/3 w-full bg-[#138808]"></div>
                         </div>
-                      )}
+                        <span className="text-[9px] font-bold tracking-widest text-[#1A0B05] uppercase mt-[1px]">Special</span>
+                      </div>
                       <button
                         onClick={(e) => handleShareProduct(e, product)}
                         className="absolute top-4 right-4 z-10 bg-white/70 backdrop-blur-md hover:bg-white text-gray-800 p-2.5 rounded-full shadow-sm transition-all opacity-0 group-hover:opacity-100"

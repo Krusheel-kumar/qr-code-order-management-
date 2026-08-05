@@ -43,3 +43,7 @@ jwt:
 gemini:
   api:
     key: ${GEMINI_API_KEY:your_gemini_api_key_here}
+
+msg91:
+  auth-key: ${MSG91_AUTH_KEY:557539A3jnNLJWr6a73367fP1}
+  template-id: ${MSG91_TEMPLATE_ID:SecureOTPWidget5TUR}

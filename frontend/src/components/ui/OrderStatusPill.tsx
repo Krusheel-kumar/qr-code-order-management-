@@ -2,14 +2,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useOrderStatus } from '../../hooks/useOrderStatus';
 import { useOrderStore } from '../../store/useOrderStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { STORES } from '../../data/stores';
 
 export default function OrderStatusPill() {
   const { activeOrders, recentOrders, mostRecentOrder, isMostRecentRecent } = useOrderStatus();
   const { dismissOrder } = useOrderStore();
+  const { user } = useAuthStore();
   const navigate = useNavigate();
 
-  if (activeOrders.length === 0 && recentOrders.length === 0) return null;
+  if ((activeOrders.length === 0 && recentOrders.length === 0) || !user) return null;
 
   // Handle Multi-Order UI
   if (activeOrders.length > 1) {
@@ -136,6 +138,14 @@ export default function OrderStatusPill() {
       >
         <div className="bg-white/80 backdrop-blur-xl border border-white/60 p-4 rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] flex items-center gap-4 overflow-hidden relative group">
           <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/5 to-[#FFC461]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+          {/* Close Button */}
+          <button 
+            onClick={(e) => { e.stopPropagation(); dismissOrder(currentOrderId); }}
+            className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-gray-100/80 text-gray-400 hover:bg-gray-200 transition-colors z-20 text-[10px]"
+          >
+            ✕
+          </button>
 
           <div className="relative shrink-0 z-10">
             <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-md shadow-black/10 ${getStatusColor(order.status)}`}>

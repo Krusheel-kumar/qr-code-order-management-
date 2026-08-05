@@ -29,3 +29,7 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: ERROR
     org.springframework.orm.jpa: ERROR
     org.springframework.transaction: ERROR
+
+msg91:
+  auth-key: ${MSG91_AUTH_KEY}
+  template-id: ${MSG91_TEMPLATE_ID}

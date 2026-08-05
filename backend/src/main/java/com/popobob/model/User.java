@@ -13,8 +13,8 @@ public class User {
     private UUID id;
     
     private String username;
-    private String passwordHash;
     private String email;
+    @Column(unique = true)
     private String phoneNumber;
     private String role;
     private Integer loyaltyPoints = 0;

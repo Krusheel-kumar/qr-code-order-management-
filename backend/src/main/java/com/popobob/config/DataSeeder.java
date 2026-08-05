@@ -10,8 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -21,23 +19,21 @@ public class DataSeeder implements CommandLineRunner {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     @Value("${ADMIN_EMAIL:}")
     private String adminEmail;
 
-    @Value("${ADMIN_PASSWORD:}")
-    private String adminPassword;
+    @Value("${ADMIN_PHONE:}")
+    private String adminPhone;
 
     @Value("${app.seed.enabled:false}")
     private boolean seedEnabled;
 
-    public DataSeeder(CategoryRepository categoryRepository, ProductRepository productRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, org.springframework.jdbc.core.JdbcTemplate jdbcTemplate) {
+    public DataSeeder(CategoryRepository categoryRepository, ProductRepository productRepository, UserRepository userRepository, org.springframework.jdbc.core.JdbcTemplate jdbcTemplate) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -604,7 +600,7 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedAdminUser() {
-        if (adminEmail != null && !adminEmail.trim().isEmpty() && adminPassword != null && !adminPassword.trim().isEmpty()) {
+        if (adminEmail != null && !adminEmail.trim().isEmpty() && adminPhone != null && !adminPhone.trim().isEmpty()) {
             String cleanEmail = adminEmail.trim();
             java.util.Optional<User> existing = userRepository.findByEmailIgnoreCase(cleanEmail);
             User admin;
@@ -618,8 +614,7 @@ public class DataSeeder implements CommandLineRunner {
                 admin = existing.get();
                 admin.setRole("ADMIN");
             }
-            // Always update the password hash to ensure the Railway variable is the source of truth
-            admin.setPasswordHash(passwordEncoder.encode(adminPassword.trim()));
+            admin.setPhoneNumber(adminPhone.trim());
             userRepository.save(admin);
         }
     }

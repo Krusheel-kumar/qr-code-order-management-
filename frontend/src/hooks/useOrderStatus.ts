@@ -3,7 +3,7 @@ import { useOrderStore } from '../store/useOrderStore';
 import { getOrderById } from '../api';
 
 export function useOrderStatus() {
-  const { orders, clearOrder, markTerminal } = useOrderStore();
+  const { orders, clearOrder, markTerminal, dismissOrder } = useOrderStore();
   const [fetchedOrders, setFetchedOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -12,17 +12,28 @@ export function useOrderStatus() {
     return orders.filter(o => !o.isDismissed);
   }, [orders]);
 
-  // Check 24 hour expiration & cleanup
+  // Check auto-dismissal & cleanup
   useEffect(() => {
-    activeAndRecentStoreOrders.forEach(order => {
-      if (order.terminalTimestamp) {
-        const isExpired = Date.now() - order.terminalTimestamp > 24 * 60 * 60 * 1000;
-        if (isExpired) {
-          clearOrder(order.id);
+    const checkInterval = setInterval(() => {
+      activeAndRecentStoreOrders.forEach(order => {
+        if (order.terminalTimestamp) {
+          const timeSinceTerminal = Date.now() - order.terminalTimestamp;
+          
+          // Auto-dismiss from UI after 10 seconds
+          if (timeSinceTerminal > 10 * 1000) {
+            dismissOrder(order.id);
+          }
+          
+          // Clear entirely from local storage after 24 hours
+          if (timeSinceTerminal > 24 * 60 * 60 * 1000) {
+            clearOrder(order.id);
+          }
         }
-      }
-    });
-  }, [activeAndRecentStoreOrders, clearOrder]);
+      });
+    }, 2000); // Check every 2 seconds
+
+    return () => clearInterval(checkInterval);
+  }, [activeAndRecentStoreOrders, dismissOrder, clearOrder]);
 
   // Fetch Orders
   useEffect(() => {

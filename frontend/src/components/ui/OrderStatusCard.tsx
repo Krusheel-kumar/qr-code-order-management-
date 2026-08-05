@@ -2,14 +2,16 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useOrderStatus } from '../../hooks/useOrderStatus';
 import { useOrderStore } from '../../store/useOrderStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { STORES } from '../../data/stores';
 
 export default function OrderStatusCard() {
   const { mostRecentOrder, isMostRecentRecent } = useOrderStatus();
   const { dismissOrder } = useOrderStore();
+  const { user } = useAuthStore();
   const navigate = useNavigate();
 
-  if (!mostRecentOrder) return null;
+  if (!mostRecentOrder || !user) return null;
 
   const order = mostRecentOrder;
   const currentOrderId = order.id;

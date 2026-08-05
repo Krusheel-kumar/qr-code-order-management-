@@ -49,15 +49,15 @@ export const getProducts = async () => {
 export const getCategories = async () => (await menuApi.get('/categories')).data;
 
 
-export const registerUser = async (data: any) => {
-  const response = await fetch(`${API_URL}/auth/register`, {
+export const verifyWidgetToken = async (data: { token: string; phoneNumber: string }) => {
+  const response = await fetch(`${API_URL}/auth/verify-widget-token`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
   if (response.ok) return await response.json();
   const err = await response.text();
-  throw new Error(err || 'Registration failed');
+  throw new Error(err || 'Failed to verify token');
 };
 
 export const getUserProfile = async (userId: string) => {
@@ -74,16 +74,17 @@ export const getUserProfile = async (userId: string) => {
   }
 };
 
-export const loginUser = async (data: any) => {
-  const response = await fetch(`${API_URL}/auth/login`, {
-    method: 'POST',
+export const updateUserProfile = async (userId: string, data: { username: string }) => {
+  const response = await fetch(`${API_URL}/users/${userId}`, {
+    method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   });
   if (response.ok) return await response.json();
-  const err = await response.text();
-  throw new Error(err || 'Login failed');
+  throw new Error('Failed to update profile');
 };
+
+
 
 export const getUserOrders = async (userId: string) => {
   const response = await fetch(`${API_URL}/users/${userId}/orders`);

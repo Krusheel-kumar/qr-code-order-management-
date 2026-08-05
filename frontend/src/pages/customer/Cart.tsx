@@ -5,6 +5,8 @@ import { useCartStore } from '../../store/useCartStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useOrderStore } from '../../store/useOrderStore';
 import { getStoreSettings } from '../../api';
+import CheckoutAuthGate from '../../components/ui/CheckoutAuthGate';
+import AuthModal from '../../components/ui/AuthModal';
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -21,6 +23,9 @@ export default function Cart() {
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [couponsList, setCouponsList] = useState<any[]>([]);
   const [notes, setNotes] = useState('');
+  
+  const [isAuthGateOpen, setIsAuthGateOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
   
   useEffect(() => {
     getStoreSettings().then(setStoreSettings).catch(console.error);
@@ -78,19 +83,12 @@ export default function Cart() {
   const appliedPackingCharge = isPickup ? storeSettings.packingCharge : 0;
   const total = Math.max(0, subtotal - totalDiscount + taxes + appliedPackingCharge);
 
-  const handleCheckout = async () => {
+  const initiateCheckout = () => {
     if (cartItems.length === 0) return;
-    if (!cartStore.customerName && !user?.username) {
-      alert("Please enter your name!");
-      return;
-    }
+    
     const finalOrderType = cartStore.orderType || 'PICKUP';
     if (finalOrderType === 'DINE_IN' && !cartStore.tableNumber) {
       alert("Please enter your table number or scan the QR code again.");
-      return;
-    }
-    if ((!user || finalOrderType === 'PICKUP') && !cartStore.customerPhone) {
-      alert("Please enter your mobile number to earn and claim loyalty points.");
       return;
     }
     if (finalOrderType === 'PICKUP' && !cartStore.storeId) {
@@ -98,6 +96,26 @@ export default function Cart() {
       return;
     }
     
+    if (!user) {
+      setIsAuthGateOpen(true);
+    } else {
+      processPayment();
+    }
+  };
+
+  const handleGuestSubmit = (name: string, phone: string) => {
+    cartStore.setCustomerName(name);
+    cartStore.setCustomerPhone(phone);
+    setIsAuthGateOpen(false);
+    setTimeout(() => {
+      processPayment();
+    }, 300);
+  };
+
+  const processPayment = async () => {
+    if (cartItems.length === 0) return;
+    
+    const finalOrderType = cartStore.orderType || 'PICKUP';
     try {
       const { createRazorpayOrder, placeOrder, getUserProfile } = await import('../../api');
       
@@ -329,26 +347,14 @@ export default function Cart() {
             <h3 className="font-heading font-black text-lg text-[#1A0B05]">Order Details</h3>
             
             {!user ? (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">Full Name *</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Jane Doe"
-                    value={cartStore.customerName}
-                    onChange={(e) => cartStore.setCustomerName(e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-semibold text-sm"
-                  />
+              <div className="bg-gradient-to-r from-[#FFFDF8] to-[#FFFBF2] p-5 rounded-2xl border border-[#D4AF37]/30 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-full bg-[#D4AF37] text-[#1A0B05] flex items-center justify-center shrink-0 shadow-sm mt-1">
+                  <span className="font-black">?</span>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">Mobile Number</label>
-                  <input
-                    type="tel"
-                    placeholder="e.g. +91 9876543210"
-                    value={cartStore.customerPhone}
-                    onChange={(e) => cartStore.setCustomerPhone(e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-3.5 outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-semibold text-sm"
-                  />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37] block mb-1">Guest Checkout</span>
+                  <p className="text-xs text-gray-600 font-semibold mb-2">We'll ask for your details in the next step, or you can log in to earn Boba Points!</p>
+                  <button onClick={() => setIsAuthOpen(true)} className="text-xs font-bold text-[#1A0B05] underline">Log in now</button>
                 </div>
               </div>
             ) : (
@@ -396,7 +402,7 @@ export default function Cart() {
             <span className="font-black text-3xl leading-none text-[#1A0B05]">₹{total}</span>
           </div>
           <button 
-            onClick={handleCheckout} 
+            onClick={initiateCheckout} 
             className="flex-1 bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black py-4 rounded-2xl flex justify-center items-center shadow-lg active:scale-[0.98] transition-all uppercase tracking-widest text-sm"
           >
             {cartStore.orderType === 'DINE_IN' ? 'Order' : 'Checkout'}
@@ -583,21 +589,15 @@ export default function Cart() {
                 {/* Customer / Table Input */}
                 <div className="space-y-4 mb-8 pb-8 border-b border-gray-100">
                   {!user ? (
-                    <div className="space-y-4">
-                      <input
-                        type="text"
-                        placeholder="Your Full Name *"
-                        value={cartStore.customerName}
-                        onChange={(e) => cartStore.setCustomerName(e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-semibold text-sm"
-                      />
-                      <input
-                        type="tel"
-                        placeholder="Mobile Number *"
-                        value={cartStore.customerPhone}
-                        onChange={(e) => cartStore.setCustomerPhone(e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-semibold text-sm"
-                      />
+                    <div className="bg-gradient-to-r from-[#FFFDF8] to-[#FFFBF2] p-5 rounded-2xl border border-[#D4AF37]/30 flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-full bg-[#D4AF37] text-[#1A0B05] flex items-center justify-center shrink-0 shadow-sm mt-1">
+                        <span className="font-black">?</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37] block mb-1">Guest Checkout</span>
+                        <p className="text-xs text-gray-600 font-semibold mb-2">We'll ask for your details in the next step.</p>
+                        <button onClick={() => setIsAuthOpen(true)} className="text-xs font-bold text-[#1A0B05] underline hover:text-[#D4AF37]">Log in to earn points</button>
+                      </div>
                     </div>
                   ) : (
                     <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
@@ -648,7 +648,7 @@ export default function Cart() {
                 {/* Luxury Apple Checkout CTA (Desktop) */}
                 <div className="hidden lg:block">
                   <button 
-                    onClick={handleCheckout} 
+                    onClick={initiateCheckout} 
                     className="w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] py-5 rounded-full font-black text-sm uppercase tracking-widest shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-3"
                   >
                     <span>{cartStore.orderType === 'DINE_IN' ? 'Place Order (Pay at Counter)' : 'Proceed to Checkout'}</span>
@@ -660,7 +660,7 @@ export default function Cart() {
             {/* Floating Checkout Bar (Mobile) */}
             <div className="lg:hidden fixed bottom-[72px] left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-[90] safe-pb shadow-[0_-8px_30px_rgba(0,0,0,0.06)]">
               <button 
-                onClick={handleCheckout} 
+                onClick={initiateCheckout} 
                 className="w-full bg-gradient-to-r from-[#1A0B05] to-[#2A1B16] text-[#D4AF37] py-4 rounded-full font-black text-sm uppercase tracking-widest shadow-[0_8px_20px_rgba(26,11,5,0.4)] active:scale-95 flex items-center justify-between px-6 transition-transform"
               >
                 <div className="flex flex-col items-start text-left">
@@ -680,6 +680,22 @@ export default function Cart() {
         )}
 
       </div>
+
+      <CheckoutAuthGate 
+        isOpen={isAuthGateOpen}
+        onClose={() => setIsAuthGateOpen(false)}
+        onLoginClick={() => {
+          setIsAuthGateOpen(false);
+          setTimeout(() => setIsAuthOpen(true), 300);
+        }}
+        onGuestSubmit={handleGuestSubmit}
+        subtotal={subtotal}
+      />
+
+      <AuthModal 
+        isOpen={isAuthOpen} 
+        onClose={() => setIsAuthOpen(false)} 
+      />
 
     </div>
   );

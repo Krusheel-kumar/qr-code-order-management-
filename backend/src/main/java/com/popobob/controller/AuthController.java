@@ -21,58 +21,49 @@ public class AuthController {
     private com.popobob.security.JwtUtil jwtUtil;
 
     @Autowired
-    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
-
-    @Autowired
     private com.popobob.service.LoyaltyService loyaltyService;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
-        String name = body.get("name");
-        String email = body.get("email");
-        String password = body.get("password");
+    @Autowired
+    private com.popobob.service.OtpService otpService;
+
+    @PostMapping("/verify-widget-token")
+    public ResponseEntity<?> verifyWidgetToken(@RequestBody Map<String, String> body) {
+        String token = body.get("token");
         String phoneNumber = body.get("phoneNumber");
 
-        if (userRepository.findByEmailIgnoreCase(email).isPresent()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Email already exists"));
+        if (token == null || phoneNumber == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Token and phone number are required"));
         }
 
-        User user = new User();
-        user.setUsername(name);
-        user.setEmail(email);
-        user.setPhoneNumber(phoneNumber);
-        user.setPasswordHash(passwordEncoder.encode(password)); 
-        user.setRole("USER");
-        user.setLoyaltyPoints(0);
+        boolean isValid = otpService.verifyWidgetToken(token);
+        if (!isValid) {
+            return ResponseEntity.status(401).body(Map.of("message", "Invalid or expired MSG91 Token"));
+        }
 
-        userRepository.save(user);
+        Optional<User> userOpt = userRepository.findByPhoneNumber(phoneNumber);
+        User user;
 
-        // Claim any pending guest rewards using the phone number
+        boolean isNewUser = false;
+        if (userOpt.isPresent()) {
+            user = userOpt.get();
+        } else {
+            // New User Registration
+            isNewUser = true;
+            user = new User();
+            user.setPhoneNumber(phoneNumber);
+            // Default username if missing
+            String name = body.get("name");
+            user.setUsername(name != null && !name.trim().isEmpty() ? name : "Guest User");
+            user.setRole("USER");
+            user.setLoyaltyPoints(0);
+            userRepository.save(user);
+        }
+
+        // Claim pending guest rewards using phone number
         loyaltyService.claimGuestRewards(user.getPhoneNumber(), user);
 
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
-
-        return ResponseEntity.ok(Map.of("user", user, "token", token));
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
-        String email = body.get("email") != null ? body.get("email").trim() : null;
-        String password = body.get("password") != null ? body.get("password").trim() : null;
-
-        Optional<User> userOpt = userRepository.findByEmailIgnoreCase(email);
-
-        if (userOpt.isPresent()) {
-            User user = userOpt.get();
-            if (passwordEncoder.matches(password, user.getPasswordHash())) {
-                // Claim any pending guest rewards on login just in case
-                loyaltyService.claimGuestRewards(user.getPhoneNumber(), user);
-
-                String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
-                return ResponseEntity.ok(Map.of("user", user, "token", token));
-            }
-        }
-        
-        return ResponseEntity.status(401).body(Map.of("message", "Invalid credentials"));
+        // We use phone number as the username in the JWT token
+        String jwtToken = jwtUtil.generateToken(user.getPhoneNumber(), user.getRole());
+        return ResponseEntity.ok(Map.of("user", user, "token", jwtToken, "isNewUser", isNewUser));
     }
 }

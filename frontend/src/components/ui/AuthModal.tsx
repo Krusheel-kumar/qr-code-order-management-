@@ -1,8 +1,18 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Lock, User as UserIcon, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { X, Phone, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
-import { loginUser, registerUser } from '../../api';
+import { verifyWidgetToken } from '../../api';
+
+declare global {
+  interface Window {
+    initSendOTP: (config: any) => void;
+    sendOTP: (phone: string, countryCode: string) => void;
+    verifyOtp: (otp: string | number) => void;
+    verifyOTP: (otp: string) => void;
+    configuration: any;
+  }
+}
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -10,68 +20,146 @@ interface AuthModalProps {
 }
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
-  const [isLogin, setIsLogin] = useState(true);
-  const [isForgot, setIsForgot] = useState(false);
-  const [forgotSent, setForgotSent] = useState(false);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [otp, setOtp] = useState(['', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
+  
   const setUser = useAuthStore(state => state.setUser);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!isOpen) {
+      setStep(1);
+      setPhoneNumber('');
+      setOtp(['', '', '', '']);
+      setError('');
+    } else {
+      // MSG91 SDK is loaded via index.html, we don't initialize here anymore.
+    }
+  }, [isOpen, phoneNumber]);
+
+  const handleRequestOtp = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    if (phoneNumber.length < 10) {
+      setError('Please enter a valid mobile number');
+      return;
+    }
     setError('');
-
+    setLoading(true);
+    
     try {
-      if (isLogin) {
-        const user = await loginUser({ email, password });
-        setUser(user);
-        onClose();
+      let formattedPhone = phoneNumber.replace('+', '');
+      if (!formattedPhone.startsWith('91')) formattedPhone = '91' + formattedPhone;
+
+      window.configuration = {
+        widgetId: "3668656e7541363234303538", 
+        tokenAuth: "557539Tl9kAR3zw36a7347b5P1", 
+        identifier: formattedPhone,
+        exposeMethods: "true",
+        success: async (data: any) => {
+          try {
+            const dataResp = await verifyWidgetToken({ token: data.message, phoneNumber: formattedPhone });
+            setUser(dataResp.user);
+            setLoading(false);
+            if (dataResp.isNewUser) {
+              setStep(3);
+            } else {
+              onClose();
+            }
+          } catch (err: any) {
+            setError(err.message || 'Verification failed on server.');
+            setLoading(false);
+          }
+        },
+        failure: (err: any) => {
+          setError(err.message || 'OTP Verification failed.');
+          setLoading(false);
+        }
+      };
+
+      if (window.initSendOTP) {
+        window.initSendOTP(window.configuration);
+        setStep(2);
+        setTimeout(() => inputRefs.current[0]?.focus(), 100);
       } else {
-        const user = await registerUser({ name, email, password });
-        setUser(user);
-        onClose();
+        setError('MSG91 SDK not loaded yet. Please wait a moment and try again.');
       }
+      setLoading(false);
     } catch (err: any) {
-      setError(err.message || 'Authentication failed. Please try again.');
-    } finally {
+      setError('Failed to initialize OTP widget. Please reload the page.');
       setLoading(false);
     }
   };
 
-  const switchMode = () => {
-    setIsLogin(!isLogin);
-    setIsForgot(false);
-    setForgotSent(false);
-    setError('');
-    setName('');
-  };
-
-  const handleForgotPassword = async (e: React.FormEvent) => {
+  const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
+    const otpCode = otp.join('');
+    if (otpCode.length !== 4) {
+      setError('Please enter the complete 4-digit OTP');
+      return;
+    }
+    setError('');
     setLoading(true);
-    setError('');
-    // Simulate sending reset link (wire to real API when ready)
-    await new Promise(r => setTimeout(r, 1200));
-    setLoading(false);
-    setForgotSent(true);
+
+    try {
+      if (typeof window.verifyOtp === 'function') {
+        window.verifyOtp(otpCode);
+      } else if (typeof window.verifyOTP === 'function') {
+        window.verifyOTP(otpCode);
+      } else {
+        throw new Error("Missing verify function. Available: " + Object.keys(window).filter(k => k.toLowerCase().includes('otp') || k.toLowerCase().includes('verify') || k.toLowerCase().includes('msg91')).join(', '));
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to verify OTP with MSG91.');
+      setLoading(false);
+    }
   };
 
-  const goToForgot = () => {
-    setIsForgot(true);
-    setForgotSent(false);
-    setError('');
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^[0-9]*$/.test(value)) return;
+    
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    // Auto focus next
+    if (value && index < 3) {
+      inputRefs.current[index + 1]?.focus();
+    }
   };
 
-  const goBackToLogin = () => {
-    setIsForgot(false);
-    setForgotSent(false);
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleNameSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (name.trim().length < 2) {
+      setError('Please enter a valid name');
+      return;
+    }
     setError('');
+    setLoading(true);
+    
+    try {
+      const { user } = useAuthStore.getState();
+      if (user && user.id) {
+        // We will add updateUserProfile to api/index.ts
+        const { updateUserProfile } = await import('../../api');
+        const updatedUser = await updateUserProfile(user.id, { username: name });
+        setUser(updatedUser);
+      }
+      onClose();
+    } catch(err: any) {
+      setError(err.message || 'Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -113,21 +201,21 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     className="h-10 w-auto object-contain brightness-0 invert mb-10"
                   />
                   <h2 className="text-white font-black text-3xl xl:text-4xl leading-tight tracking-tight mb-4">
-                  {isForgot ? 'Reset your\npassword.' : isLogin ? 'Good to see\nyou again.' : 'Start your\nluxury journey.'}
-                </h2>
-                <p className="text-white/50 text-sm font-medium leading-relaxed">
-                  {isForgot
-                    ? 'Enter your email and we will send you a link to reset your password right away.'
-                    : isLogin
-                    ? 'Log in to earn Boba Points, track your orders, and reorder your favourites in seconds.'
-                    : 'Create your account and start earning Boba Points on every single order.'}
-                </p>
+                  {step === 1 ? 'Enter your\nmobile number.' : step === 2 ? 'Verify your\nnumber.' : 'What should\nwe call you?'}
+                  </h2>
+                  <p className="text-white/50 text-sm font-medium leading-relaxed">
+                    {step === 1 
+                      ? 'Log in to earn Boba Points, track your orders, and reorder your favourites in seconds.'
+                      : step === 2 
+                      ? `We've sent a 4-digit code to your phone. Enter it to continue.`
+                      : 'Complete your profile to get personalized recommendations and guest rewards.'}
+                  </p>
                 </div>
 
                 {/* Bottom Brand Tagline */}
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-[2px] bg-[#D4AF37]" />
-                  <span className="text-[#D4AF37] text-[10px] font-black uppercase tracking-[0.25em]">
+                  <span className="text-[#D4AF37] text-[10px] font-black uppercase tracking-[0.2em]">
                     Luxury Bubble Tea Co.
                   </span>
                 </div>
@@ -156,11 +244,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
                 {/* Form Header */}
                 <div className="mb-7">
-                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mb-2">
-                    {isForgot ? 'Password Reset' : isLogin ? 'Member Login' : 'Create Account'}
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mb-2 flex items-center gap-2">
+                    <ShieldCheck size={14} /> SECURE LOGIN
                   </p>
                   <h3 className="text-2xl md:text-3xl font-black text-[#1A0B05] tracking-tight leading-tight">
-                    {isForgot ? 'Forgot Password?' : isLogin ? 'Welcome back' : "Join POP O'BOB®"}
+                    {step === 1 ? "Join POP O'BOB®" : step === 2 ? "Enter OTP Code" : "Complete Profile"}
                   </h3>
                 </div>
 
@@ -179,188 +267,150 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 </AnimatePresence>
 
                 {/* ============================================================ */}
-                {/* FORGOT PASSWORD FLOW */}
+                {/* STEP 1: PHONE NUMBER */}
                 {/* ============================================================ */}
-                {isForgot && (
-                  <div className="flex flex-col gap-4 flex-1">
-                    {forgotSent ? (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="flex flex-col items-center justify-center flex-1 text-center gap-4"
-                      >
-                        <div className="w-16 h-16 rounded-full bg-[#D4AF37]/15 flex items-center justify-center mb-2">
-                          <span className="text-3xl">✉️</span>
-                        </div>
-                        <h4 className="text-xl font-black text-[#1A0B05]">Check your inbox</h4>
-                        <p className="text-sm text-gray-500 font-medium max-w-xs leading-relaxed">
-                          We've sent a reset link to <span className="font-bold text-[#1A0B05]">{email}</span>. Check your inbox and follow the instructions.
-                        </p>
-                        <button
-                          onClick={goBackToLogin}
-                          className="mt-4 text-sm font-black text-[#D4AF37] hover:text-[#1A0B05] transition-colors underline underline-offset-2"
-                        >
-                          Back to Log In
-                        </button>
-                      </motion.div>
-                    ) : (
-                      <form onSubmit={handleForgotPassword} className="flex flex-col gap-3.5">
-                        <p className="text-sm text-gray-500 font-medium -mt-3 mb-2 leading-relaxed">
-                          Enter your registered email address and we'll send you a reset link.
-                        </p>
-                        <div className="relative">
-                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={17} />
-                          <input
-                            type="email"
-                            placeholder="Email Address"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] text-sm font-semibold text-[#1A0B05] placeholder:text-gray-400 transition-all"
-                          />
-                        </div>
-                        <button
-                          disabled={loading}
-                          type="submit"
-                          className="mt-1 w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-full py-4 text-sm tracking-wide shadow-lg hover:shadow-[0_8px_24px_rgba(212,175,55,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 disabled:opacity-60 group"
-                        >
-                          {loading ? (
-                            <span className="flex items-center gap-2">
-                              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                              </svg>
-                              Sending...
-                            </span>
-                          ) : (
-                            <><span>Send Reset Link</span><ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" /></>
-                          )}
-                        </button>
+                {step === 1 && (
+                  <form onSubmit={handleRequestOtp} className="flex flex-col gap-3.5 flex-1 justify-center">
+                    <div className="relative">
+                      <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 border-r border-gray-200 pr-3">
+                        <Phone className="text-gray-400" size={17} />
+                        <span className="text-gray-500 font-bold text-sm">+91</span>
+                      </div>
+                      <input
+                        type="tel"
+                        placeholder="Mobile Number"
+                        required
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+                        maxLength={10}
+                        className="w-full bg-white border border-gray-200 rounded-2xl pl-24 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] text-sm font-semibold text-[#1A0B05] placeholder:text-gray-400 transition-all"
+                      />
+                    </div>
+                    
+                    <button
+                      disabled={loading || phoneNumber.length < 10}
+                      type="submit"
+                      className="mt-4 w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-full py-4 text-sm tracking-wide shadow-lg hover:shadow-[0_8px_24px_rgba(212,175,55,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 disabled:opacity-60 group"
+                    >
+                      {loading ? (
+                        <span className="flex items-center gap-2">
+                          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                          </svg>
+                          Sending OTP...
+                        </span>
+                      ) : (
+                        <>
+                          <span>Continue</span>
+                          <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                        </>
+                      )}
+                    </button>
+                  </form>
+                )}
+
+                {/* ============================================================ */}
+                {/* STEP 2: VERIFY OTP */}
+                {/* ============================================================ */}
+                {step === 2 && (
+                  <form onSubmit={handleVerifyOtp} className="flex flex-col gap-3.5 flex-1 justify-center">
+                    <p className="text-sm text-gray-500 font-medium mb-4">
+                      Sent to +91 {phoneNumber} • <button type="button" onClick={() => setStep(1)} className="text-[#D4AF37] hover:text-[#1A0B05] font-bold underline">Edit</button>
+                    </p>
+                    
+                    <div className="flex gap-4 justify-center mb-6">
+                      {otp.map((digit, index) => (
+                        <input
+                          key={index}
+                          ref={(el) => (inputRefs.current[index] = el)}
+                          type="text"
+                          maxLength={1}
+                          value={digit}
+                          onChange={(e) => handleOtpChange(index, e.target.value)}
+                          onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                          className="w-14 h-16 text-center text-2xl font-black bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] transition-all"
+                        />
+                      ))}
+                    </div>
+
+                    <button
+                      disabled={loading || otp.join('').length !== 4}
+                      type="submit"
+                      className="mt-1 w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-full py-4 text-sm tracking-wide shadow-lg hover:shadow-[0_8px_24px_rgba(212,175,55,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 disabled:opacity-60 group"
+                    >
+                      {loading ? (
+                        <span className="flex items-center gap-2">
+                          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                          </svg>
+                          Verifying...
+                        </span>
+                      ) : (
+                        <>
+                          <span>Verify & Login</span>
+                          <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                        </>
+                      )}
+                    </button>
+                    
+                    <div className="mt-6 text-center">
+                      <span className="text-sm text-gray-500 font-medium">
+                        Didn't receive the code?{' '}
                         <button
                           type="button"
-                          onClick={goBackToLogin}
-                          className="text-sm font-bold text-gray-400 hover:text-[#1A0B05] transition-colors text-center mt-1"
+                          onClick={handleRequestOtp}
+                          disabled={loading}
+                          className="text-[#D4AF37] hover:text-[#1A0B05] font-black ml-1 transition-colors disabled:opacity-50"
                         >
-                          ← Back to Log In
+                          Resend OTP
                         </button>
-                      </form>
-                    )}
-                  </div>
-                )}
-
-                {/* ============================================================ */}
-                {/* LOGIN / SIGN UP FLOW */}
-                {/* ============================================================ */}
-                {!isForgot && (
-                <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 flex-1">
-                  {/* Name (Sign Up only) */}
-                  <AnimatePresence>
-                    {!isLogin && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="relative overflow-hidden"
-                      >
-                        <div className="relative">
-                          <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={17} />
-                          <input
-                            type="text"
-                            placeholder="Full Name"
-                            required
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] text-sm font-semibold text-[#1A0B05] placeholder:text-gray-400 transition-all"
-                          />
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Email */}
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={17} />
-                    <input
-                      type="email"
-                      placeholder="Email Address"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] text-sm font-semibold text-[#1A0B05] placeholder:text-gray-400 transition-all"
-                    />
-                  </div>
-
-                  {/* Password */}
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={17} />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Password"
-                      required
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-12 py-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] text-sm font-semibold text-[#1A0B05] placeholder:text-gray-400 transition-all"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors"
-                    >
-                      {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-                    </button>
-                  </div>
-
-                  {/* Forgot Password Link (Login only) */}
-                  {isLogin && (
-                    <div className="flex justify-end -mt-1">
-                      <button
-                        type="button"
-                        onClick={goToForgot}
-                        className="text-xs font-bold text-gray-400 hover:text-[#D4AF37] transition-colors"
-                      >
-                        Forgot password?
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Submit Button */}
-                  <button
-                    disabled={loading}
-                    type="submit"
-                    className="mt-1 w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-full py-4 text-sm tracking-wide shadow-lg hover:shadow-[0_8px_24px_rgba(212,175,55,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 disabled:opacity-60 group"
-                  >
-                    {loading ? (
-                      <span className="flex items-center gap-2">
-                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                        </svg>
-                        Processing...
                       </span>
-                    ) : (
-                      <>
-                        <span>{isLogin ? 'Log In' : 'Create Account'}</span>
-                        <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                      </>
-                    )}
-                  </button>
-                </form>
+                    </div>
+                  </form>
                 )}
 
-                {/* Switch Mode */}
-                <div className="mt-6 text-center">
-                  <span className="text-sm text-gray-500 font-medium">
-                    {isLogin ? "Don't have an account? " : 'Already a member? '}
+                {/* ============================================================ */}
+                {/* STEP 3: NAME REGISTRATION */}
+                {/* ============================================================ */}
+                {step === 3 && (
+                  <form onSubmit={handleNameSubmit} className="flex flex-col gap-3.5 flex-1 justify-center">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Your Full Name"
+                        required
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] text-sm font-semibold text-[#1A0B05] placeholder:text-gray-400 transition-all"
+                      />
+                    </div>
+                    
                     <button
-                      onClick={switchMode}
-                      className="text-[#D4AF37] hover:text-[#1A0B05] font-black ml-1 transition-colors"
+                      disabled={loading || name.trim().length < 2}
+                      type="submit"
+                      className="mt-4 w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-full py-4 text-sm tracking-wide shadow-lg hover:shadow-[0_8px_24px_rgba(212,175,55,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 disabled:opacity-60 group"
                     >
-                      {isLogin ? 'Sign Up' : 'Log In'}
+                      {loading ? (
+                        <span className="flex items-center gap-2">
+                          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                          </svg>
+                          Saving...
+                        </span>
+                      ) : (
+                        <>
+                          <span>Complete Profile</span>
+                          <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                        </>
+                      )}
                     </button>
-                  </span>
-                </div>
+                  </form>
+                )}
+                
               </div>
-
             </div>
           </motion.div>
         </>
