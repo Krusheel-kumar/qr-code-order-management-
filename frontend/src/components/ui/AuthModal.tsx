@@ -172,7 +172,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/70 backdrop-blur-md z-[200]"
+            className="fixed inset-0 bg-black/70 backdrop-blur-md z-[10000]"
           />
 
             {/* Modal Container */}
@@ -181,7 +181,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 40 }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed inset-0 z-[201] flex items-end md:items-center justify-center pointer-events-none p-0 md:p-6"
+              className="fixed inset-0 z-[10001] flex items-end md:items-center justify-center pointer-events-none p-0 md:p-6"
             >
               <div className="pointer-events-auto w-full md:max-w-[420px] bg-white md:rounded-[2rem] rounded-t-[2rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.15)] flex flex-col relative pb-safe">
                 
