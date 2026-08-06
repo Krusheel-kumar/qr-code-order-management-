@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, X, UserCircle2, ShieldCheck } from 'lucide-react';
+import { X, User, ArrowRight, Gift } from 'lucide-react';
 import { useCartStore } from '../../store/useCartStore';
 
 interface CheckoutAuthGateProps {
@@ -49,80 +49,74 @@ export default function CheckoutAuthGate({ isOpen, onClose, onLoginClick, onGues
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center p-0 sm:p-6">
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
-          className="absolute inset-0 bg-[#1A0B05]/60 backdrop-blur-sm"
+          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         />
         
         <motion.div 
-          initial={{ y: "100%", opacity: 0.5 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: "100%", opacity: 0 }}
-          transition={{ type: "spring", damping: 25, stiffness: 200 }}
-          className="w-full sm:max-w-md bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] overflow-hidden shadow-2xl relative z-10 max-h-[90vh] flex flex-col"
+          initial={{ y: 40, opacity: 0, scale: 0.96 }}
+          animate={{ y: 0, opacity: 1, scale: 1 }}
+          exit={{ y: 40, opacity: 0, scale: 0.96 }}
+          transition={{ type: "spring", damping: 30, stiffness: 300 }}
+          className="w-full sm:max-w-[420px] bg-white rounded-t-[2rem] sm:rounded-[2rem] overflow-hidden shadow-2xl relative z-10 max-h-[90vh] flex flex-col pb-safe"
         >
-          {/* Header */}
-          <div className="flex justify-between items-center p-6 pb-2 relative z-20">
-            <h3 className="font-heading font-black text-2xl text-[#1A0B05] tracking-tight">
-              {!isGuestForm ? 'Almost there!' : 'Guest Details'}
-            </h3>
-            <button 
-              onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors"
-            >
-              <X size={18} />
-            </button>
+          {/* Drag Handle (Mobile) */}
+          <div className="w-full flex justify-center pt-4 pb-2 sm:hidden">
+            <div className="w-12 h-1.5 bg-gray-200 rounded-full"></div>
           </div>
 
-          <div className="p-6 pt-2 pb-8 overflow-y-auto custom-scrollbar">
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full text-gray-500 hover:text-gray-800 transition-colors z-10"
+          >
+            <X size={16} />
+          </button>
+
+          <div className="p-8 pt-4 overflow-y-auto custom-scrollbar">
             {!isGuestForm ? (
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 className="space-y-6"
               >
-                {/* Value Proposition Box */}
-                <div className="bg-gradient-to-br from-[#FFFDF8] to-[#FFFBF2] rounded-[2rem] p-6 border border-[#D4AF37]/30 shadow-sm relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#D4AF37]/20 to-transparent rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
-                  
-                  <div className="flex items-start gap-4 relative z-10">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#D4AF37] to-[#FFC461] flex items-center justify-center text-white shrink-0 shadow-md">
-                      <Sparkles size={24} className="fill-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-black text-xl text-[#1A0B05] leading-tight mb-1">
-                        Unlock Your Rewards
-                      </h4>
-                      <p className="text-sm font-semibold text-gray-600 mb-3">
-                        Log in now to earn <span className="text-[#D4AF37] font-black">{potentialPoints} Boba Points</span> on this order.
-                      </p>
-                      <div className="inline-flex items-center gap-1.5 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-full border border-[#D4AF37]/20 text-[11px] font-bold text-gray-500 uppercase tracking-widest shadow-sm">
-                        <ShieldCheck size={14} className="text-emerald-500" /> Secure 1-Tap Login
-                      </div>
+                {/* Header Text */}
+                <div className="text-center mb-8">
+                  <div className="w-16 h-16 bg-gradient-to-br from-[#FFFBF2] to-[#FFF0D4] rounded-full flex items-center justify-center text-[#D4AF37] shadow-sm border border-[#D4AF37]/20 mx-auto mb-4 relative">
+                    <Gift size={28} />
+                    <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-md animate-pulse">
+                      +{potentialPoints}
                     </div>
                   </div>
+                  <h3 className="text-2xl font-black text-[#1A0B05] tracking-tight leading-tight mb-2">
+                    Wait, Claim Your Points!
+                  </h3>
+                  <p className="text-sm font-medium text-gray-500 px-4">
+                    You can earn <span className="bg-[#FFF8E7] text-[#B8860B] font-black px-2 py-0.5 rounded-md border border-[#D4AF37]/30 inline-block transform -rotate-1">{potentialPoints} Boba Points</span> on this order.
+                  </p>
                 </div>
 
                 {/* Actions */}
-                <div className="space-y-3 pt-2">
+                <div className="space-y-4">
                   <button 
                     onClick={onLoginClick}
-                    className="w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-3"
+                    className="w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] border-2 border-[#1A0B05] hover:border-[#D4AF37] py-4 rounded-2xl font-black text-sm tracking-widest uppercase transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-sm group"
                   >
-                    <UserCircle2 size={20} />
-                    <span>Join Rewards / Sign In</span>
+                    <User size={18} className="group-hover:scale-110 transition-transform" />
+                    <span>Sign Up / Log In</span>
                   </button>
                   
                   <button 
                     onClick={() => setIsGuestForm(true)}
-                    className="w-full bg-white text-gray-400 hover:text-gray-600 border border-gray-200 hover:border-gray-300 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5"
+                    className="w-full bg-white text-gray-500 hover:text-[#1A0B05] border-2 border-gray-200 hover:border-gray-300 py-4 rounded-2xl font-black text-sm tracking-widest uppercase transition-all active:scale-[0.98] flex flex-col items-center justify-center gap-1 shadow-sm"
                   >
-                    <span>Continue as Guest</span>
-                    <span className="text-[9px] font-bold text-red-400/80 tracking-normal lowercase">(lose {potentialPoints} points)</span>
+                    <span>Checkout as Guest</span>
+                    <span className="text-[9px] font-bold text-red-400 tracking-normal capitalize">You will forfeit {potentialPoints} points</span>
                   </button>
                 </div>
               </motion.div>
@@ -130,56 +124,76 @@ export default function CheckoutAuthGate({ isOpen, onClose, onLoginClick, onGues
               <motion.div 
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="space-y-5"
+                className="flex flex-col h-full"
               >
-                <p className="text-sm font-semibold text-gray-500">
-                  Please provide your details so we know who to give this delicious boba to!
-                </p>
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-black text-[#1A0B05] tracking-tight leading-tight mb-2">
+                    Guest Details
+                  </h3>
+                  <p className="text-sm font-medium text-gray-500">
+                    Who should we make this order for?
+                  </p>
+                </div>
 
-                <form onSubmit={handleGuestSubmit} className="space-y-4 pt-2">
-                  <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">Full Name *</label>
+                <form onSubmit={handleGuestSubmit} className="space-y-4">
+                  <div className="relative group">
                     <input
                       type="text"
-                      placeholder="e.g. Jane Doe"
+                      placeholder="Your Full Name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-semibold text-sm"
+                      className="w-full bg-gray-50/50 border border-gray-200 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:bg-white text-base font-bold text-[#1A0B05] placeholder:text-gray-400 placeholder:font-medium transition-all"
                       autoFocus
                     />
                   </div>
-                  <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">Mobile Number {cartStore.orderType === 'DINE_IN' ? '(Optional)' : '*'}</label>
+
+                  <div className="relative group">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 border-r border-gray-200 pr-3 transition-colors group-focus-within:border-gray-900">
+                      <span className="text-gray-800 font-bold text-sm">+91</span>
+                    </div>
                     <input
                       type="tel"
-                      placeholder="e.g. +91 9876543210"
+                      placeholder={`Mobile Number ${cartStore.orderType === 'DINE_IN' ? '(Optional)' : ''}`}
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="w-full bg-white border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-semibold text-sm"
+                      onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                      maxLength={10}
+                      className="w-full bg-gray-50/50 border border-gray-200 rounded-2xl pl-20 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:bg-white text-base font-bold text-[#1A0B05] placeholder:text-gray-400 placeholder:font-medium transition-all"
                     />
-                    <p className="text-[10px] font-semibold text-gray-400 mt-1.5 px-1">
+                  </div>
+                  {cartStore.orderType !== 'DINE_IN' && (
+                    <p className="text-[11px] font-bold text-gray-400 mt-1 px-1 text-center">
                       We'll use this to send you order tracking updates.
                     </p>
-                  </div>
-
-                  {error && (
-                    <div className="bg-red-50 text-red-500 p-3 rounded-xl text-xs font-bold text-center border border-red-100">
-                      {error}
-                    </div>
                   )}
+
+                  <AnimatePresence>
+                    {error && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                        animate={{ opacity: 1, height: 'auto', marginBottom: 16 }}
+                        exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="bg-red-50 text-red-500 px-4 py-3 rounded-xl text-xs font-bold text-center border border-red-100">
+                          {error}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
 
                   <div className="pt-4 space-y-3">
                     <button 
                       type="submit"
-                      className="w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-2"
+                      className="w-full bg-[#1A0B05] text-white hover:bg-gray-800 py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-md transition-all flex items-center justify-center gap-2"
                     >
-                      Proceed to Payment ➔
+                      <span>Proceed to Payment</span>
+                      <ArrowRight size={16} />
                     </button>
                     
                     <button 
                       type="button"
                       onClick={() => setIsGuestForm(false)}
-                      className="w-full bg-transparent text-gray-400 hover:text-gray-600 py-3 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all"
+                      className="w-full text-gray-400 hover:text-[#1A0B05] py-3 rounded-2xl font-bold text-xs uppercase tracking-widest transition-colors"
                     >
                       Back
                     </button>

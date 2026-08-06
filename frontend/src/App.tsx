@@ -16,6 +16,7 @@ import OrderTracking from './pages/customer/OrderTracking';
 import OrderCenter from './pages/customer/OrderCenter';
 import Profile from './pages/customer/Profile';
 import OrderReceipt from './pages/customer/OrderReceipt';
+import ProcessingSuccess from './pages/customer/ProcessingSuccess';
 
 import AIChatScreen from './pages/customer/chat/AIChatScreen';
 
@@ -151,6 +152,7 @@ function App() {
           <Route path="/quiz" element={<AIChatScreen />} />
           
           {/* Order Lifecycle */}
+          <Route path="/processing" element={<ProcessingSuccess />} />
           <Route path="/tracking/:id" element={<OrderTracking />} />
           <Route path="/receipt/:id" element={<OrderReceipt />} />
 

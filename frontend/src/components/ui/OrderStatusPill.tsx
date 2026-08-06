@@ -11,7 +11,7 @@ export default function OrderStatusPill() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
-  if ((activeOrders.length === 0 && recentOrders.length === 0) || !user) return null;
+  if (activeOrders.length === 0 && recentOrders.length === 0) return null;
 
   // Handle Multi-Order UI
   if (activeOrders.length > 1) {

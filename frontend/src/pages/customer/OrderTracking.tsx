@@ -90,6 +90,13 @@ export default function OrderTracking() {
               <h2 className="font-heading font-extrabold text-[28px] leading-tight mb-2 tracking-tight">
                 Order Confirmed! 🎉
               </h2>
+              {orderData?.createdAt && (
+                <p className="text-[#D4AF37] text-xs font-black uppercase tracking-widest mb-2">
+                  {new Date(orderData.createdAt).toLocaleString('en-US', { 
+                    month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true 
+                  })}
+                </p>
+              )}
               <p className="text-[#6B7280] text-sm font-medium leading-relaxed px-4">
                 We've received your order and it's being prepared with love! ❤️
               </p>

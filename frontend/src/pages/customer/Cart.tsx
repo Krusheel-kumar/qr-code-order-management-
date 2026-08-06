@@ -7,6 +7,8 @@ import { useOrderStore } from '../../store/useOrderStore';
 import { getStoreSettings } from '../../api';
 import CheckoutAuthGate from '../../components/ui/CheckoutAuthGate';
 import AuthModal from '../../components/ui/AuthModal';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CheckCircle2, Sparkles } from 'lucide-react';
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -26,6 +28,10 @@ export default function Cart() {
   
   const [isAuthGateOpen, setIsAuthGateOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [successData, setSuccessData] = useState<{ orderId: string, earnedPoints: number } | null>(null);
   
   useEffect(() => {
     getStoreSettings().then(setStoreSettings).catch(console.error);
@@ -112,14 +118,17 @@ export default function Cart() {
     }, 300);
   };
 
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+
   const processPayment = async () => {
     if (cartItems.length === 0) return;
+    setPaymentError(null);
     
     const finalOrderType = cartStore.orderType || 'PICKUP';
     try {
-      const { createRazorpayOrder, placeOrder, getUserProfile } = await import('../../api');
+      const { createRazorpayOrder } = await import('../../api');
       
-      const processOrder = async (paymentRef: string, status: string) => {
+      const compilePayloadAndNavigate = (paymentRef: string, status: string) => {
           const orderPayload: any = {
             customerName: cartStore.customerName || user?.username,
             customerPhone: cartStore.customerPhone,
@@ -142,22 +151,13 @@ export default function Cart() {
           };
           
           if (user) orderPayload.userId = user.id;
-          const result = await placeOrder(orderPayload);
           
-          if (user) {
-             try {
-               const updatedUser = await getUserProfile(user.id);
-               if (updatedUser) useAuthStore.getState().setUser(updatedUser);
-             } catch (e) {}
-          }
-          
-          cartStore.clearCart();
-          useOrderStore.getState().addOrder(result.id);
-          navigate(`/tracking/${result.id}`);
+          // Instantly navigate to processing screen without clearing cart yet
+          navigate('/processing', { state: { orderPayload, cartTotal: total }, replace: true });
       };
 
       if (cartStore.orderType === 'DINE_IN') {
-          await processOrder("PAY_AT_COUNTER", "PENDING");
+          compilePayloadAndNavigate("PAY_AT_COUNTER", "PENDING");
       } else {
           const rzpOrder = await createRazorpayOrder(total);
           const options = {
@@ -167,13 +167,8 @@ export default function Cart() {
               name: "POP O'BOB®",
               description: 'Premium Pickup Order',
               order_id: rzpOrder.id,
-              handler: async function (response: any) {
-                  try {
-                      await processOrder(response.razorpay_payment_id, "PAID");
-                  } catch (error: any) {
-                      console.error(error);
-                      alert("Payment succeeded but order placement failed! Please contact staff.");
-                  }
+              handler: function (response: any) {
+                  compilePayloadAndNavigate(response.razorpay_payment_id, "PAID");
               },
               prefill: {
                   name: cartStore.customerName || user?.username || '',
@@ -184,13 +179,13 @@ export default function Cart() {
           };
           const rzp = new (window as any).Razorpay(options);
           rzp.on('payment.failed', function (response: any) {
-              alert("Payment Failed! " + response.error.description);
+              setPaymentError("Payment was not completed. Please try again.");
           });
           rzp.open();
       }
     } catch (error: any) {
       console.error("Failed to initialize payment", error);
-      alert("Could not connect to payment gateway or backend.");
+      setPaymentError("Could not connect to payment gateway. Please try again.");
     }
   };
 
@@ -344,6 +339,11 @@ export default function Cart() {
           </div>
 
           <div className="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-sm space-y-5">
+            {paymentError && (
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-2">
+                <span className="text-xl">⚠️</span> {paymentError}
+              </div>
+            )}
             <h3 className="font-heading font-black text-lg text-[#1A0B05]">Order Details</h3>
             
             {!user ? (
@@ -619,6 +619,11 @@ export default function Cart() {
 
                 {/* Price Breakdown */}
                 <div className="space-y-4 text-sm mb-8 font-medium">
+                  {paymentError && (
+                    <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm font-bold flex items-center gap-2 mb-4">
+                      <span className="text-xl">⚠️</span> {paymentError}
+                    </div>
+                  )}
                   <div className="flex justify-between text-gray-600">
                     <span>Item Total</span>
                     <span className="text-[#1A0B05] font-bold">₹{subtotal}</span>
@@ -665,7 +670,7 @@ export default function Cart() {
               >
                 <div className="flex flex-col items-start text-left">
                   <span className="text-[10px] text-white/70">Total to Pay</span>
-                  <span className="text-lg leading-none">₹{total}</span>
+                  <span className="text-lg leading-none lining-nums tabular-nums">₹{total}</span>
                 </div>
                 <span className="flex items-center gap-2">
                   {cartStore.orderType === 'DINE_IN' ? 'Place Order' : 'Checkout'}
@@ -679,6 +684,86 @@ export default function Cart() {
           </div>
         )}
 
+        <AnimatePresence>
+          {isSuccess && successData && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[9999] bg-[#1A0B05] flex flex-col items-center justify-center p-6 text-center"
+            >
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", damping: 15, stiffness: 200, delay: 0.1 }}
+                className="w-32 h-32 bg-green-500 rounded-full flex items-center justify-center mb-8 shadow-[0_0_60px_rgba(34,197,94,0.4)]"
+              >
+                <CheckCircle2 size={64} className="text-white" />
+              </motion.div>
+              
+              <motion.h2 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="text-4xl font-black text-white mb-4 tracking-tight"
+              >
+                Order Confirmed!
+              </motion.h2>
+              
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="text-lg text-gray-400 mb-8 font-medium"
+              >
+                Your order is being sent to the kitchen.
+              </motion.p>
+              
+              {user ? (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.8, type: "spring" }}
+                  className="bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 border border-[#D4AF37]/30 rounded-3xl p-6 flex items-center gap-4 max-w-sm w-full relative overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#FFFBF2] to-[#FFF0D4] rounded-full flex items-center justify-center shadow-lg shrink-0 relative z-10">
+                    <Sparkles size={24} className="text-[#D4AF37]" />
+                  </div>
+                  <div className="text-left relative z-10">
+                    <p className="text-[11px] font-black uppercase tracking-widest text-[#D4AF37] mb-1">Rewards Unlocked</p>
+                    <p className="text-xl font-bold text-white"><span className="text-[#D4AF37]">+{successData.earnedPoints}</span> Boba Points</p>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.8, type: "spring" }}
+                  className="bg-white/5 border border-white/10 rounded-3xl p-5 flex flex-col items-center text-center gap-1.5 max-w-sm w-full"
+                >
+                  <p className="text-sm font-bold text-white/70">You missed out on <span className="text-[#D4AF37] font-black">{successData.earnedPoints} points</span>!</p>
+                  <p className="text-[11px] font-medium text-white/40">Create an account next time to earn rewards on every order.</p>
+                </motion.div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {isProcessingPayment && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[9999] bg-[#1A0B05]/80 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center"
+            >
+              <div className="w-16 h-16 border-4 border-[#D4AF37]/20 border-t-[#D4AF37] rounded-full animate-spin mb-6"></div>
+              <h3 className="text-2xl font-black text-white mb-2 tracking-tight">Confirming Order...</h3>
+              <p className="text-sm text-gray-400 font-medium">Please wait, do not close this page.</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <CheckoutAuthGate 

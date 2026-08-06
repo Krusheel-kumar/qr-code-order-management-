@@ -175,244 +175,214 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             className="fixed inset-0 bg-black/70 backdrop-blur-md z-[200]"
           />
 
-          {/* Modal Container */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 20 }}
-            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="fixed inset-0 z-[201] flex items-end md:items-center justify-center pointer-events-none px-0 md:px-4"
-          >
-            <div className="pointer-events-auto w-full md:max-w-[900px] md:h-[540px] bg-white md:rounded-[2.5rem] overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.25)] flex flex-col md:flex-row rounded-t-[2rem]">
-
-              {/* ========================================================================= */}
-              {/* LEFT PANEL — Brand Identity (Desktop Only) */}
-              {/* ========================================================================= */}
-              <div className="hidden md:flex md:w-[42%] flex-col justify-between p-10 xl:p-12 relative overflow-hidden bg-[#1A0B05]">
-                {/* Rich warm texture background blobs */}
-                <div className="absolute -top-20 -left-20 w-72 h-72 bg-[#D4AF37]/20 rounded-full blur-[80px] pointer-events-none" />
-                <div className="absolute -bottom-20 -right-10 w-64 h-64 bg-[#FFC461]/15 rounded-full blur-[80px] pointer-events-none" />
-
-                {/* Logo Area */}
-                <div>
-                  <img
-                    src="/assets/horizontal_logo.png"
-                    alt="POP O'BOB® Logo"
-                    className="h-10 w-auto object-contain brightness-0 invert mb-10"
-                  />
-                  <h2 className="text-white font-black text-3xl xl:text-4xl leading-tight tracking-tight mb-4">
-                  {step === 1 ? 'Enter your\nmobile number.' : step === 2 ? 'Verify your\nnumber.' : 'What should\nwe call you?'}
-                  </h2>
-                  <p className="text-white/50 text-sm font-medium leading-relaxed">
-                    {step === 1 
-                      ? 'Log in to earn Boba Points, track your orders, and reorder your favourites in seconds.'
-                      : step === 2 
-                      ? `We've sent a 4-digit code to your phone. Enter it to continue.`
-                      : 'Complete your profile to get personalized recommendations and guest rewards.'}
-                  </p>
+            {/* Modal Container */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 40 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 40 }}
+              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+              className="fixed inset-0 z-[201] flex items-end md:items-center justify-center pointer-events-none p-0 md:p-6"
+            >
+              <div className="pointer-events-auto w-full md:max-w-[420px] bg-white md:rounded-[2rem] rounded-t-[2rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.15)] flex flex-col relative pb-safe">
+                
+                {/* Drag Handle (Mobile) */}
+                <div className="w-full flex justify-center pt-4 pb-2 md:hidden">
+                  <div className="w-12 h-1.5 bg-gray-200 rounded-full"></div>
                 </div>
 
-                {/* Bottom Brand Tagline */}
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-[2px] bg-[#D4AF37]" />
-                  <span className="text-[#D4AF37] text-[10px] font-black uppercase tracking-[0.2em]">
-                    Luxury Bubble Tea Co.
-                  </span>
-                </div>
-              </div>
-
-              {/* ========================================================================= */}
-              {/* RIGHT PANEL — Form */}
-              {/* ========================================================================= */}
-              <div className="flex-1 flex flex-col justify-between bg-[#FDFCF9] p-7 md:p-10 xl:p-12 relative">
                 {/* Close Button */}
                 <button
                   onClick={onClose}
-                  className="absolute top-5 right-5 md:top-7 md:right-7 w-9 h-9 flex items-center justify-center bg-black/5 hover:bg-black/10 rounded-full text-gray-500 hover:text-gray-800 transition-colors z-10"
+                  className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center bg-gray-50 hover:bg-gray-100 rounded-full text-gray-500 hover:text-gray-800 transition-colors z-10"
                 >
-                  <X size={18} />
+                  <X size={16} />
                 </button>
 
-                {/* Mobile Brand Header */}
-                <div className="md:hidden mb-6">
-                  <img
-                    src="/assets/horizontal_logo.png"
-                    alt="POP O'BOB® Logo"
-                    className="h-8 w-auto object-contain mb-3"
-                  />
-                </div>
-
-                {/* Form Header */}
-                <div className="mb-7">
-                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mb-2 flex items-center gap-2">
-                    <ShieldCheck size={14} /> SECURE LOGIN
-                  </p>
-                  <h3 className="text-2xl md:text-3xl font-black text-[#1A0B05] tracking-tight leading-tight">
-                    {step === 1 ? "Join POP O'BOB®" : step === 2 ? "Enter OTP Code" : "Complete Profile"}
-                  </h3>
-                </div>
-
-                {/* Error Message */}
-                <AnimatePresence>
-                  {error && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      className="mb-5 text-xs font-bold text-red-600 bg-red-50 border border-red-100 px-4 py-3 rounded-xl"
-                    >
-                      {error}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* ============================================================ */}
-                {/* STEP 1: PHONE NUMBER */}
-                {/* ============================================================ */}
-                {step === 1 && (
-                  <form onSubmit={handleRequestOtp} className="flex flex-col gap-3.5 flex-1 justify-center">
-                    <div className="relative">
-                      <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 border-r border-gray-200 pr-3">
-                        <Phone className="text-gray-400" size={17} />
-                        <span className="text-gray-500 font-bold text-sm">+91</span>
-                      </div>
-                      <input
-                        type="tel"
-                        placeholder="Mobile Number"
-                        required
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                        maxLength={10}
-                        className="w-full bg-white border border-gray-200 rounded-2xl pl-24 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] text-sm font-semibold text-[#1A0B05] placeholder:text-gray-400 transition-all"
-                      />
+                <div className="p-8 pt-4 md:pt-10 flex flex-col">
+                  {/* Icon Header */}
+                  <div className="mb-6 flex justify-center">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FFFBF2] to-[#FFF0D4] border border-[#D4AF37]/20 flex items-center justify-center shadow-sm relative">
+                      <div className="absolute inset-0 bg-white/40 backdrop-blur-sm rounded-2xl"></div>
+                      <ShieldCheck className="text-[#D4AF37] relative z-10" size={28} />
                     </div>
-                    
-                    <button
-                      disabled={loading || phoneNumber.length < 10}
-                      type="submit"
-                      className="mt-4 w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-full py-4 text-sm tracking-wide shadow-lg hover:shadow-[0_8px_24px_rgba(212,175,55,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 disabled:opacity-60 group"
-                    >
-                      {loading ? (
-                        <span className="flex items-center gap-2">
-                          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                          </svg>
-                          Sending OTP...
-                        </span>
-                      ) : (
-                        <>
-                          <span>Continue</span>
-                          <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                        </>
-                      )}
-                    </button>
-                  </form>
-                )}
+                  </div>
 
-                {/* ============================================================ */}
-                {/* STEP 2: VERIFY OTP */}
-                {/* ============================================================ */}
-                {step === 2 && (
-                  <form onSubmit={handleVerifyOtp} className="flex flex-col gap-3.5 flex-1 justify-center">
-                    <p className="text-sm text-gray-500 font-medium mb-4">
-                      Sent to +91 {phoneNumber} • <button type="button" onClick={() => setStep(1)} className="text-[#D4AF37] hover:text-[#1A0B05] font-bold underline">Edit</button>
+                  {/* Form Header */}
+                  <div className="mb-8 text-center">
+                    <h3 className="text-2xl font-black text-[#1A0B05] tracking-tight leading-tight mb-2">
+                      {step === 1 ? "Welcome to POP O'BOB" : step === 2 ? "Verify Your Number" : "Complete Profile"}
+                    </h3>
+                    <p className="text-sm font-medium text-gray-500 leading-relaxed px-4">
+                      {step === 1 
+                        ? 'Enter your mobile number to securely log in or join our rewards program.'
+                        : step === 2 
+                        ? <>Enter the 4-digit code sent to <br/><span className="font-bold text-[#1A0B05]">+91 {phoneNumber}</span></>
+                        : 'Almost there! What should we call you?'}
                     </p>
-                    
-                    <div className="flex gap-4 justify-center mb-6">
-                      {otp.map((digit, index) => (
-                        <input
-                          key={index}
-                          ref={(el) => (inputRefs.current[index] = el)}
-                          type="text"
-                          maxLength={1}
-                          value={digit}
-                          onChange={(e) => handleOtpChange(index, e.target.value)}
-                          onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                          className="w-14 h-16 text-center text-2xl font-black bg-white border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] transition-all"
-                        />
-                      ))}
-                    </div>
+                  </div>
 
-                    <button
-                      disabled={loading || otp.join('').length !== 4}
-                      type="submit"
-                      className="mt-1 w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-full py-4 text-sm tracking-wide shadow-lg hover:shadow-[0_8px_24px_rgba(212,175,55,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 disabled:opacity-60 group"
-                    >
-                      {loading ? (
-                        <span className="flex items-center gap-2">
-                          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                          </svg>
-                          Verifying...
-                        </span>
-                      ) : (
-                        <>
-                          <span>Verify & Login</span>
-                          <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                        </>
-                      )}
-                    </button>
-                    
-                    <div className="mt-6 text-center">
-                      <span className="text-sm text-gray-500 font-medium">
-                        Didn't receive the code?{' '}
+                  {/* Error Message */}
+                  <AnimatePresence>
+                    {error && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                        animate={{ opacity: 1, height: 'auto', marginBottom: 20 }}
+                        exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="text-xs font-bold text-red-600 bg-red-50 border border-red-100 px-4 py-3 rounded-xl text-center">
+                          {error}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* ============================================================ */}
+                  {/* STEP 1: PHONE NUMBER */}
+                  {/* ============================================================ */}
+                  {step === 1 && (
+                    <form onSubmit={handleRequestOtp} className="flex flex-col gap-4">
+                      <div className="relative group">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 border-r border-gray-200 pr-3 transition-colors group-focus-within:border-[#D4AF37]/30">
+                          <span className="text-gray-800 font-bold text-sm">+91</span>
+                        </div>
+                        <input
+                          type="tel"
+                          placeholder="Mobile Number"
+                          required
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+                          maxLength={10}
+                          className="w-full bg-gray-50/50 border border-gray-200 rounded-2xl pl-20 pr-4 py-4 focus:outline-none focus:ring-4 focus:ring-[#D4AF37]/10 focus:border-[#D4AF37] focus:bg-white text-base font-bold text-[#1A0B05] placeholder:text-gray-400 placeholder:font-medium transition-all"
+                        />
+                      </div>
+                      
+                      <button
+                        disabled={loading || phoneNumber.length < 10}
+                        type="submit"
+                        className="w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-2xl py-4.5 text-sm tracking-widest uppercase shadow-lg shadow-[#1A0B05]/10 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none mt-2"
+                      >
+                        {loading ? (
+                          <span className="flex items-center gap-2">
+                            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                            </svg>
+                            Sending...
+                          </span>
+                        ) : (
+                          <>
+                            <span>Continue</span>
+                            <ArrowRight size={16} />
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  )}
+
+                  {/* ============================================================ */}
+                  {/* STEP 2: VERIFY OTP */}
+                  {/* ============================================================ */}
+                  {step === 2 && (
+                    <form onSubmit={handleVerifyOtp} className="flex flex-col gap-5">
+                      <div className="flex gap-3 justify-center mb-2">
+                        {otp.map((digit, index) => (
+                          <input
+                            key={index}
+                            ref={(el) => (inputRefs.current[index] = el)}
+                            type="text"
+                            maxLength={1}
+                            value={digit}
+                            onChange={(e) => handleOtpChange(index, e.target.value)}
+                            onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                            className="w-14 h-16 text-center text-2xl font-black bg-gray-50/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#D4AF37]/10 focus:border-[#D4AF37] focus:bg-white text-[#1A0B05] transition-all shadow-sm"
+                          />
+                        ))}
+                      </div>
+
+                      <button
+                        disabled={loading || otp.join('').length !== 4}
+                        type="submit"
+                        className="w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-2xl py-4.5 text-sm tracking-widest uppercase shadow-lg shadow-[#1A0B05]/10 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
+                      >
+                        {loading ? (
+                          <span className="flex items-center gap-2">
+                            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                            </svg>
+                            Verifying...
+                          </span>
+                        ) : (
+                          <>
+                            <span>Verify & Login</span>
+                            <ArrowRight size={16} />
+                          </>
+                        )}
+                      </button>
+                      
+                      <div className="text-center mt-2 flex flex-col gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setStep(1)}
+                          className="text-xs text-gray-500 font-bold hover:text-[#1A0B05] transition-colors"
+                        >
+                          Change Mobile Number
+                        </button>
                         <button
                           type="button"
                           onClick={handleRequestOtp}
                           disabled={loading}
-                          className="text-[#D4AF37] hover:text-[#1A0B05] font-black ml-1 transition-colors disabled:opacity-50"
+                          className="text-xs text-[#D4AF37] font-bold hover:text-[#1A0B05] transition-colors disabled:opacity-50"
                         >
-                          Resend OTP
+                          Resend OTP Code
                         </button>
-                      </span>
-                    </div>
-                  </form>
-                )}
+                      </div>
+                    </form>
+                  )}
 
-                {/* ============================================================ */}
-                {/* STEP 3: NAME REGISTRATION */}
-                {/* ============================================================ */}
-                {step === 3 && (
-                  <form onSubmit={handleNameSubmit} className="flex flex-col gap-3.5 flex-1 justify-center">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="Your Full Name"
-                        required
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="w-full bg-white border border-gray-200 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] text-sm font-semibold text-[#1A0B05] placeholder:text-gray-400 transition-all"
-                      />
-                    </div>
-                    
-                    <button
-                      disabled={loading || name.trim().length < 2}
-                      type="submit"
-                      className="mt-4 w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-full py-4 text-sm tracking-wide shadow-lg hover:shadow-[0_8px_24px_rgba(212,175,55,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 disabled:opacity-60 group"
-                    >
-                      {loading ? (
-                        <span className="flex items-center gap-2">
-                          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
-                          </svg>
-                          Saving...
-                        </span>
-                      ) : (
-                        <>
-                          <span>Complete Profile</span>
-                          <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                        </>
-                      )}
-                    </button>
-                  </form>
-                )}
-                
+                  {/* ============================================================ */}
+                  {/* STEP 3: NAME REGISTRATION */}
+                  {/* ============================================================ */}
+                  {step === 3 && (
+                    <form onSubmit={handleNameSubmit} className="flex flex-col gap-4">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Your Full Name"
+                          required
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          className="w-full bg-gray-50/50 border border-gray-200 rounded-2xl px-5 py-4 focus:outline-none focus:ring-4 focus:ring-[#D4AF37]/10 focus:border-[#D4AF37] focus:bg-white text-base font-bold text-[#1A0B05] placeholder:text-gray-400 placeholder:font-medium transition-all text-center"
+                        />
+                      </div>
+                      
+                      <button
+                        disabled={loading || name.trim().length < 2}
+                        type="submit"
+                        className="w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-2xl py-4.5 text-sm tracking-widest uppercase shadow-lg shadow-[#1A0B05]/10 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none mt-2"
+                      >
+                        {loading ? (
+                          <span className="flex items-center gap-2">
+                            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                            </svg>
+                            Saving...
+                          </span>
+                        ) : (
+                          <>
+                            <span>Complete Profile</span>
+                            <ArrowRight size={16} />
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  )}
+                  
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
         </>
       )}
     </AnimatePresence>

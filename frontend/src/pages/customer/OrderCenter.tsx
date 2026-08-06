@@ -67,6 +67,11 @@ export default function OrderCenter() {
           <div className="text-right">
             <span className="block text-gray-900 font-black">₹{order.totalAmount || order.total || 0}</span>
             <span className="text-xs text-gray-400 font-bold">#{order.orderNumber || order.id.substring(0, 5)}</span>
+            {order.createdAt && (
+              <span className="text-[10px] text-gray-400 font-medium block mt-1">
+                {new Date(order.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true })}
+              </span>
+            )}
           </div>
         </div>
 

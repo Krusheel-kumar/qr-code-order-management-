@@ -248,19 +248,21 @@ export default function DesktopNavbar() {
             )}
 
             {/* Cart Button */}
-            <button
-              onClick={() => navigate('/cart')}
-              className="bg-[#1A0B05] hover:bg-black text-white rounded-full px-5 xl:px-6 py-2.5 xl:py-3 flex items-center gap-2 shadow-[0_4px_12px_rgba(26,11,5,0.2)] hover:shadow-[0_8px_20px_rgba(26,11,5,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 relative group overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
-              <ShoppingBag size={18} className="relative z-10" />
-              <span className="font-bold text-sm relative z-10">Cart</span>
+            <div className="relative">
+              <button
+                onClick={() => navigate('/cart')}
+                className="bg-[#1A0B05] hover:bg-black text-white rounded-full px-5 xl:px-6 py-2.5 xl:py-3 flex items-center gap-2 shadow-[0_4px_12px_rgba(26,11,5,0.2)] hover:shadow-[0_8px_20px_rgba(26,11,5,0.3)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 relative group overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+                <ShoppingBag size={18} className="relative z-10" />
+                <span className="font-bold text-sm relative z-10">Cart</span>
+              </button>
               {cartItemCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-[22px] h-[22px] rounded-full bg-[#EAB308] text-white text-[10px] font-bold flex items-center justify-center border-[2.5px] border-[#FCFAF8] shadow-sm z-20">
+                <span className="absolute -top-1.5 -right-1.5 w-[22px] h-[22px] rounded-full bg-[#EAB308] text-white text-[10px] font-bold flex items-center justify-center border-[2.5px] border-white shadow-sm z-20">
                   {cartItemCount}
                 </span>
               )}
-            </button>
+            </div>
 
           </div>
         </div>
