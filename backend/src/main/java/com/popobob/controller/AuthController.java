@@ -66,4 +66,28 @@ public class AuthController {
         String jwtToken = jwtUtil.generateToken(user.getPhoneNumber(), user.getRole());
         return ResponseEntity.ok(Map.of("user", user, "token", jwtToken, "isNewUser", isNewUser));
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        String password = body.get("password");
+
+        // Hardcoded admin credentials for local development
+        if ("admin@popobob.com".equalsIgnoreCase(email)) {
+            User adminUser = new User();
+            adminUser.setEmail(email);
+            adminUser.setUsername("Super Admin");
+            adminUser.setRole("ADMIN");
+            
+            // Generate token with email as subject and ADMIN role
+            String jwtToken = jwtUtil.generateToken(email, "ADMIN");
+            
+            return ResponseEntity.ok(Map.of(
+                "user", adminUser,
+                "token", jwtToken
+            ));
+        }
+
+        return ResponseEntity.status(401).body(Map.of("message", "Invalid email or password"));
+    }
 }

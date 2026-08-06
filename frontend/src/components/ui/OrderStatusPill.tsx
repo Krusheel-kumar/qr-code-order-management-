@@ -25,6 +25,17 @@ export default function OrderStatusPill() {
           className="fixed bottom-[88px] left-4 right-4 lg:left-auto lg:right-6 lg:bottom-6 lg:w-80 z-50 cursor-pointer"
         >
           <div className="bg-white/90 backdrop-blur-xl border border-gray-200 p-4 rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.08)] flex items-center gap-4 overflow-hidden relative group">
+            {/* Close Button */}
+            <button 
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                activeOrders.forEach(order => dismissOrder(order.id)); 
+              }}
+              className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-gray-100/80 text-gray-400 hover:bg-gray-200 transition-colors z-20 text-[10px]"
+            >
+              ✕
+            </button>
+
             {/* Multi-Order Icon Stack */}
             <div className="relative shrink-0 z-10 w-12 h-12">
               <div className="absolute top-0 right-0 w-10 h-10 rounded-xl bg-orange-200 border-2 border-white shadow-sm flex items-center justify-center text-sm z-0 translate-x-1 -translate-y-1">🧋</div>

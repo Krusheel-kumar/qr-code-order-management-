@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Search, ShoppingBag, Share2 } from 'lucide-react';
+import { Search, ShoppingBag, Share2, Menu as MenuIcon, BookOpen, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import type { MenuItem } from '../../data/menu';
 import { useCartStore } from '../../store/useCartStore';
@@ -14,7 +15,7 @@ export default function FullMenu() {
   const location = useLocation();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('');
+  const [isMenuMapOpen, setIsMenuMapOpen] = useState(false);
   const [blacklistedProductIds, setBlacklistedProductIds] = useState<string[]>([]);
   
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
@@ -33,65 +34,43 @@ export default function FullMenu() {
     }
   }, [cartStore.storeId]);
 
-  const DYNAMIC_CATEGORIES = useMemo(() => {
-    const cats = new Set(MENU.map(item => item.category).filter(Boolean));
-    const result: string[] = [];
-    for (const c of Array.from(cats)) {
-      result.push(c as string);
-    }
-    return result;
-  }, [MENU]);
+  const mobileCategoryRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
+  const desktopCategoryRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
 
-  const [mainCategory, setMainCategory] = useState(() => {
-    return location.state?.mainCategory || DYNAMIC_CATEGORIES[0] || 'Milk Teas';
-  });
-
-  const containerRef = useRef<HTMLDivElement>(null);
-  const categoryRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
-
-  // Group menu by display categories
+  // Group menu by Main Category -> Subcategory
   const groupedMenu = useMemo(() => {
-    const groups: { [key: string]: MenuItem[] } = {};
+    const groups: { [mainCat: string]: { [subCat: string]: MenuItem[] } } = {};
+    
     MENU.forEach(item => {
-      // Only include items from the selected main category
-      if (item.category !== mainCategory && mainCategory !== 'All') return;
-
-      // Use subcategory if exists, else category
-      const cat = item.subcategory || item.category;
-      if (!groups[cat]) groups[cat] = [];
+      const mainCat = item.category || 'Other';
+      const subCat = item.subcategory || mainCat;
       
-      // Filter by search
-      if (searchQuery) {
-        if (item.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-          groups[cat].push(item);
-        }
-      } else {
-        groups[cat].push(item);
+      if (searchQuery && !item.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return;
+      }
+      
+      if (!groups[mainCat]) groups[mainCat] = {};
+      if (!groups[mainCat][subCat]) groups[mainCat][subCat] = [];
+      
+      groups[mainCat][subCat].push(item);
+    });
+    
+    // Cleanup empty categories
+    Object.keys(groups).forEach(mainCat => {
+      if (Object.keys(groups[mainCat]).length === 0) {
+        delete groups[mainCat];
       }
     });
     
-    // Remove empty categories
-    Object.keys(groups).forEach(k => {
-      if (groups[k].length === 0) delete groups[k];
-    });
-    
     return groups;
-  }, [searchQuery, mainCategory, MENU]);
+  }, [searchQuery, MENU]);
 
-  const categories = Object.keys(groupedMenu);
-
-  // Set initial active category
-  useEffect(() => {
-    if (categories.length > 0 && !activeCategory) {
-      setActiveCategory(categories[0]);
-    }
-  }, [categories, activeCategory]);
+  const mainCategories = Object.keys(groupedMenu);
 
   // Handle openProductId from location state or URL params
   useEffect(() => {
     let openProductId = location.state?.openProductId;
     
-    // Check URL params for deep link
     if (!openProductId) {
       const params = new URLSearchParams(window.location.search);
       openProductId = params.get('p');
@@ -100,7 +79,6 @@ export default function FullMenu() {
     if (openProductId) {
       const productToOpen = MENU.find(p => p.id === openProductId);
       if (productToOpen) {
-        // Wait a small delay to ensure UI is ready
         setTimeout(() => {
           setSelectedProduct(productToOpen);
         }, 100);
@@ -108,40 +86,22 @@ export default function FullMenu() {
     }
   }, [location.state, location.search]);
 
-  // ScrollSpy logic
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!containerRef.current) return;
-      const scrollY = window.scrollY;
-      
-      let currentCat = categories[0];
-      for (const cat of categories) {
-        const el = categoryRefs.current[cat];
-        if (el && el.offsetTop - 150 <= scrollY) {
-          currentCat = cat;
-        }
+  const scrollToCategory = (mainCat: string, subCat: string) => {
+    setIsMenuMapOpen(false); // Close the map if open
+    
+    setTimeout(() => {
+      const key = `${mainCat}-${subCat}`;
+      const el = window.innerWidth >= 1024 ? desktopCategoryRefs.current[key] : mobileCategoryRefs.current[key];
+      if (el) {
+        const offset = window.innerWidth >= 1024 ? 140 : 110;
+        const y = el.getBoundingClientRect().top + window.scrollY - offset; 
+        window.scrollTo({ top: y, behavior: 'smooth' });
       }
-      
-      if (currentCat !== activeCategory) {
-        setActiveCategory(currentCat);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [categories, activeCategory]);
-
-  const scrollToCategory = (cat: string) => {
-    const el = categoryRefs.current[cat];
-    if (el) {
-      const top = el.offsetTop - 140; // Offset for sticky headers
-      window.scrollTo({ top, behavior: 'smooth' });
-    }
+    }, 200);
   };
 
   const openCustomizer = (product: MenuItem) => {
     if (product.category === 'Bake House' || product.category === 'Quick Bites') {
-      // Add directly to cart without customization
       cartStore.addItem({
         product: product,
         customization: 'Standard',
@@ -170,7 +130,6 @@ export default function FullMenu() {
         imageUrl: product.image,
       },
       () => {
-        // Fallback
         setShareModal({
           isOpen: true,
           title: `Check out ${product.name} at POP O'BOB®!`,
@@ -180,16 +139,84 @@ export default function FullMenu() {
     );
   };
 
+  const renderProductCard = (product: MenuItem) => {
+    const isBlacklisted = blacklistedProductIds.includes(product.id);
+    return (
+      <div 
+        key={product.id}
+        onClick={() => !isBlacklisted && openCustomizer(product)}
+        className={`bg-white p-3 lg:p-5 rounded-[1.5rem] lg:rounded-[2.2rem] flex flex-col gap-3 lg:gap-4 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all cursor-pointer group hover:shadow-[0_8px_30px_rgb(212,175,55,0.12)] hover:border-[#D4AF37]/30 ${isBlacklisted ? 'opacity-55 cursor-not-allowed' : 'active:scale-[0.98] lg:hover:-translate-y-1'}`}
+      >
+        <div className="w-full aspect-square lg:aspect-[4/3] rounded-[1rem] lg:rounded-[1.6rem] overflow-hidden bg-[#F5F3EC] relative shadow-inner">
+          {isBlacklisted ? (
+            <div className="absolute top-2 lg:top-4 left-2 lg:left-4 z-10 bg-[#1A0B05] text-white text-[10px] font-black uppercase tracking-wider px-2 lg:px-3 py-1 rounded-md lg:rounded-full shadow-sm lg:shadow-md">
+              Sold Out
+            </div>
+          ) : product.badge ? (
+            <div className="absolute top-2 lg:top-4 left-2 lg:left-4 z-10 bg-white/40 backdrop-blur-md border border-white/60 text-[#5A3825] text-[9px] font-black uppercase tracking-widest px-2.5 lg:px-3 py-1 rounded-full shadow-sm lg:shadow-md">
+              {product.badge}
+            </div>
+          ) : null}
+          <button 
+            onClick={(e) => handleShare(e, product)}
+            className="absolute top-2 right-2 lg:top-4 lg:right-4 z-10 bg-white/80 backdrop-blur-md hover:bg-white text-[#1A0B05] p-1.5 lg:p-2.5 rounded-full shadow-sm transition-all active:scale-95 lg:opacity-0 lg:group-hover:opacity-100"
+          >
+            <Share2 size={14} className="lg:w-4 lg:h-4" />
+          </button>
+          {product.image ? (
+            <img src={product.image} alt={product.name} className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-700 ease-out" loading="lazy" />
+          ) : (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-[#F5F3EC] text-gray-300">
+              <ShoppingBag size={32} className="mb-2 opacity-50" />
+            </div>
+          )}
+        </div>
+        
+        <div className="flex flex-col justify-between flex-1 px-1 lg:px-0">
+          <span className="text-[9px] lg:text-[10px] font-black text-[#D4AF37] mb-1 uppercase tracking-widest leading-none block">{product.subcategory || product.category}</span>
+          <h3 className="font-bold text-[14px] lg:text-[16px] text-[#1A0B05] leading-snug tracking-tight mb-1 lg:mb-2 line-clamp-2 lg:line-clamp-1 group-hover:text-[#D4AF37] transition-colors">{product.name}</h3>
+          
+          <div className="hidden lg:block">
+             <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed mb-6 font-medium">
+               {product.story || ''}
+             </p>
+          </div>
+          
+          <div className="flex justify-between items-end mt-auto pt-2 lg:pt-4 lg:border-t lg:border-gray-100">
+            <span className="font-black text-[15px] lg:text-2xl text-[#1A0B05] tracking-tight">₹{product.price.toFixed(0)}</span>
+            
+            <div className="lg:hidden">
+              <button className="bg-[#1A0B05] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#1A0B05] px-3.5 py-1.5 rounded-full flex items-center justify-center text-[10px] font-black uppercase tracking-wider transition-all duration-300 shadow-md active:scale-95">
+                Add
+              </button>
+            </div>
+            <div className="hidden lg:block">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!isBlacklisted) openCustomizer(product);
+                }}
+                className="bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 active:scale-95"
+              >
+                <span>+ Add to Bag</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-[#FDFCF9] pb-32 animate-in fade-in duration-500 font-sans max-w-[1440px] mx-auto" ref={containerRef}>
+    <div className="min-h-[100dvh] bg-[#FDFCF9] pb-32 animate-in fade-in duration-500 font-sans max-w-[1440px] mx-auto relative">
       
       {/* ========================================================================= */}
       {/* MOBILE MENU VIEW */}
       {/* ========================================================================= */}
       <div className="lg:hidden">
-        {/* Search Header */}
-        <div className="sticky top-0 z-30 bg-[#FDFCF9]/95 backdrop-blur-xl px-4 pt-4 pb-2 border-b border-gray-100">
-          <div className="relative mb-3">
+        {/* Search Header ONLY */}
+        <div className="sticky top-0 z-30 bg-[#FDFCF9]/95 backdrop-blur-xl px-4 pt-4 pb-4 border-b border-gray-100 shadow-sm">
+          <div className="relative">
             <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
               <Search size={20} className="text-gray-400" />
             </div>
@@ -198,113 +225,49 @@ export default function FullMenu() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white border border-gray-200 rounded-2xl py-3 pl-12 pr-4 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] shadow-sm transition-all"
-              placeholder="Search our menu..."
+              placeholder="Search our full menu..."
             />
-          </div>
-
-          {/* Main Category Switcher */}
-          <div className="flex bg-white border border-gray-100 p-1 rounded-2xl mb-4 overflow-x-auto hide-scrollbar shadow-sm">
-            {DYNAMIC_CATEGORIES.map(cat => (
-              <button
-                key={cat}
-                onClick={() => {
-                  setMainCategory(cat);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className={`flex-1 min-w-[100px] py-2.5 px-3 text-xs font-black rounded-xl transition-all text-center whitespace-nowrap ${
-                  mainCategory === cat
-                    ? 'bg-[#1A0B05] text-white shadow-md'
-                    : 'text-gray-500 hover:text-[#1A0B05]'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Scrollable Category Pills */}
-          <div className="flex overflow-x-auto hide-scrollbar gap-2 pb-2 -mx-4 px-4 snap-x">
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => scrollToCategory(cat)}
-                className={`snap-center shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-all shadow-sm ${
-                  activeCategory === cat 
-                    ? 'bg-[#1A0B05] text-white shadow-md' 
-                    : 'bg-white text-gray-600 border border-gray-200 hover:border-[#D4AF37]/50'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
           </div>
         </div>
 
-        {/* Menu Sections */}
-        <div className="px-4 mt-6 space-y-8">
-          {categories.map(cat => (
-            <div 
-              key={cat} 
-              ref={el => { if(el) categoryRefs.current[cat] = el; }}
-              className="scroll-mt-36"
-            >
-              <h2 className="text-xl font-black text-[#1A0B05] mb-3 sticky top-[120px] z-20 bg-[#FDFCF9]/95 backdrop-blur-md py-2 -mx-4 px-4 border-y border-gray-100">
-                {cat}
-              </h2>
+        {/* Continuous Scroll Sections Grouped by Main -> Sub */}
+        <div className="px-4 mt-6 space-y-12">
+          {mainCategories.map(mainCat => (
+            <div key={mainCat} className="space-y-6">
               
-              <div className="grid grid-cols-2 gap-4">
-                {groupedMenu[cat].map(product => {
-                  const isBlacklisted = blacklistedProductIds.includes(product.id);
-                  return (
-                    <div 
-                      key={product.id}
-                      onClick={() => !isBlacklisted && openCustomizer(product)}
-                      className={`bg-white p-3 rounded-[1.5rem] flex flex-col gap-3 border border-gray-100 shadow-sm transition-all cursor-pointer group hover:shadow-md hover:border-[#D4AF37]/30 ${isBlacklisted ? 'opacity-55 cursor-not-allowed' : 'active:scale-[0.98]'}`}
-                    >
-                      <div className="w-full aspect-square rounded-[1rem] overflow-hidden bg-gray-50 relative shadow-inner">
-                        {isBlacklisted ? (
-                          <div className="absolute top-2 left-2 z-10 bg-[#1A0B05] text-white text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md shadow-sm">
-                            Sold Out
-                          </div>
-                        ) : product.badge ? (
-                          <div className="absolute top-2 left-2 z-10 bg-[#1A0B05] text-[#D4AF37] text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-md shadow-sm">
-                            {product.badge}
-                          </div>
-                        ) : null}
-                        <button 
-                          onClick={(e) => handleShare(e, product)}
-                          className="absolute top-2 right-2 z-10 bg-white/80 backdrop-blur-md hover:bg-white text-[#1A0B05] p-1.5 rounded-full shadow-sm transition-all active:scale-95"
-                        >
-                          <Share2 size={14} />
-                        </button>
-                        {product.image ? (
-                          <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" loading="lazy" />
-                        ) : (
-                          <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-300">
-                            <ShoppingBag size={32} className="mb-2 opacity-50" />
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="flex flex-col justify-between flex-1 px-1">
-                        <h3 className="font-black text-[13px] text-[#1A0B05] leading-tight mb-1 line-clamp-2">{product.name}</h3>
-                        
-                        <div className="flex justify-between items-center mt-auto pt-2">
-                          <span className="font-black text-[14px] text-[#D4AF37]">₹{product.price.toFixed(0)}</span>
-                          <button className="bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] w-7 h-7 rounded-full flex items-center justify-center font-black text-lg transition-colors shadow-sm">
-                            +
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+              {/* Level 1: Main Category Header */}
+              <div className="flex items-center gap-4">
+                <h1 className="text-3xl font-black text-[#1A0B05] tracking-tight uppercase">{mainCat}</h1>
+                <div className="h-px bg-gray-200 flex-1"></div>
               </div>
+              
+              {/* Level 2: Subcategories */}
+              <div className="space-y-10">
+                {Object.keys(groupedMenu[mainCat]).map(subCat => (
+                  <div 
+                    key={`${mainCat}-${subCat}`} 
+                    ref={el => { if(el) mobileCategoryRefs.current[`${mainCat}-${subCat}`] = el; }}
+                    className="scroll-mt-28"
+                  >
+                    <h2 className="text-[14px] font-black text-[#D4AF37] mb-4 uppercase tracking-[0.2em]">
+                      {subCat}
+                    </h2>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      {groupedMenu[mainCat][subCat].map(product => renderProductCard(product))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
             </div>
           ))}
 
-          {categories.length === 0 && (
-            <div className="py-20 text-center">
+          {mainCategories.length === 0 && (
+            <div className="py-20 text-center flex flex-col items-center">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                 <Search className="text-gray-400" size={24} />
+              </div>
               <h3 className="font-black text-[#1A0B05] text-lg mb-1">No items found</h3>
               <p className="text-gray-500 text-sm font-medium">Try adjusting your search.</p>
             </div>
@@ -324,7 +287,7 @@ export default function FullMenu() {
               POP O'BOB® MENU
             </span>
             <h1 className="text-5xl font-black text-[#1A0B05] tracking-tight">
-              Our Menu
+              Our Full Menu
             </h1>
           </div>
 
@@ -337,148 +300,129 @@ export default function FullMenu() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-white border border-gray-200 rounded-full py-3.5 pl-12 pr-6 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/50 focus:border-[#D4AF37] shadow-sm transition-all"
-              placeholder="Search drinks, toppings, treats..."
+              placeholder="Search our massive catalog..."
             />
           </div>
         </div>
 
-        {/* Main Category Pills */}
-        <div className="flex items-center gap-3 mb-8 overflow-x-auto hide-scrollbar">
-          {DYNAMIC_CATEGORIES.map(cat => (
-            <button
-              key={cat}
-              onClick={() => {
-                setMainCategory(cat);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className={`px-7 py-3.5 rounded-full text-xs font-black uppercase tracking-widest transition-all ${
-                mainCategory === cat
-                  ? 'bg-[#1A0B05] text-[#D4AF37] shadow-lg scale-105'
-                  : 'bg-white hover:bg-[#FFFBF2] text-gray-700 hover:text-[#1A0B05] border border-gray-200 shadow-sm'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Subcategory Chips */}
-        {categories.length > 1 && (
-          <div className="flex items-center gap-2 mb-12 pb-6 border-b border-gray-200 flex-wrap">
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => scrollToCategory(cat)}
-                className={`px-5 py-2 rounded-full text-xs font-bold transition-all ${
-                  activeCategory === cat
-                    ? 'bg-[#1A0B05] text-white font-black shadow-md'
-                    : 'bg-white text-gray-600 border border-gray-200 hover:border-[#D4AF37]/50'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Desktop Luxury Menu Sections */}
-        <div className="space-y-16">
-          {categories.map(cat => (
-            <div 
-              key={cat} 
-              ref={el => { if(el) categoryRefs.current[cat] = el; }}
-              className="scroll-mt-36"
-            >
-              <div className="flex items-center justify-between mb-8">
-                <h2 className="text-3xl font-black text-[#1A0B05] tracking-tight">
-                  {cat}
-                </h2>
-                <span className="text-xs font-extrabold uppercase tracking-widest text-gray-400">
-                  {groupedMenu[cat].length} {groupedMenu[cat].length === 1 ? 'creation' : 'creations'}
-                </span>
-              </div>
+        {/* Desktop Sections */}
+        <div className="space-y-20 min-h-[50vh]">
+          {mainCategories.map(mainCat => (
+            <div key={mainCat} className="space-y-12">
               
-              <div className="grid grid-cols-4 xl:grid-cols-5 gap-8">
-                {groupedMenu[cat].map(product => {
-                  const isBlacklisted = blacklistedProductIds.includes(product.id);
-                  return (
-                    <div 
-                      key={product.id}
-                      onClick={() => !isBlacklisted && openCustomizer(product)}
-                      className={`bg-white p-5 rounded-[2.2rem] border border-gray-100 shadow-sm hover:shadow-xl hover:border-[#D4AF37]/40 transition-all duration-300 overflow-hidden flex flex-col justify-between group cursor-pointer ${
-                        isBlacklisted ? 'opacity-55 cursor-not-allowed' : 'hover:-translate-y-1'
-                      }`}
-                    >
-                      <div>
-                        <div className="w-full aspect-[4/3] rounded-[1.6rem] overflow-hidden bg-gray-50 relative mb-5 shadow-inner">
-                          {isBlacklisted ? (
-                            <div className="absolute top-4 left-4 z-10 bg-[#1A0B05] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-md">
-                              Sold Out
-                            </div>
-                          ) : product.badge ? (
-                            <div className="absolute top-4 left-4 z-10 bg-[#1A0B05] text-[#D4AF37] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-md">
-                              {product.badge}
-                            </div>
-                          ) : null}
-                          <button 
-                            onClick={(e) => handleShare(e, product)}
-                            className="absolute top-4 right-4 z-10 bg-white/80 backdrop-blur-md hover:bg-white text-[#1A0B05] p-2.5 rounded-full shadow-sm transition-all opacity-0 group-hover:opacity-100"
-                            title="Share"
-                          >
-                            <Share2 size={14} />
-                          </button>
-                          {product.image ? (
-                            <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" loading="lazy" />
-                          ) : (
-                            <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 text-gray-300">
-                              <ShoppingBag size={40} className="mb-2 opacity-50" />
-                            </div>
-                          )}
-                        </div>
+              <div className="flex items-center gap-6">
+                <h1 className="text-5xl font-black text-[#1A0B05] tracking-tighter uppercase">{mainCat}</h1>
+                <div className="h-[2px] bg-gray-100 flex-1 mt-3"></div>
+              </div>
 
-                        {product.category && (
-                          <span className="text-[10px] font-black uppercase tracking-widest text-[#D4AF37] block mb-1">
-                            {product.category}
-                          </span>
-                        )}
-                        <h3 className="text-lg font-black text-[#1A0B05] tracking-tight mb-2 group-hover:text-[#D4AF37] transition-colors line-clamp-1">
-                          {product.name}
-                        </h3>
-                        <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed mb-6 font-medium">
-                          {product.story || ''}
-                        </p>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                        <span className="text-2xl font-black text-[#1A0B05]">
-                          ₹{product.price.toFixed(0)}
-                        </span>
-                        
-                        <button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (!isBlacklisted) openCustomizer(product);
-                          }}
-                          className="bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 active:scale-95"
-                        >
-                          <span>+ Add to Bag</span>
-                        </button>
-                      </div>
+              <div className="space-y-16 pl-4 border-l-2 border-[#D4AF37]/20">
+                {Object.keys(groupedMenu[mainCat]).map(subCat => (
+                  <div 
+                    key={`${mainCat}-${subCat}`} 
+                    ref={el => { if(el) desktopCategoryRefs.current[`${mainCat}-${subCat}`] = el; }}
+                    className="scroll-mt-36"
+                  >
+                    <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
+                      <h2 className="text-2xl font-black text-[#1A0B05] tracking-tight uppercase">
+                        {subCat}
+                      </h2>
+                      <span className="text-xs font-extrabold uppercase tracking-widest text-gray-400">
+                        {groupedMenu[mainCat][subCat].length} {groupedMenu[mainCat][subCat].length === 1 ? 'creation' : 'creations'}
+                      </span>
                     </div>
-                  );
-                })}
+                    
+                    <div className="grid grid-cols-4 xl:grid-cols-5 gap-8">
+                      {groupedMenu[mainCat][subCat].map(product => renderProductCard(product))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           ))}
 
-          {categories.length === 0 && (
+          {mainCategories.length === 0 && (
             <div className="py-28 text-center">
               <h3 className="font-black text-[#1A0B05] text-2xl mb-2">No menu items found</h3>
-              <p className="text-gray-500 font-medium text-sm">Try adjusting your search query or selecting another category.</p>
+              <p className="text-gray-500 font-medium text-sm">Try adjusting your search query.</p>
             </div>
           )}
         </div>
       </div>
+
+      {/* ========================================================================= */}
+      {/* FLOATING MENU MAP (FAB) */}
+      {/* ========================================================================= */}
+      {mainCategories.length > 0 && !searchQuery && (
+        <button 
+          onClick={() => setIsMenuMapOpen(true)}
+          className="fixed bottom-24 lg:bottom-12 right-6 z-40 bg-[#1A0B05] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-[#1A0B05] shadow-[0_8px_30px_rgb(0,0,0,0.2)] px-6 py-3.5 rounded-full flex items-center gap-2 transition-all duration-300 hover:scale-105 active:scale-95 border border-white/10"
+        >
+          <MenuIcon size={18} strokeWidth={2.5} />
+          <span className="font-black text-xs uppercase tracking-widest">Menu</span>
+        </button>
+      )}
+
+      {/* FLOATING MENU MAP (BOTTOM SHEET / MODAL) - TWO LEVEL HIERARCHY */}
+      <AnimatePresence>
+        {isMenuMapOpen && (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center pointer-events-none">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto"
+              onClick={() => setIsMenuMapOpen(false)}
+            />
+            <motion.div 
+              initial={{ y: "100%", sm: { y: 20, opacity: 0 } }}
+              animate={{ y: 0, sm: { y: 0, opacity: 1 } }}
+              exit={{ y: "100%", sm: { y: 20, opacity: 0 } }}
+              transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+              className="bg-[#FDFCF9] w-full max-w-md h-[85vh] sm:h-[80vh] rounded-t-3xl sm:rounded-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] relative z-10 flex flex-col pointer-events-auto border-t border-[#D4AF37]/20"
+            >
+              <div className="p-6 pt-7 border-b border-gray-100 flex justify-between items-center bg-white rounded-t-3xl sm:rounded-3xl shadow-sm z-10 shrink-0">
+                <h3 className="font-black text-xl text-[#1A0B05] uppercase tracking-[0.2em]">
+                  Menu
+                </h3>
+                <button 
+                  onClick={() => setIsMenuMapOpen(false)}
+                  className="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              
+              <div className="overflow-y-auto overscroll-contain flex-1 min-h-0 p-6 pb-12 space-y-10">
+                {mainCategories.map((mainCat, idx) => (
+                  <motion.div 
+                    key={mainCat}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.1, duration: 0.5, ease: "easeOut" }}
+                  >
+                    <h4 className="text-[13px] font-black text-[#1A0B05] uppercase tracking-[0.25em] mb-4 flex items-center gap-4">
+                      {mainCat}
+                      <div className="h-[2px] bg-[#D4AF37]/20 flex-1 rounded-full"></div>
+                    </h4>
+                    <div className="flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                      {Object.keys(groupedMenu[mainCat]).map((subCat, index) => (
+                        <button
+                          key={subCat}
+                          onClick={() => scrollToCategory(mainCat, subCat)}
+                          className={`w-full flex items-center justify-between p-4 sm:p-5 hover:bg-[#FDFCF9] active:bg-gray-50 transition-all group ${index !== Object.keys(groupedMenu[mainCat]).length - 1 ? 'border-b border-gray-50' : ''}`}
+                        >
+                          <span className="font-bold text-[14px] text-[#1A0B05] tracking-widest group-hover:text-[#D4AF37] transition-colors uppercase">{subCat}</span>
+                          <span className="text-[11px] font-black text-[#D4AF37] bg-[#D4AF37]/10 px-3 py-1 rounded-full">{groupedMenu[mainCat][subCat].length}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <CustomizerSheet 
         product={selectedProduct} 
@@ -486,7 +430,6 @@ export default function FullMenu() {
         onClose={closeCustomizer} 
       />
 
-      {/* Share Modal Fallback */}
       <ShareModal
         isOpen={shareModal.isOpen}
         onClose={() => setShareModal(prev => ({ ...prev, isOpen: false }))}

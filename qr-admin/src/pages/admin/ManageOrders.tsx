@@ -145,7 +145,9 @@ export default function ManageOrders() {
       <div className="flex justify-between items-start mb-3">
         <div>
           <h3 className="font-heading font-black text-[#2A1B16] text-lg">{order.orderNumber || `#${order.id.substring(0, 8).toUpperCase()}`}</h3>
-          <p className="text-xs text-[#8D6E63] font-semibold mt-0.5">{new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+          <p className="text-xs text-[#8D6E63] font-semibold mt-0.5">
+            {new Date(order.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+          </p>
         </div>
         <div className={`px-2.5 py-1 rounded-lg text-[10px] font-bold tracking-wider ${order.orderType === 'PICKUP' ? 'bg-[#FFB5A7]/25 text-[#C26B5C] border border-[#FFB5A7]/30' : 'bg-[#FFD54F]/25 text-[#2A1B16] border border-[#FFD54F]/30'}`}>
           {order.orderType === 'PICKUP' ? 'PICKUP' : 'DINE-IN'}
