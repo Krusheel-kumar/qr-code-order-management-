@@ -389,7 +389,7 @@ export default function Cart() {
           </div>
         </main>
 
-        <div className="fixed bottom-[80px] left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-100 p-5 flex gap-5 z-[80] shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+        <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-100 p-5 flex gap-5 z-[80] shadow-[0_-10px_30px_rgba(0,0,0,0.05)] pb-safe">
           <div className="flex flex-col justify-center px-2">
             <span className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Total Pay</span>
             <span className="font-black text-3xl leading-none text-[#1A0B05]">₹{total}</span>
@@ -656,7 +656,7 @@ export default function Cart() {
             </div>
 
             {/* Floating Checkout Bar (Mobile) */}
-            <div className="lg:hidden fixed bottom-[72px] left-0 right-0 p-4 bg-white/80 backdrop-blur-xl border-t border-gray-100 z-[90] safe-pb shadow-[0_-8px_30px_rgba(0,0,0,0.06)]">
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-[var(--color-surface)] backdrop-blur-[24px] border-t border-gray-100 z-[90] safe-pb shadow-[var(--shadow-soft-modal)]">
               <button 
                 onClick={initiateCheckout} 
                 className="w-full bg-gradient-to-r from-[#1A0B05] to-[#2A1B16] text-[#D4AF37] py-4 rounded-full font-black text-sm uppercase tracking-widest shadow-[0_8px_20px_rgba(26,11,5,0.4)] active:scale-95 flex items-center justify-between px-6 transition-transform"

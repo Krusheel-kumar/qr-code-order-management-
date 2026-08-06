@@ -17,6 +17,10 @@ export default function BottomNavigation() {
     { path: '/cart', icon: ShoppingCart, label: 'Cart' },
     { path: '/profile', icon: User, label: 'Profile' },
   ];
+  const hideNavRoutes = ['/cart', '/processing', '/checkout'];
+  if (hideNavRoutes.some(route => location.pathname.startsWith(route))) {
+    return null;
+  }
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-[9999]">
