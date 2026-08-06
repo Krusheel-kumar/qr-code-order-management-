@@ -40,7 +40,7 @@ public class AuthController {
             return ResponseEntity.status(401).body(Map.of("message", "Invalid or expired MSG91 Token"));
         }
 
-        Optional<User> userOpt = userRepository.findByPhoneNumber(phoneNumber);
+        Optional<User> userOpt = userRepository.findFirstByPhoneNumber(phoneNumber);
         User user;
 
         boolean isNewUser = false;
