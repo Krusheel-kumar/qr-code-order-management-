@@ -21,6 +21,7 @@ public class GlobalExceptionHandler {
         
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "An unexpected error occurred. Please contact support if the issue persists.");
+        errorResponse.put("dev_message", ex.getClass().getName() + ": " + ex.getMessage());
         // We do NOT send stack traces to the frontend in production for security reasons.
         
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
