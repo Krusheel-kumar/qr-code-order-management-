@@ -15,7 +15,7 @@ spring:
         default_batch_fetch_size: 100
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 app:
   seed:
