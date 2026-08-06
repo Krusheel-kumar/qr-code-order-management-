@@ -20,8 +20,7 @@ export default function BottomNavigation() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-[9999]">
-      {/* Safe Area Background */}
-      <div className="absolute inset-0 bg-white/80 backdrop-blur-2xl border-t border-black/5 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] pointer-events-none" />
+      <div className="absolute inset-0 bg-white/70 backdrop-blur-[24px] border-t border-white/40 shadow-[var(--shadow-soft-modal)]" />
       
       <div className="relative flex justify-around items-center h-[72px] px-4 max-w-md mx-auto safe-pb">
         {navItems.map((item) => {
@@ -54,7 +53,7 @@ export default function BottomNavigation() {
               to={item.path}
               className="relative flex flex-col items-center justify-center w-[60px] h-full group"
             >
-              <div className={`relative flex flex-col items-center justify-center z-10 transition-all duration-300 ${isActive ? '-translate-y-0.5' : ''}`}>
+              <div className={`relative flex flex-col items-center justify-center z-10 transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isActive ? '-translate-y-1 scale-105' : 'hover:-translate-y-0.5'}`}>
                 <div className={`relative mb-1 transition-colors duration-300 ${isActive ? 'text-black' : 'text-gray-400 group-hover:text-gray-600'}`}>
                   <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} className={isActive ? 'drop-shadow-sm' : ''} />
                   {item.label === 'Cart' && cartItemCount > 0 && (

@@ -63,7 +63,7 @@ export default function CheckoutAuthGate({ isOpen, onClose, onLoginClick, onGues
           animate={{ y: 0, opacity: 1, scale: 1 }}
           exit={{ y: 40, opacity: 0, scale: 0.96 }}
           transition={{ type: "spring", damping: 30, stiffness: 300 }}
-          className="w-full sm:max-w-[420px] bg-white rounded-t-[2rem] sm:rounded-[2rem] overflow-hidden shadow-2xl relative z-10 max-h-[90vh] flex flex-col pb-safe"
+          className="w-full sm:max-w-[440px] bg-[var(--color-surface)] rounded-t-[var(--radius-modal)] sm:rounded-[var(--radius-modal)] overflow-hidden shadow-[var(--shadow-soft-modal)] relative z-10 max-h-[90vh] flex flex-col pb-safe"
         >
           {/* Drag Handle (Mobile) */}
           <div className="w-full flex justify-center pt-4 pb-2 sm:hidden">
@@ -142,7 +142,7 @@ export default function CheckoutAuthGate({ isOpen, onClose, onLoginClick, onGues
                       placeholder="Your Full Name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-gray-50/50 border border-gray-200 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:bg-white text-base font-bold text-[#1A0B05] placeholder:text-gray-400 placeholder:font-medium transition-all"
+                      className="w-full bg-[var(--color-surface-muted)] border border-gray-100 rounded-[var(--radius-lg)] px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30 focus:border-[#D4AF37] focus:bg-white text-base font-bold text-[var(--color-foreground)] placeholder:text-gray-400 placeholder:font-medium transition-all shadow-[var(--shadow-soft-sm)]"
                       autoFocus
                     />
                   </div>
@@ -157,7 +157,7 @@ export default function CheckoutAuthGate({ isOpen, onClose, onLoginClick, onGues
                       value={phone}
                       onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
                       maxLength={10}
-                      className="w-full bg-gray-50/50 border border-gray-200 rounded-2xl pl-20 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 focus:bg-white text-base font-bold text-[#1A0B05] placeholder:text-gray-400 placeholder:font-medium transition-all"
+                      className="w-full bg-[var(--color-surface-muted)] border border-gray-100 rounded-[var(--radius-lg)] pl-20 pr-4 py-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30 focus:border-[#D4AF37] focus:bg-white text-base font-bold text-[var(--color-foreground)] placeholder:text-gray-400 placeholder:font-medium transition-all shadow-[var(--shadow-soft-sm)]"
                     />
                   </div>
                   {cartStore.orderType !== 'DINE_IN' && (
@@ -184,7 +184,7 @@ export default function CheckoutAuthGate({ isOpen, onClose, onLoginClick, onGues
                   <div className="pt-4 space-y-3">
                     <button 
                       type="submit"
-                      className="w-full bg-[#1A0B05] text-white hover:bg-gray-800 py-4 rounded-2xl font-black text-sm uppercase tracking-widest shadow-md transition-all flex items-center justify-center gap-2"
+                      className="w-full bg-[var(--color-premium-dark)] text-white hover:bg-[#D4AF37] hover:text-[#1A0B05] py-4 rounded-[var(--radius-md)] font-black text-sm uppercase tracking-widest shadow-[var(--shadow-soft-1)] hover:shadow-[var(--shadow-soft-2)] transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
                     >
                       <span>Proceed to Payment</span>
                       <ArrowRight size={16} />

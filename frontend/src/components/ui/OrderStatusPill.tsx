@@ -36,8 +36,8 @@ export default function OrderStatusPill() {
 
             {/* Multi-Order Icon Stack */}
             <div className="relative shrink-0 z-10 w-12 h-12">
-              <div className="absolute top-0 right-0 w-10 h-10 rounded-xl bg-orange-200 border-2 border-white shadow-sm flex items-center justify-center text-sm z-0 translate-x-1 -translate-y-1">🧋</div>
-              <div className="absolute bottom-0 left-0 w-10 h-10 rounded-xl bg-[#1A0B05] border-2 border-white shadow-md flex items-center justify-center text-sm z-10">🧋</div>
+              <div className="absolute top-0 right-0 w-10 h-10 rounded-[14px] bg-orange-200 border-2 border-white shadow-sm flex items-center justify-center text-sm z-0 translate-x-1 -translate-y-1">🧋</div>
+              <div className="absolute bottom-0 left-0 w-10 h-10 rounded-[14px] bg-[#1A0B05] border-2 border-white shadow-md flex items-center justify-center text-sm z-10">🧋</div>
             </div>
 
             <div className="flex-1 min-w-0 z-10">

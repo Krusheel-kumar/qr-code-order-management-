@@ -183,7 +183,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
               className="fixed inset-0 z-[10001] flex items-end md:items-center justify-center pointer-events-none p-0 md:p-6"
             >
-              <div className="pointer-events-auto w-full md:max-w-[420px] bg-white md:rounded-[2rem] rounded-t-[2rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.15)] flex flex-col relative pb-safe">
+              <div className="pointer-events-auto w-full md:max-w-[440px] bg-[var(--color-surface)] md:rounded-[var(--radius-modal)] rounded-t-[var(--radius-modal)] overflow-hidden shadow-[var(--shadow-soft-modal)] flex flex-col relative pb-safe">
                 
                 {/* Drag Handle (Mobile) */}
                 <div className="w-full flex justify-center pt-4 pb-2 md:hidden">
@@ -253,14 +253,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                           value={phoneNumber}
                           onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
                           maxLength={10}
-                          className="w-full bg-gray-50/50 border border-gray-200 rounded-2xl pl-20 pr-4 py-4 focus:outline-none focus:ring-4 focus:ring-[#D4AF37]/10 focus:border-[#D4AF37] focus:bg-white text-base font-bold text-[#1A0B05] placeholder:text-gray-400 placeholder:font-medium transition-all"
+                          className="w-full bg-[var(--color-surface-muted)] border border-gray-100 rounded-[var(--radius-lg)] pl-20 pr-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30 focus:border-[#D4AF37] focus:bg-white text-base font-bold text-[var(--color-foreground)] placeholder:text-gray-400 placeholder:font-medium transition-all shadow-[var(--shadow-soft-sm)]"
                         />
                       </div>
                       
                       <button
                         disabled={loading || phoneNumber.length < 10}
                         type="submit"
-                        className="w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-2xl py-4.5 text-sm tracking-widest uppercase shadow-lg shadow-[#1A0B05]/10 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none mt-2"
+                        className="w-full bg-[var(--color-premium-dark)] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-[var(--radius-md)] py-4 text-sm tracking-widest uppercase shadow-[var(--shadow-soft-1)] hover:shadow-[var(--shadow-soft-2)] hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none mt-4"
                       >
                         {loading ? (
                           <span className="flex items-center gap-2">
@@ -295,7 +295,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                             value={digit}
                             onChange={(e) => handleOtpChange(index, e.target.value)}
                             onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                            className="w-14 h-16 text-center text-2xl font-black bg-gray-50/50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-[#D4AF37]/10 focus:border-[#D4AF37] focus:bg-white text-[#1A0B05] transition-all shadow-sm"
+                            className="w-14 h-16 text-center text-2xl font-black bg-[var(--color-surface-muted)] border border-gray-100 rounded-[var(--radius-lg)] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30 focus:border-[#D4AF37] focus:bg-white text-[var(--color-foreground)] transition-all shadow-[var(--shadow-soft-sm)]"
                           />
                         ))}
                       </div>
@@ -303,7 +303,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       <button
                         disabled={loading || otp.join('').length !== 4}
                         type="submit"
-                        className="w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-2xl py-4.5 text-sm tracking-widest uppercase shadow-lg shadow-[#1A0B05]/10 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none"
+                        className="w-full bg-[var(--color-premium-dark)] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-[var(--radius-md)] py-4 text-sm tracking-widest uppercase shadow-[var(--shadow-soft-1)] hover:shadow-[var(--shadow-soft-2)] hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none mt-4"
                       >
                         {loading ? (
                           <span className="flex items-center gap-2">
