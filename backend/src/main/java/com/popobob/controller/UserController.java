@@ -50,10 +50,8 @@ public class UserController {
     public ResponseEntity<?> getUserOrders(@PathVariable UUID id) {
         Optional<User> userOpt = userRepository.findById(id);
         if (userOpt.isPresent()) {
-            List<Order> userOrders = orderRepository.findAll()
-                .stream()
-                .filter(order -> order.getUser() != null && order.getUser().getId().equals(id))
-                .toList();
+            User user = userOpt.get();
+            List<Order> userOrders = orderRepository.findByUser_IdOrCustomerPhoneOrderByCreatedAtDesc(id, user.getPhoneNumber());
             return ResponseEntity.ok(userOrders);
         }
         return ResponseEntity.notFound().build();

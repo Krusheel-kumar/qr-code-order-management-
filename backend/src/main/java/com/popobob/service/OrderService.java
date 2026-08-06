@@ -52,6 +52,8 @@ public class OrderService {
         
         if (request.getUserId() != null) {
             userRepository.findById(request.getUserId()).ifPresent(order::setUser);
+        } else if (request.getCustomerPhone() != null && !request.getCustomerPhone().trim().isEmpty()) {
+            userRepository.findFirstByPhoneNumber(request.getCustomerPhone()).ifPresent(order::setUser);
         }
         
         List<OrderItem> items = new ArrayList<>();
