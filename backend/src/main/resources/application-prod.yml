@@ -31,5 +31,5 @@ logging:
     org.springframework.transaction: ERROR
 
 msg91:
-  auth-key: ${MSG91_AUTH_KEY}
-  template-id: ${MSG91_TEMPLATE_ID}
+  auth-key: ${MSG91_AUTH_KEY:557539A3jnNLJWr6a73367fP1}
+  template-id: ${MSG91_TEMPLATE_ID:SecureOTPWidget5TUR}
