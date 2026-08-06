@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Search, ShoppingBag, Share2, Menu as MenuIcon, BookOpen, X } from 'lucide-react';
+import { Search, ShoppingBag, Share2, Menu as MenuIcon, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import type { MenuItem } from '../../data/menu';
@@ -374,9 +374,9 @@ export default function FullMenu() {
               onClick={() => setIsMenuMapOpen(false)}
             />
             <motion.div 
-              initial={{ y: "100%", sm: { y: 20, opacity: 0 } }}
-              animate={{ y: 0, sm: { y: 0, opacity: 1 } }}
-              exit={{ y: "100%", sm: { y: 20, opacity: 0 } }}
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
               transition={{ type: "spring", bounce: 0, duration: 0.4 }}
               className="bg-[#FDFCF9] w-full max-w-md h-[85vh] sm:h-[80vh] rounded-t-3xl sm:rounded-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.1)] relative z-10 flex flex-col pointer-events-auto border-t border-[#D4AF37]/20"
             >

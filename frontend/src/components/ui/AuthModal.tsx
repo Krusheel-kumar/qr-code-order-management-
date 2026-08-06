@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Phone, ArrowRight, ShieldCheck } from 'lucide-react';
+import { X, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { verifyWidgetToken } from '../../api';
 
@@ -289,7 +289,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         {otp.map((digit, index) => (
                           <input
                             key={index}
-                            ref={(el) => (inputRefs.current[index] = el)}
+                            ref={(el) => { inputRefs.current[index] = el; }}
                             type="text"
                             maxLength={1}
                             value={digit}

@@ -118,7 +118,7 @@ export default function DiscoveryHome() {
     }
   };
 
-  const renderProductCard = (product: MenuItem, index: number, badgeText?: string) => (
+  const renderProductCard = (product: MenuItem, index: number) => (
     <motion.div 
       key={product.id}
       initial={{ opacity: 0, x: 20 }}
@@ -318,10 +318,7 @@ export default function DiscoveryHome() {
 
       {/* Dynamic Discovery Sections */}
       {discoverySections.map((section) => {
-        // Find products from MENU that have this section's ID in their discoverySections array
-        // (Since backend returns products in discoverySection, we could use that, but we have full MENU loaded locally, so we can just use the products provided in section.products)
-        // Note: We need to map the section.products to our full MenuItem so we get all local fields (like icons, etc.)
-        const sectionProducts = (section.products || [])
+        const products = (section.products || [])
           .map((sp: any) => {
             const localProduct = MENU.find(m => m.id === sp.id);
             if (localProduct) return localProduct;
@@ -335,7 +332,7 @@ export default function DiscoveryHome() {
           })
           .filter(Boolean) as MenuItem[];
           
-        if (sectionProducts.length === 0) return null;
+        if (products.length === 0) return null;
         
         return (
           <section key={section.id} className="mb-10">
@@ -344,7 +341,9 @@ export default function DiscoveryHome() {
               <span className="text-xs font-bold text-gray-400 mb-0.5">See all &gt;</span>
             </div>
             <div className="flex gap-4 overflow-x-auto hide-scrollbar snap-x px-4 pb-4">
-              {sectionProducts.map((product, i) => renderProductCard(product, i))}
+              {products.slice(0, 4).map((product, idx) => 
+                renderProductCard(product, idx)
+              )}
             </div>
           </section>
         );

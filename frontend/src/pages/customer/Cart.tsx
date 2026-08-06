@@ -3,12 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trash2, Ticket, Wallet } from 'lucide-react';
 import { useCartStore } from '../../store/useCartStore';
 import { useAuthStore } from '../../store/useAuthStore';
-import { useOrderStore } from '../../store/useOrderStore';
 import { getStoreSettings } from '../../api';
 import CheckoutAuthGate from '../../components/ui/CheckoutAuthGate';
 import AuthModal from '../../components/ui/AuthModal';
-import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, Sparkles } from 'lucide-react';
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -28,10 +25,6 @@ export default function Cart() {
   
   const [isAuthGateOpen, setIsAuthGateOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  
-  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [successData, setSuccessData] = useState<{ orderId: string, earnedPoints: number } | null>(null);
   
   useEffect(() => {
     getStoreSettings().then(setStoreSettings).catch(console.error);
@@ -178,7 +171,7 @@ export default function Cart() {
               theme: { color: '#1A0B05' }
           };
           const rzp = new (window as any).Razorpay(options);
-          rzp.on('payment.failed', function (response: any) {
+          rzp.on('payment.failed', function () {
               setPaymentError("Payment was not completed. Please try again.");
           });
           rzp.open();
@@ -684,86 +677,7 @@ export default function Cart() {
           </div>
         )}
 
-        <AnimatePresence>
-          {isSuccess && successData && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[9999] bg-[#1A0B05] flex flex-col items-center justify-center p-6 text-center"
-            >
-              <motion.div
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: "spring", damping: 15, stiffness: 200, delay: 0.1 }}
-                className="w-32 h-32 bg-green-500 rounded-full flex items-center justify-center mb-8 shadow-[0_0_60px_rgba(34,197,94,0.4)]"
-              >
-                <CheckCircle2 size={64} className="text-white" />
-              </motion.div>
-              
-              <motion.h2 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-4xl font-black text-white mb-4 tracking-tight"
-              >
-                Order Confirmed!
-              </motion.h2>
-              
-              <motion.p 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="text-lg text-gray-400 mb-8 font-medium"
-              >
-                Your order is being sent to the kitchen.
-              </motion.p>
-              
-              {user ? (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.8, type: "spring" }}
-                  className="bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 border border-[#D4AF37]/30 rounded-3xl p-6 flex items-center gap-4 max-w-sm w-full relative overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-                  <div className="w-14 h-14 bg-gradient-to-br from-[#FFFBF2] to-[#FFF0D4] rounded-full flex items-center justify-center shadow-lg shrink-0 relative z-10">
-                    <Sparkles size={24} className="text-[#D4AF37]" />
-                  </div>
-                  <div className="text-left relative z-10">
-                    <p className="text-[11px] font-black uppercase tracking-widest text-[#D4AF37] mb-1">Rewards Unlocked</p>
-                    <p className="text-xl font-bold text-white"><span className="text-[#D4AF37]">+{successData.earnedPoints}</span> Boba Points</p>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.8, type: "spring" }}
-                  className="bg-white/5 border border-white/10 rounded-3xl p-5 flex flex-col items-center text-center gap-1.5 max-w-sm w-full"
-                >
-                  <p className="text-sm font-bold text-white/70">You missed out on <span className="text-[#D4AF37] font-black">{successData.earnedPoints} points</span>!</p>
-                  <p className="text-[11px] font-medium text-white/40">Create an account next time to earn rewards on every order.</p>
-                </motion.div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
 
-        <AnimatePresence>
-          {isProcessingPayment && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[9999] bg-[#1A0B05]/80 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center"
-            >
-              <div className="w-16 h-16 border-4 border-[#D4AF37]/20 border-t-[#D4AF37] rounded-full animate-spin mb-6"></div>
-              <h3 className="text-2xl font-black text-white mb-2 tracking-tight">Confirming Order...</h3>
-              <p className="text-sm text-gray-400 font-medium">Please wait, do not close this page.</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       <CheckoutAuthGate 

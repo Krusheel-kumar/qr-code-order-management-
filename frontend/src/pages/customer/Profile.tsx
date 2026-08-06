@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Clock, Award, ArrowRight, ShieldCheck, ChevronRight, User as UserIcon, LifeBuoy } from 'lucide-react';
+import { User as UserIcon, Award, Clock, ChevronRight, LogOut, ArrowRight, LifeBuoy } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useOrderStore } from '../../store/useOrderStore';
 import AuthModal from '../../components/ui/AuthModal';
@@ -80,7 +80,7 @@ export default function Profile() {
           {user?.username?.charAt(0).toUpperCase() || 'U'}
         </div>
         <h2 className="font-heading font-black text-2xl text-[#1A0B05] tracking-tight">{user?.username || 'Guest User'}</h2>
-        <p className="text-gray-500 text-sm font-bold mt-1 bg-gray-100 px-3 py-1 rounded-full">{user?.phoneNumber || 'No Phone'}</p>
+        <p className="text-gray-500 text-sm font-bold mt-1 bg-gray-100 px-3 py-1 rounded-full">{user?.username ? 'Verified Member' : 'Guest'}</p>
       </div>
 
       <div className="w-full max-w-[600px] px-6 space-y-6">

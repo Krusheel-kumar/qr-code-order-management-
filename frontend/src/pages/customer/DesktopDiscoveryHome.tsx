@@ -229,7 +229,7 @@ export default function DesktopDiscoveryHome({
 
             <div className="grid grid-cols-4 gap-8">
               {sectionProducts.map((product, idx) => {
-                const badgeText = product.badge || (idx === 0 ? 'Best Seller' : undefined);
+                
                 return (
                   <motion.div
                     key={product.id}

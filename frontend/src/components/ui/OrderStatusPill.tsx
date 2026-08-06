@@ -2,13 +2,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useOrderStatus } from '../../hooks/useOrderStatus';
 import { useOrderStore } from '../../store/useOrderStore';
-import { useAuthStore } from '../../store/useAuthStore';
 import { STORES } from '../../data/stores';
 
 export default function OrderStatusPill() {
   const { activeOrders, recentOrders, mostRecentOrder, isMostRecentRecent } = useOrderStatus();
   const { dismissOrder } = useOrderStore();
-  const { user } = useAuthStore();
   const navigate = useNavigate();
 
   if (activeOrders.length === 0 && recentOrders.length === 0) return null;
