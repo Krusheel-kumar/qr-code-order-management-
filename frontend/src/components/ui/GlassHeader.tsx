@@ -216,7 +216,7 @@ export default function GlassHeader({ onOpenProfile, onOpenSearch, onOpenAuth }:
                     <h4 className="font-black text-xl leading-tight">{user ? user.username : 'Guest User'}</h4>
                     {user && (
                       <span className="text-[11px] font-bold opacity-80 mt-0.5 tracking-wide">
-                        {user.phone || user.email}
+                        {user.phoneNumber || user.email}
                       </span>
                     )}
                   </div>

@@ -132,7 +132,7 @@ export default function Cart() {
       const compilePayloadAndNavigate = (paymentRef: string, status: string) => {
           const orderPayload: any = {
             customerName: cartStore.customerName || user?.username,
-            customerPhone: cartStore.customerPhone || user?.phone,
+            customerPhone: cartStore.customerPhone || user?.phoneNumber,
             tableNumber: finalOrderType === 'PICKUP' ? null : cartStore.tableNumber,
             storeId: cartStore.storeId,
             orderType: finalOrderType,

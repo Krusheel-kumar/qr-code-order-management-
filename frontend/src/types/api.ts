@@ -18,7 +18,7 @@ export interface UserProfile {
   id: string;
   username: string;
   email: string | '';
-  phone: string;
+  phoneNumber: string;
   loyaltyPoints: number;
   role?: string;
 }
