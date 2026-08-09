@@ -28,7 +28,7 @@ public class OrderItem {
     @Column(columnDefinition = "TEXT")
     private String customizations;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "order_item_customizations",
         joinColumns = @JoinColumn(name = "order_item_id")

@@ -19,6 +19,9 @@ public class PopOBobApplication {
     @PostConstruct
     public void init() {
         try {
+            // Force application timezone to IST for consistent order timestamps
+            java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("Asia/Kolkata"));
+            
             // Fix schema types just in case
             jdbcTemplate.execute("ALTER TABLE campaigns ALTER COLUMN image TYPE TEXT");
             jdbcTemplate.execute("ALTER TABLE stories ALTER COLUMN image TYPE TEXT");
