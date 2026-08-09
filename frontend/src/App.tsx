@@ -32,24 +32,25 @@ import POPBuddyHome from './pages/customer/ai/POPBuddyHome';
 import BottomNavigation from './components/ui/BottomNavigation';
 import FloatingCartButton from './components/ui/FloatingCartButton';
 import OrderStatusPill from './components/ui/OrderStatusPill';
-
-
 import DesktopNavbar from './components/ui/DesktopNavbar';
 import Footer from './components/ui/Footer';
+import { ToastProvider } from './components/ui/Toast';
 
 // Layout with Responsive Navigation
 const MainLayout = () => (
-  <div className="min-h-[100dvh] bg-[var(--color-background)] font-sans relative pb-[80px] lg:pb-0 lg:pt-[104px]">
-    <DesktopNavbar />
-    <Outlet />
-    <Footer />
-
-    <div className="lg:hidden">
-      <FloatingCartButton />
-      <OrderStatusPill />
-      <BottomNavigation />
+  <ToastProvider>
+    <div className="min-h-[100dvh] bg-[var(--color-background)] font-sans relative pb-[80px] lg:pb-0 lg:pt-[104px]">
+      <DesktopNavbar />
+      <Outlet />
+      <Footer />
+  
+      <div className="lg:hidden">
+        <FloatingCartButton />
+        <OrderStatusPill />
+        <BottomNavigation />
+      </div>
     </div>
-  </div>
+  </ToastProvider>
 );
 
 const StoreClosedOverlay = () => (
