@@ -19,18 +19,21 @@ export default function PickupLocations() {
 
   return (
     <div className="min-h-[100dvh] bg-[#FDFCF9] flex flex-col font-sans relative">
-      {/* Premium Header */}
-      <div className="bg-[#1A0B05] px-6 pt-10 pb-6 flex flex-col justify-end sticky top-0 z-20 rounded-b-[2rem] shadow-xl shadow-[#1A0B05]/10">
-        <div className="flex items-center gap-4 mb-2">
+      {/* Premium Light Header */}
+      <div className="bg-white/95 backdrop-blur-xl px-6 pt-12 pb-5 flex flex-col sticky top-0 z-20 border-b border-gray-100/50 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
+        <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate(-1)} 
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white active:scale-95 transition-all"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-gray-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:bg-gray-50 active:scale-95 transition-all text-[#1A0B05] shrink-0"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={22} strokeWidth={2.5} />
           </button>
-          <div>
-            <p className="text-[#D4AF37] text-[10px] font-black uppercase tracking-[0.2em] mb-0.5">Find a store</p>
-            <h1 className="text-2xl font-black text-white tracking-tight leading-none">Our Locations</h1>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1.5 mb-1">
+              <MapPin size={13} className="text-[#D4AF37]" strokeWidth={2.5} />
+              <p className="text-[#D4AF37] text-[10px] font-black uppercase tracking-[0.2em] leading-none mt-0.5">Find a store</p>
+            </div>
+            <h1 className="text-[24px] font-black text-[#1A0B05] tracking-tight leading-none">Our Locations</h1>
           </div>
         </div>
       </div>
@@ -45,7 +48,7 @@ export default function PickupLocations() {
             return (
               <div 
                 key={store.id}
-                className={`bg-white rounded-[2rem] p-6 shadow-sm border transition-all duration-300 relative overflow-hidden group ${
+                className={`bg-white rounded-[1.5rem] shadow-sm border transition-all duration-300 relative overflow-hidden flex flex-col group p-4 ${
                   !store.isOpen 
                     ? 'border-red-100/50 opacity-70' 
                     : isSelected 
@@ -55,63 +58,93 @@ export default function PickupLocations() {
               >
                 {/* Selected Badge */}
                 {isSelected && (
-                  <div className="absolute top-5 right-5 bg-[#D4AF37]/10 text-[#D4AF37] p-1.5 rounded-full">
-                    <CheckCircle2 size={20} className="fill-[#D4AF37] text-white" />
+                  <div className="absolute top-4 right-4 bg-[#D4AF37]/90 backdrop-blur-sm text-white p-1 rounded-full z-10 shadow-sm">
+                    <CheckCircle2 size={16} className="fill-[#D4AF37] text-white" />
                   </div>
                 )}
 
-                <div className="flex justify-between items-start mb-4">
+                {/* Top Row: Thumbnail & Info */}
+                <div className="flex gap-4">
+                  {/* Thumbnail */}
                   <div 
-                    className="flex-1 cursor-pointer pr-10"
+                    className="w-24 h-24 rounded-[1rem] bg-gray-100 relative overflow-hidden shrink-0 cursor-pointer"
                     onClick={() => store.isOpen && handleSelectStore(store.id)}
                   >
-                    <h3 className="text-xl font-black text-[#1A0B05] mb-1.5 group-hover:text-[#D4AF37] transition-colors">{store.name}</h3>
-                    <div className="flex items-start gap-2 text-gray-500 text-sm font-medium">
-                      <MapPin size={16} className="shrink-0 mt-0.5 text-[#D4AF37]" />
-                      <span className="leading-snug">{store.address}</span>
+                    {/* @ts-ignore */}
+                    {store.image && (
+                      <img 
+                        // @ts-ignore
+                        src={store.image} 
+                        alt={store.name} 
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <div 
+                    className="flex-1 flex flex-col pt-0.5 cursor-pointer"
+                    onClick={() => store.isOpen && handleSelectStore(store.id)}
+                  >
+                    <h3 className="text-[15px] font-black text-[#1A0B05] mb-1 leading-tight pr-6 group-hover:text-[#D4AF37] transition-colors line-clamp-2">{store.name}</h3>
+                    <div className="flex items-start gap-1 text-gray-500 text-[11px] font-medium mb-2 pr-1">
+                      <MapPin size={12} className="shrink-0 mt-0.5 text-[#D4AF37]" strokeWidth={2.5} />
+                      <span className="leading-snug line-clamp-2">{store.address}</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 mt-auto">
+                      <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider ${store.isOpen ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
+                        {store.isOpen ? 'OPEN' : 'CLOSED'}
+                      </span>
+                      <div className="text-[10px] font-bold text-gray-500 flex items-center gap-1">
+                        <Clock size={10} className="text-gray-400" />
+                        {/* @ts-ignore */}
+                        {store.opensAt} - {store.closesAt}
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div 
-                  className="flex items-center justify-between mb-6 cursor-pointer bg-gray-50/50 rounded-xl p-3"
-                  onClick={() => store.isOpen && handleSelectStore(store.id)}
-                >
-                  <div className="flex items-center gap-4 text-xs font-bold">
-                    <span className={`flex items-center gap-1.5 px-2 py-1 rounded-md ${store.isOpen ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${store.isOpen ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
-                      {store.isOpen ? 'OPEN' : 'CLOSED'}
+                {/* Action Buttons */}
+                <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100 relative z-10">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (store.isOpen) handleSelectStore(store.id);
+                    }}
+                    className={`flex-[2] rounded-xl py-2.5 flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] ${
+                      isSelected 
+                        ? 'bg-[#1A0B05] text-[#D4AF37] shadow-md' 
+                        : 'bg-[#D4AF37] text-[#1A0B05] hover:bg-[#C5A028]'
+                    }`}
+                  >
+                    <CheckCircle2 size={16} className={isSelected ? 'fill-[#D4AF37] text-[#1A0B05]' : ''} />
+                    <span className="text-[11px] font-black uppercase tracking-widest">
+                      {isSelected ? 'Selected' : 'Select'}
                     </span>
-                    <span className="flex items-center gap-1.5 text-gray-400">
-                      <Clock size={14} />
-                      Closes {store.closesAt}
-                    </span>
-                  </div>
-                  
-                  <span className="text-xs font-black text-[#1A0B05] bg-[#D4AF37]/20 px-3 py-1.5 rounded-lg border border-[#D4AF37]/20">
-                    {store.distance}
-                  </span>
-                </div>
-                
-                <div className="flex gap-3">
+                  </button>
+
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
                       window.open(`tel:${store.phone}`, '_self');
                     }}
-                    className="flex-1 py-3.5 rounded-full bg-white text-[#1A0B05] font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 border-2 border-[#1A0B05] hover:bg-[#1A0B05] hover:text-white active:scale-[0.98] transition-all"
+                    className="flex-1 bg-gray-50 border border-gray-200 text-gray-700 rounded-xl py-2.5 flex items-center justify-center gap-1.5 hover:bg-gray-100 transition-colors active:scale-[0.98]"
                   >
-                    <Phone size={14} /> Call Store
+                    <Phone size={14} />
+                    <span className="text-[10px] font-black uppercase hidden sm:block">Call</span>
                   </button>
+
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      // @ts-ignore - mapUrl is optional
+                      // @ts-ignore
                       window.open(store.mapUrl || getDirectionsUrl(store.address), '_blank');
                     }}
-                    className="flex-1 py-3.5 rounded-full bg-[#1A0B05] text-white font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 border-2 border-[#1A0B05] hover:bg-[#D4AF37] hover:text-[#1A0B05] hover:border-[#D4AF37] active:scale-[0.98] transition-all shadow-md"
+                    className="flex-1 bg-gray-100 text-[#1A0B05] rounded-xl py-2.5 flex items-center justify-center gap-1.5 hover:bg-gray-200 transition-colors active:scale-[0.98]"
                   >
-                    <Navigation size={14} fill="currentColor" /> Directions
+                    <Navigation size={14} />
+                    <span className="text-[10px] font-black uppercase hidden sm:block">Map</span>
                   </button>
                 </div>
                 

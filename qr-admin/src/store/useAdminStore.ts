@@ -444,16 +444,26 @@ export const useAdminStore = create<AdminState>((set) => ({
       const api = await import('../api');
       const item = useAdminStore.getState().menuItems.find(i => i.id === id);
       const isActive = !useAdminStore.getState().activeItems[id];
+      
+      // OPTIMISTIC UI UPDATE
+      set((state) => {
+        const newMenuItems = state.menuItems.map(i => i.id === id ? { ...i, isAvailable: isActive } : i);
+        return {
+          activeItems: {
+            ...state.activeItems,
+            [id]: isActive
+          },
+          menuItems: newMenuItems
+        };
+      });
+
       if (item) {
         await api.updateProduct({ ...item, isAvailable: isActive });
       }
-      set((state) => ({
-        activeItems: {
-          ...state.activeItems,
-          [id]: isActive
-        }
-      }));
-    } catch (e) { console.error('Failed to toggle', e); }
+    } catch (e) {
+      console.error('Failed to toggle', e);
+      // We could optionally revert the optimistic update here on failure
+    }
   },
   
   activeCategories: initialActiveCategories,

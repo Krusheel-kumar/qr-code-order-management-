@@ -54,7 +54,6 @@ export default function StoreSelectorSheet({ isOpen, onClose }: Props) {
                   <span className="text-xs text-[#8D6E63] mt-0.5">{store.address}</span>
                   <span className="text-xs text-gray-400 mt-2 font-medium flex items-center gap-2">
                     <span>🕒 Closes {store.closesAt}</span>
-                    <span>📍 {store.distance}</span>
                   </span>
                 </button>
               ))}

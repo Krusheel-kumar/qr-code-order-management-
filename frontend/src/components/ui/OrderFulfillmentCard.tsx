@@ -94,8 +94,6 @@ export default function OrderFulfillmentCard() {
                 {currentStore && (
                   <div className="flex items-center text-xs text-gray-500 font-medium">
                     <Clock size={12} className="mr-1" /> Closes {currentStore.closesAt} 
-                    <span className="mx-2">•</span> 
-                    {currentStore.distance}
                     <span className="mx-2">•</span>
                     <span className={`flex items-center gap-1 font-bold ${currentStore.isOpen ? 'text-emerald-600' : 'text-red-500'}`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${currentStore.isOpen ? 'bg-emerald-500' : 'bg-red-500'}`}></span>

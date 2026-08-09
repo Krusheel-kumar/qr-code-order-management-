@@ -16,7 +16,6 @@ import ProfileSheet from '../../components/ui/ProfileSheet';
 import GlassHeader from '../../components/ui/GlassHeader';
 import DesktopDiscoveryHome from './DesktopDiscoveryHome';
 import SocialWidgets from '../../components/ui/SocialWidgets';
-import OrderStatusCard from '../../components/ui/OrderStatusCard';
 
 import { useCartStore } from '../../store/useCartStore';
 import { useAuthStore } from '../../store/useAuthStore';
@@ -119,42 +118,27 @@ export default function DiscoveryHome() {
   };
 
   const renderProductCard = (product: MenuItem, index: number) => (
-    <motion.div 
+    <div 
       key={product.id}
-      initial={{ opacity: 0, x: 20 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.1 }}
       onClick={() => handleProductClick(product)}
-      className="snap-start shrink-0 w-[160px] bg-white rounded-[1.5rem] border border-black/[0.03] shadow-[0_8px_24px_rgba(0,0,0,0.04)] relative group hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] transition-all cursor-pointer flex flex-col overflow-hidden"
+      className="snap-start shrink-0 w-[140px] bg-white rounded-[24px] border-none shadow-soft-sm relative group hover:shadow-soft-1 active:scale-[0.98] transition-all duration-300 ease-out cursor-pointer flex flex-col overflow-hidden mb-2"
     >
       <div className="w-full aspect-[4/5] bg-gray-50 relative overflow-hidden">
-        {/* Minimalist Independence Day Badge */}
-        <div className="absolute top-2.5 left-2.5 z-10 bg-white/85 backdrop-blur-md px-2 py-1 rounded-md border border-white/60 shadow-sm flex items-center gap-1.5">
-          <div className="flex flex-col w-3 h-[8px] rounded-[1px] overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.1)]">
-            <div className="h-1/3 w-full bg-[#FF9933]"></div>
-            <div className="h-1/3 w-full bg-white relative flex items-center justify-center">
-              <div className="w-[1px] h-[1px] bg-[#000080] rounded-full"></div>
-            </div>
-            <div className="h-1/3 w-full bg-[#138808]"></div>
-          </div>
-          <span className="text-[8px] font-bold tracking-widest text-[#1A0B05] uppercase mt-[1px]">Special</span>
-        </div>
-        <img src={product.image || 'https://images.unsplash.com/photo-1558857563-b37102e95cb4?auto=format&fit=crop&q=80&w=800'} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+        <img src={product.image || 'https://images.unsplash.com/photo-1558857563-b37102e95cb4?auto=format&fit=crop&q=80&w=800'} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
       </div>
       
-      <div className="p-3.5 pt-3 flex flex-col flex-1">
-        <h4 className="font-extrabold text-[16px] text-gray-900 leading-tight mb-0.5">{product.name}</h4>
-        <span className="text-[12px] font-medium text-gray-400 mb-2 uppercase tracking-wider">{product.category.replace('cat_', '')}</span>
+      <div className="p-3 flex flex-col flex-1">
+        <h4 className="font-extrabold text-[13px] text-premium-dark leading-tight mb-0.5 line-clamp-2">{product.name}</h4>
+        <span className="text-[10px] font-bold text-gray-400 mb-2 uppercase tracking-wider">{product.category.replace('cat_', '')}</span>
         
         <div className="flex justify-between items-center mt-auto">
-          <span className="font-extrabold text-[17px] text-black tracking-tight">₹{Math.round(Number(product.price))}</span>
-          <button className="bg-primary text-black hover:bg-[#FF9800] hover:text-white w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold leading-none pb-0.5 transition-colors shadow-sm">
+          <span className="font-extrabold text-[14px] text-black tracking-tight">₹{Math.round(Number(product.price))}</span>
+          <button className="bg-[var(--color-primary)] text-[#1A0B05] w-7 h-7 rounded-full flex items-center justify-center text-base font-bold leading-none pb-0.5 shadow-sm hover:brightness-95 active:scale-95 transition-all">
             +
           </button>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 
   return (
@@ -194,8 +178,6 @@ export default function DiscoveryHome() {
           onOpenSearch={() => setIsSearchOpen(true)} 
           onOpenAuth={() => setIsAuthOpen(true)} 
         />
-
-        <OrderStatusCard />
 
       {/* Skeletons while loading empty initial state */}
       {isLoading && campaigns.length === 0 && stories.length === 0 && discoverySections.length === 0 && (
@@ -239,7 +221,7 @@ export default function DiscoveryHome() {
               >
                 <img 
                   src={campaign.image} 
-                  className="w-full h-full object-cover active:scale-95 transition-transform duration-300" 
+                  className="w-full h-full object-cover transition-transform duration-300" 
                   onClick={() => {
                     if (campaign.link) {
                       // Support internal routing and query params like /menu?category=Barista
@@ -299,7 +281,7 @@ export default function DiscoveryHome() {
         <div className="flex gap-4 overflow-x-auto hide-scrollbar snap-x pb-2 pr-4">
           {stories.map(story => (
             <button key={story.id} onClick={() => setSelectedStory(story.id)} className="flex flex-col items-center gap-1.5 snap-start shrink-0 relative group">
-              <div className="w-[72px] h-[72px] rounded-full p-[3px] bg-gradient-to-tr from-[#FF9800] via-[#FF5722] to-[#FFC461] shadow-sm group-active:scale-95 transition-transform">
+              <div className="w-[72px] h-[72px] rounded-full p-[3px] bg-gradient-to-tr from-[#FF9800] via-[#FF5722] to-[#FFC461] shadow-sm transition-transform">
                 <div className="w-full h-full rounded-full border-2 border-white overflow-hidden bg-gray-100">
                   <img src={story.image} className="w-full h-full object-cover" />
                 </div>
@@ -351,50 +333,7 @@ export default function DiscoveryHome() {
 
 
 
-      {/* Screen 07: Drink Of The Week */}
-      <section className="px-4 mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="font-black text-2xl tracking-tighter text-[#1A0B05]">
-            Drink Of The <span className="text-[#D4AF37]">Week</span>
-          </h3>
-        </div>
-        
-        <div 
-          className="rounded-[2rem] bg-gradient-to-r from-[#5A3825] to-[#3E2312] text-white overflow-hidden shadow-xl flex flex-col group cursor-pointer border border-white/10" 
-          onClick={() => featuredProduct && setSelectedProduct(featuredProduct)}
-        >
-          {/* Top: Image (Full width) */}
-          <div className="w-full h-56 relative overflow-hidden">
-            <div className="absolute inset-0 bg-[#D4AF37]/10 mix-blend-overlay z-10 pointer-events-none"></div>
-            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#3E2312] to-transparent z-10 pointer-events-none"></div>
-            
-            <img 
-              src={featuredProduct?.image || 'https://images.unsplash.com/photo-1558857563-b37102e95cb4?auto=format&fit=crop&q=80&w=800'} 
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-            />
-            
-            <div className="absolute top-4 left-4 bg-white/20 backdrop-blur-md border border-white/20 text-white text-[9px] font-black uppercase tracking-[0.15em] px-3 py-1.5 rounded-full shadow-sm z-20">
-               Spotlight
-            </div>
-          </div>
-          
-          {/* Bottom: Content */}
-          <div className="p-5 relative z-20 flex flex-col -mt-4">
-            <h4 className="font-black text-2xl leading-tight tracking-tight text-white mb-6">
-              {featuredProduct?.name}
-            </h4>
-            
-            <div className="flex items-center justify-between mt-2">
-              <span className="font-black text-2xl text-white">₹{Math.round(Number(featuredProduct?.price || 0))}</span>
-              <button 
-                className="bg-[#D4AF37] hover:bg-white text-[#1A0B05] px-6 py-2.5 rounded-full font-black text-[11px] uppercase tracking-widest shadow-lg transition-all"
-              >
-                Order
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+
 
       {/* Screen 08: Best Combos */}
       {combos.length > 0 && (
@@ -420,42 +359,7 @@ export default function DiscoveryHome() {
         </section>
       )}
       
-      {/* AI Recommender Intercept - Premium Brand Aligned */}
-      <section className="px-4 mb-8">
-        <motion.div 
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => navigate('/ai/home', {
-            state: {
-              customerName: user?.username || null,
-              isGuest: !user
-            }
-          })}
-          className="bg-gradient-to-r from-[#8E5E35] to-[#5A3825] rounded-[2rem] p-6 relative overflow-hidden shadow-xl cursor-pointer flex flex-col gap-5 group border border-white/10"
-        >
-          {/* Subtle Gold Blur */}
-          <div className="absolute -right-10 -top-10 w-40 h-40 bg-[#D4AF37]/20 rounded-full blur-3xl mix-blend-screen pointer-events-none"></div>
-          
-          <div className="flex items-center justify-between relative z-10">
-            <div className="bg-white/20 backdrop-blur-md border border-white/20 px-3 py-1.5 rounded-full flex items-center gap-2 shadow-sm">
-              <span className="text-sm">🪄</span>
-              <span className="text-white text-[10px] font-black tracking-[0.2em] uppercase">POB AI Assistant</span>
-            </div>
-            <div className="w-10 h-10 bg-white text-[#5A3825] rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-               <span className="text-xl drop-shadow-sm">🤖</span>
-            </div>
-          </div>
 
-          <div className="relative z-10">
-            <h4 className="font-black text-[20px] leading-tight tracking-tight text-white mb-2">
-              Not sure what to order? 
-            </h4>
-            <p className="text-[#FFC461] text-[12px] font-bold flex items-center gap-1.5 uppercase tracking-wide">
-              Ask AI Assistant <span className="group-hover:translate-x-1 transition-transform">➔</span>
-            </p>
-          </div>
-        </motion.div>
-      </section>
 
       </div>
       

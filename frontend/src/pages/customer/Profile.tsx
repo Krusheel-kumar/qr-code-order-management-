@@ -18,29 +18,33 @@ export default function Profile() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#FDFCF9] pb-28 flex flex-col items-center">
-        {/* Guest Header Hero */}
-        <div className="w-full bg-[#1A0B05] pt-16 pb-12 px-6 flex flex-col items-center text-center relative overflow-hidden rounded-b-[3rem] shadow-sm">
-          <div className="absolute -top-20 -left-20 w-72 h-72 bg-[#D4AF37]/10 rounded-full blur-[80px] pointer-events-none" />
-          <div className="w-20 h-20 bg-gradient-to-br from-[#FFFBF2] to-[#FFF0D4] rounded-full flex items-center justify-center mb-6 shadow-lg border-4 border-white/10 relative z-10">
-            <UserIcon size={32} className="text-[#D4AF37]" />
-          </div>
-          <h2 className="font-heading font-black text-3xl text-white tracking-tight mb-3 relative z-10">
-            Welcome to POP O'BOB
-          </h2>
-          <p className="text-sm font-medium text-white/60 max-w-xs relative z-10">
-            Join the club to earn Boba Points on every order and unlock exclusive rewards.
-          </p>
+      <div className="min-h-[100dvh] bg-gradient-to-b from-[#FFF5E1] to-[#FDFCF9] pb-28 pt-10 flex flex-col items-center justify-center px-6 relative">
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+           <div className="absolute -top-20 -left-20 w-96 h-96 bg-[#D4AF37]/15 rounded-full blur-[100px]" />
+           <div className="absolute bottom-20 -right-20 w-80 h-80 bg-[#D4AF37]/10 rounded-full blur-[80px]" />
         </div>
 
-        <div className="w-full max-w-[500px] px-6 -mt-6 relative z-20 space-y-6">
-          <button 
-            onClick={() => setShowAuthModal(true)}
-            className="w-full bg-white hover:bg-[#D4AF37] text-[#1A0B05] hover:text-white border-2 border-[#1A0B05] hover:border-[#D4AF37] font-black rounded-2xl py-4.5 text-[15px] shadow-lg shadow-[#1A0B05]/5 hover:shadow-xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 group uppercase tracking-widest"
-          >
-            <span>Log In / Sign Up</span>
-            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-          </button>
+        <div className="w-full max-w-[360px] flex flex-col items-center text-center relative z-10 w-full mt-[-8vh]">
+          {/* Elegant, compact logo container */}
+          <div className="w-20 h-20 rounded-full flex items-center justify-center mb-6 shadow-[0_8px_24px_rgba(212,175,55,0.2)] border-4 border-white relative z-10 overflow-hidden bg-[#1A0B05]">
+            <img src="/Brand Emblem.png" alt="POP O'BOB Logo" className="w-[102%] h-[102%] object-contain" />
+          </div>
+          
+          <h2 className="font-heading font-black text-2xl text-[#1A0B05] tracking-tight mb-2.5">
+            Welcome to POP O'BOB
+          </h2>
+          <p className="text-[13px] font-medium text-gray-500 max-w-[260px] leading-relaxed mb-8">
+            Join the club to earn Boba Points on every order and unlock exclusive rewards.
+          </p>
+
+          <div className="w-full space-y-4">
+            <button 
+              onClick={() => setShowAuthModal(true)}
+              className="w-full bg-[#1A0B05] text-white hover:bg-[#D4AF37] border-2 border-[#1A0B05] hover:border-[#D4AF37] font-black rounded-2xl py-3.5 text-[14px] shadow-[0_4px_16px_rgba(26,11,5,0.12)] hover:shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 group uppercase tracking-widest"
+            >
+              <span>Log In / Sign Up</span>
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </button>
           
           {guestOrders.length > 0 && (
             <div className="bg-white rounded-[2rem] p-2 shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-100">
@@ -64,6 +68,7 @@ export default function Profile() {
               </button>
             </div>
           )}
+          </div>
         </div>
         <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
       </div>

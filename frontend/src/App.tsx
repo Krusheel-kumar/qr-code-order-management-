@@ -17,6 +17,8 @@ import OrderCenter from './pages/customer/OrderCenter';
 import Profile from './pages/customer/Profile';
 import OrderReceipt from './pages/customer/OrderReceipt';
 import ProcessingSuccess from './pages/customer/ProcessingSuccess';
+import PrivacyPolicy from './pages/customer/PrivacyPolicy';
+import TermsOfService from './pages/customer/TermsOfService';
 
 import AIChatScreen from './pages/customer/chat/AIChatScreen';
 
@@ -33,12 +35,14 @@ import OrderStatusPill from './components/ui/OrderStatusPill';
 
 
 import DesktopNavbar from './components/ui/DesktopNavbar';
+import Footer from './components/ui/Footer';
 
 // Layout with Responsive Navigation
 const MainLayout = () => (
   <div className="min-h-[100dvh] bg-[var(--color-background)] font-sans relative pb-[80px] lg:pb-0 lg:pt-[104px]">
     <DesktopNavbar />
     <Outlet />
+    <Footer />
 
     <div className="lg:hidden">
       <FloatingCartButton />
@@ -109,8 +113,8 @@ function App() {
     };
 
     fetchStatus();
-    // Poll every 15 seconds
-    const interval = setInterval(fetchStatus, 15000);
+    // Poll every 60 seconds
+    const interval = setInterval(fetchStatus, 60000);
     return () => {
       clearInterval(interval);
       useMenuStore.getState().stopPolling();
@@ -142,8 +146,9 @@ function App() {
             {/* Screen 17 */}
             <Route path="/cart" element={<Cart />} />
             
-            {/* User Profile */}
             <Route path="/profile" element={<Profile />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
           </Route>
 
           {/* Full Screen Flows (No Bottom Nav) */}

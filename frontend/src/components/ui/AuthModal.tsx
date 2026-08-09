@@ -1,8 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowRight, ShieldCheck } from 'lucide-react';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { verifyWidgetToken } from '../../api';
+import { Button } from './Button';
+import { Input } from './Input';
+import { Sheet } from './Sheet';
 
 declare global {
   interface Window {
@@ -24,6 +27,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [name, setName] = useState('');
   const [otp, setOtp] = useState(['', '', '', '']);
+  const [resendTimer, setResendTimer] = useState(30);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
@@ -41,8 +45,21 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
   }, [isOpen, phoneNumber]);
 
-  const handleRequestOtp = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Resend Timer countdown logic
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (step === 2 && resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [step, resendTimer]);
+
+  const handleRequestOtp = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (phoneNumber.length < 10) {
       setError('Please enter a valid mobile number');
       return;
@@ -62,6 +79,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         success: async (data: any) => {
           try {
             const dataResp = await verifyWidgetToken({ token: data.message, phoneNumber: formattedPhone });
+            if (dataResp.token) {
+              localStorage.setItem('auth_token', dataResp.token);
+            }
             setUser(dataResp.user);
             setLoading(false);
             if (dataResp.isNewUser) {
@@ -83,9 +103,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       if (window.initSendOTP) {
         window.initSendOTP(window.configuration);
         setStep(2);
+        setResendTimer(30); // Start timer when OTP sent
         setTimeout(() => inputRefs.current[0]?.focus(), 100);
       } else {
-        setError('MSG91 SDK not loaded yet. Please wait a moment and try again.');
+        throw new Error("MSG91 OTP script not loaded yet");
       }
       setLoading(false);
     } catch (err: any) {
@@ -152,7 +173,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         // We will add updateUserProfile to api/index.ts
         const { updateUserProfile } = await import('../../api');
         const updatedUser = await updateUserProfile(user.id, { username: name });
-        setUser(updatedUser);
+        setUser(updatedUser as any);
       }
       onClose();
     } catch(err: any) {
@@ -163,42 +184,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-black/70 backdrop-blur-md z-[10000]"
-          />
-
-            {/* Modal Container */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: 40 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 40 }}
-              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed inset-0 z-[10001] flex items-end md:items-center justify-center pointer-events-none p-0 md:p-6"
-            >
-              <div className="pointer-events-auto w-full md:max-w-[440px] bg-[var(--color-surface)] md:rounded-[var(--radius-modal)] rounded-t-[var(--radius-modal)] overflow-hidden shadow-[var(--shadow-soft-modal)] flex flex-col relative pb-safe">
-                
-                {/* Drag Handle (Mobile) */}
-                <div className="w-full flex justify-center pt-4 pb-2 md:hidden">
-                  <div className="w-12 h-1.5 bg-gray-200 rounded-full"></div>
-                </div>
-
-                {/* Close Button */}
-                <button
-                  onClick={onClose}
-                  className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center bg-gray-50 hover:bg-gray-100 rounded-full text-gray-500 hover:text-gray-800 transition-colors z-10"
-                >
-                  <X size={16} />
-                </button>
-
-                <div className="p-8 pt-4 md:pt-10 flex flex-col">
+    <Sheet isOpen={isOpen} onClose={onClose}>
+      <div className="p-8 pt-4 md:pt-10 flex flex-col">
                   {/* Icon Header */}
                   <div className="mb-6 flex justify-center">
                     <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FFFBF2] to-[#FFF0D4] border border-[#D4AF37]/20 flex items-center justify-center shadow-sm relative">
@@ -246,21 +233,22 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2 border-r border-gray-200 pr-3 transition-colors group-focus-within:border-[#D4AF37]/30">
                           <span className="text-gray-800 font-bold text-sm">+91</span>
                         </div>
-                        <input
+                        <Input
                           type="tel"
                           placeholder="Mobile Number"
                           required
                           value={phoneNumber}
                           onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
                           maxLength={10}
-                          className="w-full bg-[var(--color-surface-muted)] border border-gray-100 rounded-[var(--radius-lg)] pl-20 pr-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]/30 focus:border-[#D4AF37] focus:bg-white text-base font-bold text-[var(--color-foreground)] placeholder:text-gray-400 placeholder:font-medium transition-all shadow-[var(--shadow-soft-sm)]"
+                          className="pl-16 font-bold"
                         />
                       </div>
                       
-                      <button
+                      <Button
                         disabled={loading || phoneNumber.length < 10}
                         type="submit"
-                        className="w-full bg-[var(--color-premium-dark)] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-[var(--radius-md)] py-4 text-sm tracking-widest uppercase shadow-[var(--shadow-soft-1)] hover:shadow-[var(--shadow-soft-2)] hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none mt-4"
+                        className="mt-4 w-full"
+                        size="lg"
                       >
                         {loading ? (
                           <span className="flex items-center gap-2">
@@ -276,7 +264,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                             <ArrowRight size={16} />
                           </>
                         )}
-                      </button>
+                      </Button>
                     </form>
                   )}
 
@@ -300,10 +288,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         ))}
                       </div>
 
-                      <button
+                      <Button
                         disabled={loading || otp.join('').length !== 4}
                         type="submit"
-                        className="w-full bg-[var(--color-premium-dark)] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-[var(--radius-md)] py-4 text-sm tracking-widest uppercase shadow-[var(--shadow-soft-1)] hover:shadow-[var(--shadow-soft-2)] hover:-translate-y-0.5 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none mt-4"
+                        className="mt-4 w-full"
+                        size="lg"
                       >
                         {loading ? (
                           <span className="flex items-center gap-2">
@@ -319,7 +308,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                             <ArrowRight size={16} />
                           </>
                         )}
-                      </button>
+                      </Button>
                       
                       <div className="text-center mt-2 flex flex-col gap-2">
                         <button
@@ -332,10 +321,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         <button
                           type="button"
                           onClick={handleRequestOtp}
-                          disabled={loading}
-                          className="text-xs text-[#D4AF37] font-bold hover:text-[#1A0B05] transition-colors disabled:opacity-50"
+                          disabled={loading || resendTimer > 0}
+                          className={`text-xs font-bold transition-colors ${resendTimer > 0 ? 'text-gray-400' : 'text-[#D4AF37] hover:text-[#1A0B05]'}`}
                         >
-                          Resend OTP Code
+                          {resendTimer > 0 ? `Resend OTP in ${resendTimer}s` : 'Resend OTP Code'}
                         </button>
                       </div>
                     </form>
@@ -347,20 +336,21 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   {step === 3 && (
                     <form onSubmit={handleNameSubmit} className="flex flex-col gap-4">
                       <div className="relative">
-                        <input
+                        <Input
                           type="text"
                           placeholder="Your Full Name"
                           required
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          className="w-full bg-gray-50/50 border border-gray-200 rounded-2xl px-5 py-4 focus:outline-none focus:ring-4 focus:ring-[#D4AF37]/10 focus:border-[#D4AF37] focus:bg-white text-base font-bold text-[#1A0B05] placeholder:text-gray-400 placeholder:font-medium transition-all text-center"
+                          className="text-center font-bold"
                         />
                       </div>
                       
-                      <button
+                      <Button
                         disabled={loading || name.trim().length < 2}
                         type="submit"
-                        className="w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] font-black rounded-2xl py-4.5 text-sm tracking-widest uppercase shadow-lg shadow-[#1A0B05]/10 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none mt-2"
+                        className="mt-2 w-full"
+                        size="lg"
                       >
                         {loading ? (
                           <span className="flex items-center gap-2">
@@ -376,15 +366,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                             <ArrowRight size={16} />
                           </>
                         )}
-                      </button>
+                      </Button>
                     </form>
                   )}
                   
-                </div>
-              </div>
-            </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+      </div>
+    </Sheet>
   );
 }

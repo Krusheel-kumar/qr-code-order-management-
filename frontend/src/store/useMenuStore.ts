@@ -91,7 +91,7 @@ export const useMenuStore = create<MenuState>()(
       } catch (error) {
         console.error('Polling failed', error);
       }
-    }, 15000);
+    }, 60000);
     set({ pollingInterval: interval });
   },
 

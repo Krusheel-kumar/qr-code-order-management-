@@ -36,6 +36,8 @@ public class MenuService {
         return productRepository.findByIsAvailableTrue();
     }
 
+    private final com.popobob.repository.DiscoverySectionRepository discoverySectionRepository;
+
     public Product saveProduct(Product product) {
         if (product.getImageUrl() != null && product.getImageUrl().startsWith("data:image")) {
             product.setImageUrl(cloudinaryService.uploadBase64Image(product.getImageUrl()));
@@ -45,8 +47,22 @@ public class MenuService {
                 if (product.getVersion() == null) {
                     product.setVersion(existing.getVersion() != null ? existing.getVersion() : 0);
                 }
+                // Preserve customization groups as they are managed via separate endpoints
+                product.setCustomizationGroups(existing.getCustomizationGroups());
             });
         }
+        
+        // Attach discovery sections to avoid TransientObjectException
+        if (product.getDiscoverySections() != null) {
+            java.util.List<com.popobob.model.DiscoverySection> attachedSections = new java.util.ArrayList<>();
+            for (com.popobob.model.DiscoverySection ds : product.getDiscoverySections()) {
+                if (ds.getId() != null) {
+                    discoverySectionRepository.findById(ds.getId()).ifPresent(attachedSections::add);
+                }
+            }
+            product.setDiscoverySections(attachedSections);
+        }
+        
         return productRepository.save(product);
     }
 

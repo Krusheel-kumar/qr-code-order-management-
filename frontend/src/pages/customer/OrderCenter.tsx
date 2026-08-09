@@ -12,18 +12,26 @@ export default function OrderCenter() {
   const { user } = useAuthStore();
   const [historyOrders, setHistoryOrders] = useState<any[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [errorHistory, setErrorHistory] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user?.id) return;
     setLoadingHistory(true);
+    setErrorHistory(null);
     getUserOrders(user.id).then(data => {
-      // Filter out orders that are currently in 'active' or 'recent' state locally to prevent duplication
-      const activeOrRecentIds = [...activeOrders.map(o => o.id), ...recentOrders.map(o => o.id)];
-      const filteredHistory = data.filter((o: any) => !activeOrRecentIds.includes(o.id));
-      setHistoryOrders(filteredHistory);
+      if (!Array.isArray(data)) {
+        setErrorHistory('Data is not an array: ' + JSON.stringify(data));
+        setHistoryOrders([]);
+        setLoadingHistory(false);
+        return;
+      }
+      setHistoryOrders(data);
       setLoadingHistory(false);
-    }).catch(() => setLoadingHistory(false));
-  }, [user, activeOrders, recentOrders]);
+    }).catch((err) => {
+      setErrorHistory(err.message || 'API Error');
+      setLoadingHistory(false);
+    });
+  }, [user?.id]);
 
   const getStatusText = (status: string) => {
     switch (status) {
@@ -146,6 +154,12 @@ export default function OrderCenter() {
 
             <section className="mt-8 mb-4 border-t border-gray-200 pt-8">
               <h2 className="text-xs font-black uppercase tracking-widest text-gray-400 mb-6 ml-1">Order History</h2>
+              
+              {errorHistory && (
+                <div className="bg-red-50 text-red-600 p-4 rounded-xl text-xs font-bold mb-4">
+                  {errorHistory}
+                </div>
+              )}
               
               {loadingHistory ? (
                 <div className="flex justify-center p-8"><div className="w-8 h-8 border-4 border-[#D4AF37] border-t-transparent rounded-full animate-spin"></div></div>

@@ -241,17 +241,7 @@ export default function DesktopDiscoveryHome({
                     className="bg-white rounded-[2.2rem] border border-gray-100 shadow-[0_12px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_70px_rgba(0,0,0,0.09)] transition-all duration-500 overflow-hidden flex flex-col justify-between group cursor-pointer"
                   >
                     <div className="w-full aspect-[4/3] bg-gradient-to-b from-[#FFFDF8] to-[#F5EBE0]/60 relative overflow-hidden">
-                      {/* Minimalist Independence Day Badge */}
-                      <div className="absolute top-3 left-3 z-10 bg-white/85 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/60 shadow-sm flex items-center gap-1.5">
-                        <div className="flex flex-col w-[14px] h-[9px] rounded-[1px] overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.1)]">
-                          <div className="h-1/3 w-full bg-[#FF9933]"></div>
-                          <div className="h-1/3 w-full bg-white relative flex items-center justify-center">
-                            <div className="w-[1.5px] h-[1.5px] bg-[#000080] rounded-full"></div>
-                          </div>
-                          <div className="h-1/3 w-full bg-[#138808]"></div>
-                        </div>
-                        <span className="text-[9px] font-bold tracking-widest text-[#1A0B05] uppercase mt-[1px]">Special</span>
-                      </div>
+
                       <button
                         onClick={(e) => handleShareProduct(e, product)}
                         className="absolute top-4 right-4 z-10 bg-white/70 backdrop-blur-md hover:bg-white text-gray-800 p-2.5 rounded-full shadow-sm transition-all opacity-0 group-hover:opacity-100"
@@ -353,7 +343,7 @@ export default function DesktopDiscoveryHome({
       {/* 5. DRINK OF THE WEEK & AI RECOMMENDER (Side-by-Side Grid)               */}
       {/* ========================================================================= */}
       <section className="max-w-[1440px] mx-auto px-8 xl:px-12 mb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8 h-[350px]">
+        <div className="grid grid-cols-1 gap-6 xl:gap-8 h-[350px]">
           
           {/* DRINK OF THE WEEK (Left Card) */}
           <motion.div 
@@ -413,45 +403,7 @@ export default function DesktopDiscoveryHome({
             </div>
           </motion.div>
 
-          {/* AI RECOMMENDER BANNER (Right Card) */}
-          <motion.div 
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-            whileHover={{ y: -4, transition: { duration: 0.2 } }}
-            whileTap={{ scale: 0.99 }}
-            onClick={onOpenAI}
-            className="rounded-[2.5rem] bg-white text-[#1A0B05] p-8 xl:p-12 overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.05)] cursor-pointer group flex flex-col justify-center border border-black/5 h-full relative"
-          >
-            {/* Subtle Gold Blur Background */}
-            <div className="absolute -right-10 -top-10 w-80 h-80 bg-[#D4AF37]/10 rounded-full blur-[60px] pointer-events-none" />
 
-            <div className="flex items-center justify-between w-full relative z-10 h-full">
-              {/* Left: Content & Headline */}
-              <div className="flex flex-col justify-center gap-4 flex-1">
-                <div className="bg-[#1A0B05]/5 border border-[#1A0B05]/10 px-4 py-1.5 rounded-full flex items-center gap-2 shadow-sm w-fit">
-                  <span className="text-base">🪄</span>
-                  <span className="text-[#1A0B05] text-[10px] font-black tracking-[0.2em] uppercase">POB AI Assistant</span>
-                </div>
-
-                <h2 className="text-4xl font-black text-[#1A0B05] tracking-tight leading-[1.1]">
-                  Not sure what to order?
-                </h2>
-
-                <p className="text-gray-500 text-xs font-bold flex items-center gap-1.5 uppercase tracking-widest mt-2 group-hover:text-[#D4AF37] transition-colors">
-                  Let AI build your perfect cup <span className="group-hover:translate-x-1 transition-transform">➔</span>
-                </p>
-              </div>
-
-              {/* Right: Interactive Action Button */}
-              <div className="pl-8 flex items-center">
-                <div className="w-20 h-20 bg-white border border-[#1A0B05]/10 rounded-full flex items-center justify-center shadow-lg group-hover:border-[#D4AF37] group-hover:shadow-[0_10px_30px_rgba(212,175,55,0.3)] group-hover:scale-110 transition-all flex-shrink-0 overflow-hidden">
-                  <img src="/assets/logo 2.png" alt="Brand Logo" className="w-full h-full object-cover scale-110" />
-                </div>
-              </div>
-            </div>
-          </motion.div>
         </div>
       </section>
 

@@ -20,7 +20,7 @@ public class StoreBlacklistController {
     private final ProductRepository productRepository;
     private final CustomizationOptionRepository optionRepository;
 
-    private Store getOrCreateStore(String storeId) {
+    private synchronized Store getOrCreateStore(String storeId) {
         return storeRepository.findById(storeId)
                 .orElseGet(() -> {
                     Store newStore = new Store();

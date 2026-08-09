@@ -64,6 +64,7 @@ export default function ItemEditModal({ isOpen, onClose, item }: ItemEditModalPr
         await updateItem({ ...item, ...formData } as MenuItem);
       } else {
         const newItem: MenuItem = {
+          ...formData, // spread formData to catch isBestseller, discoverySections, etc.
           id: `p-${Date.now()}`,
           name: formData.name || 'New Item',
           category: formData.category || categories[0],

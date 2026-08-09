@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, ShoppingBag, Share2 } from 'lucide-react';
+import { X, Check, ShoppingBag, Share2, MapPin } from 'lucide-react';
 import type { MenuItem } from '../data/menu';
 import { useCartStore } from '../store/useCartStore';
 import { shareContent } from '../utils/shareUtils';
@@ -8,6 +8,7 @@ import ShareModal from './ui/ShareModal';
 import BadgeChip from './ui/BadgeChip';
 import type { CustomizationGroup, CustomizationOption } from '../data/models';
 import { getBlacklistedOptions } from '../api';
+import { STORES } from '../data/stores';
 
 interface CustomizerSheetProps {
   product: MenuItem | null;
@@ -262,19 +263,48 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
                 {/* Product Header Info */}
                 <div className="p-6 pb-2">
                   <div className="flex flex-col mb-1">
-                    <h3 className="font-heading font-black text-2xl lg:text-3xl text-[#1A0B05] leading-tight tracking-tight mb-2">{product.name}</h3>
-                    <span className="font-black text-2xl text-[#D4AF37]">₹{product.price}</span>
+                    <h3 className="font-heading font-black text-xl lg:text-2xl text-[#1A0B05] leading-tight tracking-tight mb-1">{product.name}</h3>
+                    <span className="font-black text-lg text-[#D4AF37]">₹{product.price}</span>
                   </div>
                   {product.story?.trim() && (
-                    <p className="text-sm lg:text-base text-gray-500 mt-4 leading-relaxed bg-gray-50 p-4 rounded-2xl italic border border-gray-100">
+                    <p className="text-[13px] lg:text-sm text-gray-500 mt-3 leading-relaxed bg-gray-50 p-4 rounded-xl italic border border-gray-100">
                       "{product.story}"
                     </p>
                   )}
                 </div>
 
-                {/* Customization Options */}
+                {/* Customization Options or Store Selection */}
                 <div className="p-6 pt-2 space-y-8 flex-1">
-                    {product.customizationGroups?.map(group => {
+                  {cartStore.orderType === 'PICKUP' && !cartStore.storeId ? (
+                    <div className="space-y-4">
+                      <div className="text-center mb-6">
+                        <h3 className="text-[#1A0B05] font-black text-xl mb-1">Select Pickup Store</h3>
+                        <p className="text-gray-500 text-sm">Please choose a location to see availability and customize your drink.</p>
+                      </div>
+                      
+                      <div className="flex flex-col gap-3">
+                        {STORES.map((store) => (
+                          <button
+                            key={store.id}
+                            onClick={() => cartStore.setStoreId(store.id)}
+                            className="w-full bg-white border border-gray-100 p-4 rounded-2xl flex items-start gap-4 text-left active:scale-[0.98] transition-all hover:border-[#D4AF37]/50 shadow-sm"
+                          >
+                            <div className="w-10 h-10 rounded-full bg-[#FFFBF2] text-[#D4AF37] flex items-center justify-center shrink-0 mt-0.5">
+                              <MapPin size={20} strokeWidth={2.5} />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-black text-[#1A0B05] text-[15px] mb-1">{store.name}</h4>
+                              <p className="text-gray-500 text-xs leading-relaxed">{store.address}</p>
+                              <div className="mt-2 text-[#D4AF37] text-[10px] font-black uppercase tracking-wider">
+                                {store.isOpen ? 'Open Now' : 'Closed'} • {store.opensAt} - {store.closesAt}
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    product.customizationGroups?.map(group => {
                       const selected = selections[group.id] || [];
                       const error = groupErrors[group.id];
                       return (
@@ -361,19 +391,22 @@ export default function CustomizerSheet({ product, isOpen, onClose }: Customizer
                           </div>
                         </div>
                       );
-                    })}
+                    })
+                  )}
                 </div>
                 
                 {/* Footer Add To Cart Button */}
-                <div className="shrink-0 p-4 lg:p-6 bg-[#FDFCF9]/95 backdrop-blur-xl border-t border-gray-100 sticky bottom-0 z-50 mt-auto">
-                  <button
-                    onClick={handleAddToCart}
-                    className="w-full bg-[#D4AF37] hover:bg-[#FFC461] text-[#1A0B05] py-4 lg:py-5 rounded-full font-black text-[15px] shadow-[0_8px_20px_rgba(212,175,55,0.3)] active:scale-[0.98] transition-all flex justify-between items-center px-8 border border-[#1A0B05]/10 uppercase tracking-widest"
-                  >
-                    <span>Add to Bag</span>
-                    <span className="text-xl font-black">₹{totalPrice}</span>
-                  </button>
-                </div>
+                {(cartStore.orderType !== 'PICKUP' || cartStore.storeId) && (
+                  <div className="shrink-0 p-4 lg:p-6 bg-[#FDFCF9]/95 backdrop-blur-xl border-t border-gray-100 sticky bottom-0 z-50 mt-auto">
+                    <button
+                      onClick={handleAddToCart}
+                      className="w-full bg-[#D4AF37] hover:bg-[#FFC461] text-[#1A0B05] py-4 lg:py-5 rounded-full font-black text-[15px] shadow-[0_8px_20px_rgba(212,175,55,0.3)] active:scale-[0.98] transition-all flex justify-between items-center px-8 border border-[#1A0B05]/10 uppercase tracking-widest"
+                    >
+                      <span>Add to Bag</span>
+                      <span className="text-xl font-black">₹{totalPrice}</span>
+                    </button>
+                  </div>
+                )}
 
               </div>
             </div>

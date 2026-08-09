@@ -24,11 +24,12 @@ export default function DesktopNavbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
 
-  const currentStore = storeId ? STORES.find(s => s.id === storeId) : STORES[0];
+  const currentStore = storeId ? STORES.find(s => s.id === storeId) : null;
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 15);
+      const isNowScrolled = window.scrollY > 15;
+      setIsScrolled(prev => prev !== isNowScrolled ? isNowScrolled : prev);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -156,8 +157,8 @@ export default function DesktopNavbar() {
                     <span className="text-[10px] font-medium text-gray-500 leading-tight">
                       {orderType === 'PICKUP' ? 'Pickup at' : 'Delivery to'}
                     </span>
-                    <span className="text-[13px] font-bold text-[#1A0B05] leading-tight max-w-[90px] xl:max-w-[120px] truncate">
-                      {currentStore?.name || 'Select Store'}
+                    <span className={`text-[13px] font-bold leading-tight max-w-[90px] xl:max-w-[120px] truncate ${!currentStore ? 'text-red-500' : 'text-[#1A0B05]'}`}>
+                      {currentStore?.name || 'No Store Selected'}
                     </span>
                   </div>
                   <ChevronDown size={14} className={`text-gray-400 ml-1 transition-transform ${isLocationMenuOpen ? 'rotate-180 text-[#1A0B05]' : ''}`} />
