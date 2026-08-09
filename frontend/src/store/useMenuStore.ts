@@ -6,7 +6,8 @@ import type { Campaign, Story, DiscoverySection, Category, Coupon } from '../dat
 
 
 interface MenuState {
-  menuItems: MenuItem[];
+  menuItems: any[];
+  setMenuItems: (items: any[]) => void;
   categories: Category[];
   campaigns: Campaign[];
   stories: Story[];
@@ -31,14 +32,14 @@ interface MenuState {
 export const useMenuStore = create<MenuState>()(
   persist(
     (set, get) => ({
-  // Initialize empty
-  menuItems: [],
-  categories: [],
-  campaigns: [],
-  stories: [],
-  discoverySections: [],
-  coupons: [],
-  isLoading: true,
+      menuItems: [],
+      setMenuItems: (items) => set({ menuItems: items }),
+      categories: [],
+      campaigns: [],
+      stories: [],
+      discoverySections: [],
+      coupons: [],
+      isLoading: true,
   pollingInterval: null,
   
   initializeMenu: async () => {
@@ -60,7 +61,7 @@ export const useMenuStore = create<MenuState>()(
         discoverySections: fetchedSections !== null ? fetchedSections : state.discoverySections,
         coupons: fetchedCoupons !== null ? fetchedCoupons : state.coupons,
         isLoading: false 
-      }));
+      } as any));
     } catch (error) {
       console.error('Failed to fetch menu from backend', error);
       set({ isLoading: false });
@@ -87,7 +88,7 @@ export const useMenuStore = create<MenuState>()(
           stories: fetchedStories !== null ? fetchedStories : state.stories,
           discoverySections: fetchedSections !== null ? fetchedSections : state.discoverySections,
           coupons: fetchedCoupons !== null ? fetchedCoupons : state.coupons
-        }));
+        } as any));
       } catch (error) {
         console.error('Polling failed', error);
       }

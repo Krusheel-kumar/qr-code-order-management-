@@ -65,8 +65,9 @@ export default function ProcessingSuccess() {
         if (user) {
           try {
              const updatedUser = await getUserProfile(user.id);
-             if (updatedUser) setUser(updatedUser);
-          } catch (e) {}
+             if (updatedUser) {
+          setUser(updatedUser as any);
+        }  } catch (e) {}
         }
         await new Promise(r => setTimeout(r, 600));
         setCurrentStep(3);
