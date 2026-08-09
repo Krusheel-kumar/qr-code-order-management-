@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2, Ticket, Wallet } from 'lucide-react';
+import { ArrowLeft, Trash2, Ticket, Wallet, Loader2 } from 'lucide-react';
 import { useCartStore } from '../../store/useCartStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { getStoreSettings } from '../../api';
@@ -118,10 +118,12 @@ export default function Cart() {
   };
 
   const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const processPayment = async () => {
     if (cartItems.length === 0) return;
     setPaymentError(null);
+    setIsProcessing(true);
     
     const finalOrderType = cartStore.orderType || 'PICKUP';
     try {
@@ -130,7 +132,7 @@ export default function Cart() {
       const compilePayloadAndNavigate = (paymentRef: string, status: string) => {
           const orderPayload: any = {
             customerName: cartStore.customerName || user?.username,
-            customerPhone: cartStore.customerPhone || user?.phoneNumber,
+            customerPhone: cartStore.customerPhone || user?.phone,
             tableNumber: finalOrderType === 'PICKUP' ? null : cartStore.tableNumber,
             storeId: cartStore.storeId,
             orderType: finalOrderType,
@@ -158,33 +160,39 @@ export default function Cart() {
       if (cartStore.orderType === 'DINE_IN') {
           compilePayloadAndNavigate("PAY_AT_COUNTER", "PENDING");
       } else {
-          const rzpOrder = await createRazorpayOrder(total);
-          const options = {
-              key: 'rzp_test_T4aQ5u6TRc7G0O',
-              amount: rzpOrder.amount,
-              currency: rzpOrder.currency,
-              name: "POP O'BOB®",
-              description: 'Premium Pickup Order',
-              order_id: rzpOrder.id,
-              handler: function (response: any) {
-                  compilePayloadAndNavigate(response.razorpay_payment_id, "PAID");
-              },
-              prefill: {
-                  name: cartStore.customerName || user?.username || '',
-                  contact: cartStore.customerPhone || '',
-                  email: user?.email || ''
-              },
-              theme: { color: '#1A0B05' }
-          };
-          const rzp = new (window as any).Razorpay(options);
-          rzp.on('payment.failed', function () {
-              setPaymentError("Payment was not completed. Please try again.");
-          });
-          rzp.open();
+          try {
+            const rzpOrder = await createRazorpayOrder(total);
+            const options = {
+                key: 'rzp_test_T4aQ5u6TRc7G0O',
+                amount: rzpOrder.amount,
+                currency: rzpOrder.currency,
+                name: "POP O'BOB®",
+                description: 'Premium Pickup Order',
+                order_id: rzpOrder.id,
+                handler: function (response: any) {
+                    compilePayloadAndNavigate(response.razorpay_payment_id, "PAID");
+                },
+                prefill: {
+                    name: cartStore.customerName || user?.username || '',
+                    contact: cartStore.customerPhone || '',
+                    email: user?.email || ''
+                },
+                theme: { color: '#1A0B05' }
+            };
+            const rzp = new (window as any).Razorpay(options);
+            rzp.on('payment.failed', function () {
+                setPaymentError("Payment was not completed. Please try again.");
+                setIsProcessing(false);
+            });
+            rzp.open();
+          } catch (e: any) {
+            setPaymentError(e?.message || 'Failed to initialize payment');
+            setIsProcessing(false);
+          }
       }
-    } catch (error: any) {
-      console.error("Failed to initialize payment", error);
-      setPaymentError("Could not connect to payment gateway. Please try again.");
+    } catch (err) {
+      setPaymentError('Payment initialization failed. Please try again.');
+      setIsProcessing(false);
     }
   };
 
@@ -679,10 +687,18 @@ export default function Cart() {
                 {/* Luxury Apple Checkout CTA (Desktop) */}
                 <div className="hidden lg:block">
                   <button 
-                    onClick={initiateCheckout} 
-                    className="w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] py-5 rounded-full font-black text-sm uppercase tracking-widest shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-3"
+                    onClick={initiateCheckout}
+                    disabled={isProcessing}
+                    className="w-full bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] py-5 rounded-full font-black text-sm uppercase tracking-widest shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5 active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:pointer-events-none"
                   >
-                    <span>{cartStore.orderType === 'DINE_IN' ? 'Place Order (Pay at Counter)' : 'Proceed to Checkout'}</span>
+                    {isProcessing ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        PROCESSING...
+                      </span>
+                    ) : (
+                      <span>{cartStore.orderType === 'DINE_IN' ? 'Place Order (Pay at Counter)' : 'Proceed to Checkout'}</span>
+                    )}
                   </button>
                 </div>
               </div>
@@ -691,18 +707,21 @@ export default function Cart() {
             {/* Floating Checkout Bar (Mobile) */}
             <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-[var(--color-surface)] backdrop-blur-[24px] border-t border-gray-100 z-[90] safe-pb shadow-[var(--shadow-soft-modal)]">
               <button 
-                onClick={initiateCheckout} 
-                className="w-full bg-gradient-to-r from-[#1A0B05] to-[#2A1B16] text-[#D4AF37] py-4 rounded-full font-black text-sm uppercase tracking-widest shadow-[0_8px_20px_rgba(26,11,5,0.4)] active:scale-95 flex items-center justify-between px-6 transition-transform"
+                onClick={initiateCheckout}
+                disabled={isProcessing}
+                className="w-full bg-gradient-to-r from-[#1A0B05] to-[#2A1B16] text-[#D4AF37] py-4 rounded-full font-black text-sm uppercase tracking-widest shadow-[0_8px_20px_rgba(26,11,5,0.4)] active:scale-95 flex items-center justify-between px-6 transition-transform disabled:opacity-50 disabled:pointer-events-none"
               >
                 <div className="flex flex-col items-start text-left">
                   <span className="text-[10px] text-white/70">Total to Pay</span>
                   <span className="text-lg leading-none lining-nums tabular-nums">₹{total}</span>
                 </div>
                 <span className="flex items-center gap-2">
-                  {cartStore.orderType === 'DINE_IN' ? 'Place Order' : 'Checkout'}
-                  <div className="w-6 h-6 bg-[#D4AF37] text-[#1A0B05] rounded-full flex items-center justify-center">
-                    <span className="text-[10px]">➔</span>
-                  </div>
+                  {isProcessing ? 'PROCESSING...' : (cartStore.orderType === 'DINE_IN' ? 'Place Order' : 'Checkout')}
+                  {!isProcessing && (
+                    <div className="w-6 h-6 bg-[#D4AF37] text-[#1A0B05] rounded-full flex items-center justify-center">
+                      <span className="text-[10px]">➔</span>
+                    </div>
+                  )}
                 </span>
               </button>
             </div>
