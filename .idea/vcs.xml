@@ -2,6 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Giftcard/backend" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Giftcard/customer-ui" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Giftcard/staff-admin" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/pobwebsite" vcs="Git" />
   </component>
 </project>

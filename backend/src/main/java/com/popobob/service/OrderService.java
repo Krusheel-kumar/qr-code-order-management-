@@ -8,6 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.ResponseEntity;
+import java.util.Map;
+import java.util.HashMap;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -183,19 +187,58 @@ public class OrderService {
         order.setItems(items);
         order.setSubtotalAmount(totalAmount);
 
-        // Apply Coupon Discount
+        // Apply Coupon / BOGO Discount
         BigDecimal couponDiscountAmt = BigDecimal.ZERO;
         if (request.getCouponCode() != null && !request.getCouponCode().isEmpty()) {
-            Coupon coupon = couponRepository.findByCodeIgnoreCase(request.getCouponCode())
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid or expired coupon code!"));
-            if (coupon.getActive() != null && !coupon.getActive()) {
-                throw new IllegalArgumentException("Invalid or expired coupon code!");
+            if (request.getCouponCode().toUpperCase().startsWith("BOGO-")) {
+                // Handle BOGO validation via Campaign Microservice
+                try {
+                    RestTemplate restTemplate = new RestTemplate();
+                    String bogoUrl = "http://localhost:8081/api/bogo/validate";
+                    
+                    Map<String, Object> reqBody = new HashMap<>();
+                    reqBody.put("code", request.getCouponCode().toUpperCase());
+                    reqBody.put("storeId", request.getStoreId());
+                    
+                    List<Map<String, Object>> cartItemsList = new ArrayList<>();
+                    for (OrderItemDto item : request.getItems()) {
+                        Map<String, Object> cartItem = new HashMap<>();
+                        Product p = productRepository.findById(item.getProductId()).orElse(null);
+                        if (p != null) {
+                            cartItem.put("price", p.getPrice());
+                            cartItem.put("quantity", item.getQuantity());
+                            cartItemsList.add(cartItem);
+                        }
+                    }
+                    reqBody.put("cartItems", cartItemsList);
+                    
+                    ResponseEntity<Map> response = restTemplate.postForEntity(bogoUrl, reqBody, Map.class);
+                    Map<String, Object> resBody = response.getBody();
+                    if (resBody != null && Boolean.TRUE.equals(resBody.get("valid"))) {
+                        Object discountObj = resBody.get("discountAmount");
+                        if (discountObj != null) {
+                            couponDiscountAmt = new BigDecimal(discountObj.toString());
+                        }
+                    } else {
+                        throw new IllegalArgumentException("Invalid BOGO code.");
+                    }
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("Failed to validate BOGO code: " + e.getMessage());
+                }
+            } else {
+                // Existing standard coupon logic
+                Coupon coupon = couponRepository.findByCodeIgnoreCase(request.getCouponCode())
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid or expired coupon code!"));
+                if (coupon.getActive() != null && !coupon.getActive()) {
+                    throw new IllegalArgumentException("Invalid or expired coupon code!");
+                }
+                if (coupon.getType() != null && (coupon.getType().equalsIgnoreCase("PERCENTAGE"))) {
+                    couponDiscountAmt = totalAmount.multiply(new BigDecimal(coupon.getValue() != null ? coupon.getValue() : 0)).divide(new BigDecimal("100"));
+                } else if (coupon.getValue() != null) {
+                    couponDiscountAmt = new BigDecimal(coupon.getValue());
+                }
             }
-            if (coupon.getType() != null && (coupon.getType().equalsIgnoreCase("PERCENTAGE"))) {
-                couponDiscountAmt = totalAmount.multiply(new BigDecimal(coupon.getValue() != null ? coupon.getValue() : 0)).divide(new BigDecimal("100"));
-            } else if (coupon.getValue() != null) {
-                couponDiscountAmt = new BigDecimal(coupon.getValue());
-            }
+            
             totalAmount = totalAmount.subtract(couponDiscountAmt);
             if (totalAmount.compareTo(BigDecimal.ZERO) < 0) {
                 totalAmount = BigDecimal.ZERO;
@@ -247,6 +290,19 @@ public class OrderService {
         
         // Calculate and add loyalty points via Loyalty Module (requires saved order ID)
         loyaltyService.processOrderLoyalty(savedOrder);
+        
+        // Burn BOGO Code
+        if (request.getCouponCode() != null && request.getCouponCode().toUpperCase().startsWith("BOGO-")) {
+            try {
+                RestTemplate restTemplate = new RestTemplate();
+                String redeemUrl = "http://localhost:8081/api/bogo/redeem";
+                Map<String, String> redeemBody = new HashMap<>();
+                redeemBody.put("code", request.getCouponCode().toUpperCase());
+                restTemplate.postForEntity(redeemUrl, redeemBody, Map.class);
+            } catch (Exception e) {
+                System.err.println("Failed to redeem BOGO code: " + e.getMessage());
+            }
+        }
         
         // Notify Staff KDS via WebSocket
         messagingTemplate.convertAndSend("/topic/orders", savedOrder);
