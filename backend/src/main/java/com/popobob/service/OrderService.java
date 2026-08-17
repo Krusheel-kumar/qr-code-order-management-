@@ -32,6 +32,7 @@ public class OrderService {
     private final LoyaltyService loyaltyService;
     private final CouponRepository couponRepository;
     private final StoreSettingsRepository storeSettingsRepository;
+    private final com.popobob.security.JwtUtil jwtUtil;
     @Transactional
     public Order createOrder(OrderRequestDto request) {
         Order order = new Order();
@@ -298,9 +299,15 @@ public class OrderService {
                 String redeemUrl = "http://localhost:8081/api/bogo/redeem";
                 Map<String, String> redeemBody = new HashMap<>();
                 redeemBody.put("code", request.getCouponCode().toUpperCase());
-                restTemplate.postForEntity(redeemUrl, redeemBody, Map.class);
+                
+                org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+                headers.set("Authorization", "Bearer " + jwtUtil.generateToken("internal", "ADMIN"));
+                headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
+                
+                org.springframework.http.HttpEntity<Map<String, String>> requestEntity = new org.springframework.http.HttpEntity<>(redeemBody, headers);
+                restTemplate.postForEntity(redeemUrl, requestEntity, Map.class);
             } catch (Exception e) {
-                System.err.println("Failed to redeem BOGO code: " + e.getMessage());
+                throw new RuntimeException("CRITICAL: Failed to redeem BOGO code. Order aborted to prevent double-spend. Details: " + e.getMessage());
             }
         }
         

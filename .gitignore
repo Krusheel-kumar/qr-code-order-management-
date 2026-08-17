@@ -1,0 +1,7 @@
+
+.env
+.env.*
+!.env.example
+*.log
+backend_live_log.txt
+backend_new_log.txt

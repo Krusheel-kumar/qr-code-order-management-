@@ -163,7 +163,7 @@ export default function Cart() {
           try {
             const rzpOrder = await createRazorpayOrder(total);
             const options = {
-                key: 'rzp_test_T4aQ5u6TRc7G0O',
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
                 amount: rzpOrder.amount,
                 currency: rzpOrder.currency,
                 name: "POP O'BOB®",

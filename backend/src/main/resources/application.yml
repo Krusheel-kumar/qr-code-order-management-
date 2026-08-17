@@ -2,9 +2,9 @@ spring:
   application:
     name: Pop O Bob
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://ep-snowy-silence-ahoq2ovz-pooler.c-3.us-east-1.aws.neon.tech:5432/neondb?sslmode=require}
-    username: ${SPRING_DATASOURCE_USERNAME:neondb_owner}
-    password: ${SPRING_DATASOURCE_PASSWORD:npg_M5aqwncLV3uZ}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update
@@ -22,9 +22,9 @@ app:
     enabled: true
 
 razorpay:
-  key-id: ${RAZORPAY_KEY_ID:rzp_test_T4aQ5u6TRc7G0O}
-  key-secret: ${RAZORPAY_KEY_SECRET:wds1TgsHLGs5qdrb7NwmAhtN}
-  webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:local_webhook_secret_key}
+  key-id: ${RAZORPAY_KEY_ID}
+  key-secret: ${RAZORPAY_KEY_SECRET}
+  webhook-secret: ${RAZORPAY_WEBHOOK_SECRET}
 
 logging:
   level:
@@ -45,5 +45,5 @@ gemini:
     key: ${GEMINI_API_KEY:your_gemini_api_key_here}
 
 msg91:
-  auth-key: ${MSG91_AUTH_KEY:557539A3jnNLJWr6a73367fP1}
+  auth-key: ${MSG91_AUTH_KEY}
   template-id: ${MSG91_TEMPLATE_ID:SecureOTPWidget5TUR}

@@ -72,8 +72,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       if (!formattedPhone.startsWith('91')) formattedPhone = '91' + formattedPhone;
 
       window.configuration = {
-        widgetId: import.meta.env.VITE_MSG91_WIDGET_ID || "3668656e7541363234303538", 
-        tokenAuth: import.meta.env.VITE_MSG91_TOKEN_AUTH || "557539Tl9kAR3zw36a7347b5P1", 
+        widgetId: import.meta.env.VITE_MSG91_WIDGET_ID, 
+        tokenAuth: import.meta.env.VITE_MSG91_TOKEN_AUTH,
         identifier: formattedPhone,
         exposeMethods: "true",
         success: async (data: any) => {
