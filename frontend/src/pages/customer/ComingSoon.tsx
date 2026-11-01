@@ -14,21 +14,21 @@ export default function ComingSoon() {
     <div className="relative min-h-screen bg-[#FAF7F2] text-[#1A0B05] overflow-x-hidden font-sans flex flex-col justify-between selection:bg-[#F3C644] selection:text-black">
       
       {/* ========================================================================= */}
-      {/* SUBTLE MINIMAL AMBIENT GLOW (No harsh or cartoonish blobs) */}
+      {/* SUBTLE MINIMAL AMBIENT GLOW */}
       {/* ========================================================================= */}
       <div className="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden">
         {/* Soft, warm, diffused luxury light */}
-        <div className="absolute -top-[10%] left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-gradient-to-b from-[#FDE8B3]/50 to-transparent blur-[100px] rounded-full" />
-        <div className="absolute top-[40%] left-[10%] w-[350px] h-[350px] bg-[#FED7AA]/30 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-[#FEF08A]/25 blur-[130px] rounded-full" />
+        <div className="absolute -top-[10%] left-1/2 -translate-x-1/2 w-[650px] h-[350px] bg-gradient-to-b from-[#FDE8B3]/45 to-transparent blur-[120px] rounded-full" />
+        <div className="absolute top-[40%] left-[8%] w-[350px] h-[350px] bg-[#FED7AA]/25 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[10%] right-[8%] w-[400px] h-[400px] bg-[#FEF08A]/20 blur-[130px] rounded-full" />
       </div>
 
       {/* ========================================================================= */}
-      {/* 1. MINIMAL TOP NAVBAR */}
+      {/* 1. BIGGER, PROMINENT CENTERED BRAND HEADER */}
       {/* ========================================================================= */}
-      <header className="relative z-20 w-full pt-8 pb-4 px-4 sm:px-8 flex justify-center">
+      <header className="relative z-20 w-full pt-10 sm:pt-14 pb-4 px-4 sm:px-8 flex flex-col items-center justify-center">
         <motion.div 
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="flex items-center justify-center"
@@ -36,47 +36,27 @@ export default function ComingSoon() {
           <img 
             src={horizontalLogo} 
             alt="POP O' BOB - Specialty Bubble Tea" 
-            className="h-9 sm:h-11 md:h-12 w-auto object-contain drop-shadow-sm" 
+            className="h-12 sm:h-16 md:h-20 w-auto object-contain drop-shadow-sm select-none" 
           />
         </motion.div>
       </header>
 
       {/* ========================================================================= */}
-      {/* 2. MAIN MINIMAL CONTENT */}
+      {/* 2. MAIN EDITORIAL CONTENT */}
       {/* ========================================================================= */}
-      <main className="relative z-10 w-full max-w-lg mx-auto px-5 py-4 sm:py-6 flex flex-col items-center text-center">
+      <main className="relative z-10 w-full max-w-lg mx-auto px-5 py-2 sm:py-4 flex flex-col items-center text-center">
         
-        {/* Minimalist Status Badge */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="mb-4 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/80 border border-[#EADBCE] shadow-sm backdrop-blur-md"
-        >
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E5A93C] opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D97706]" />
-          </span>
-          <span className="text-[11px] font-bold text-[#8C5E35] tracking-widest uppercase">
-            Something New Is Coming
-          </span>
-        </motion.div>
-
-        {/* Clean, Bold, Minimal Headline */}
+        {/* Headline: Modern, Bold Editorial Typography */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="flex flex-col items-center"
+          className="flex flex-col items-center mt-2"
         >
-          <h1 className="text-4xl sm:text-5xl font-black text-[#1A0B05] tracking-tight leading-[1.05] font-['Outfit',sans-serif]">
-            Something New
+          <h1 className="text-4xl sm:text-5xl md:text-[54px] font-black text-[#140804] tracking-[-0.03em] leading-[1.08] font-['Outfit',sans-serif]">
+            Something New <br />
+            <span className="text-[#D97706] inline-block mt-1">Is Coming.</span>
           </h1>
-          <div className="mt-1 sm:mt-1.5 flex items-center justify-center gap-2">
-            <span className="text-4xl sm:text-5xl font-black text-[#1A0B05] tracking-tight leading-[1.05] font-['Outfit',sans-serif]">
-              Is Coming.
-            </span>
-          </div>
         </motion.div>
 
         {/* Minimal Subtitle */}
@@ -84,31 +64,31 @@ export default function ComingSoon() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.25 }}
-          className="text-sm sm:text-base text-[#6B5A4E] font-medium leading-relaxed max-w-sm sm:max-w-md mx-auto mt-3 mb-4"
+          className="text-sm sm:text-base text-[#6E594B] font-medium leading-relaxed max-w-sm sm:max-w-md mx-auto mt-4 mb-4"
         >
           We're upgrading your experience with new flavours and exciting offers.
         </motion.p>
 
-        {/* Coming Soon Tag */}
+        {/* Coming Soon Pill */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mb-6"
+          className="mb-7"
         >
-          <div className="inline-block bg-[#1A0B05] text-[#F3C644] px-6 py-2 rounded-full font-bold text-xs sm:text-sm tracking-wide shadow-md">
-            Coming Soon.
+          <div className="inline-block bg-[#1A0B05] text-[#FFD54F] px-7 py-2.5 rounded-full font-bold text-xs sm:text-sm tracking-wider uppercase shadow-md">
+            Coming Soon
           </div>
         </motion.div>
 
         {/* ========================================================================= */}
-        {/* 3. CENTERPIECE DRINK (Clean, Framed Portrait Card with Soft Shadow) */}
+        {/* 3. CENTERPIECE DRINK CARD */}
         {/* ========================================================================= */}
         <motion.div 
           initial={{ opacity: 0, y: 15, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.7, delay: 0.35 }}
-          className="relative w-full max-w-[260px] sm:max-w-[300px] mb-7 select-none"
+          className="relative w-full max-w-[260px] sm:max-w-[290px] mb-7 select-none"
         >
           {/* Ambient soft glow */}
           <div className="absolute inset-0 bg-[#E5A93C]/20 rounded-[2.2rem] blur-2xl transform scale-95 pointer-events-none" />
@@ -223,7 +203,7 @@ export default function ComingSoon() {
 
       </main>
 
-      {/* Tiny spacing */}
+      {/* Spacing */}
       <div className="h-4 pointer-events-none" />
 
     </div>
