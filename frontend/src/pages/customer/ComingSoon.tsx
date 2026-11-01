@@ -9,6 +9,22 @@ import honeydewCupImage from '../../assets/honeydew.png';
 const SWIGGY_URL = 'https://www.swiggy.com/city/hyderabad/pop-o-bob-bubble-tea-cafe';
 const ZOMATO_URL = 'https://www.zomato.com/hyderabad/restaurants/pop-obob-bubble-tea-cafe';
 
+// Joyful Sparkle / Burst Rays Accent (as shown in poster reference)
+function SparkleBurst({ className }: { className?: string }) {
+  return (
+    <svg 
+      viewBox="0 0 100 100" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      <line x1="25.7" y1="33.2" x2="34.3" y2="11.8" stroke="#F8B919" strokeWidth="8" strokeLinecap="round" />
+      <line x1="43.2" y1="48.4" x2="61.8" y2="31.6" stroke="#F8B919" strokeWidth="8" strokeLinecap="round" />
+      <line x1="48.8" y1="70.3" x2="71.2" y2="64.7" stroke="#F8B919" strokeWidth="8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export default function ComingSoon() {
   return (
     <div className="relative min-h-screen bg-[#FFF8EE] text-[#1A0B05] overflow-x-hidden font-sans flex flex-col justify-between selection:bg-[#F3C644] selection:text-black">
@@ -163,6 +179,19 @@ export default function ComingSoon() {
                   (e.target as HTMLImageElement).src = honeydewCupImage;
                 }}
               />
+
+              {/* Sparkle / Burst Rays Accent at Top-Right of Drink (as in reference poster) */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.6 }}
+                animate={{ opacity: 1, scale: [1, 1.1, 1] }}
+                transition={{ 
+                  opacity: { duration: 0.5, delay: 0.4 },
+                  scale: { duration: 2.4, repeat: Infinity, ease: "easeInOut" }
+                }}
+                className="absolute -top-3 right-0 sm:-top-4 sm:right-2 lg:-top-5 lg:right-3 w-11 h-11 sm:w-13 sm:h-13 lg:w-15 lg:h-15 pointer-events-none select-none z-20"
+              >
+                <SparkleBurst className="w-full h-full drop-shadow-sm" />
+              </motion.div>
             </div>
           </motion.div>
 
