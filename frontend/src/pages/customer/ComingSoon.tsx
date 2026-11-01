@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, ExternalLink, MapPin, Instagram, MessageCircle, Heart, ArrowUpRight } from 'lucide-react';
+import { Sparkles, MapPin } from 'lucide-react';
 
 import brandEmblem from '../../assets/Brand Emblem.png';
 import wordmarkLogo from '../../assets/Wordmark Logo.png';
@@ -12,6 +12,36 @@ const SWIGGY_URL = 'https://www.swiggy.com/city/hyderabad/pop-o-bob-bubble-tea-c
 const ZOMATO_URL = 'https://www.zomato.com/hyderabad/restaurants/pop-obob-bubble-tea-cafe';
 const INSTAGRAM_URL = 'https://www.instagram.com/popobobofficial?igsh=MWQ0a2trdmwycDdjMg==';
 const WHATSAPP_URL = 'https://wa.me/919999999999?text=Hi%20Pop%20O%20Bob!';
+
+// Inline SVGs to avoid any Lucide export version incompatibilities
+const InstagramIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+  </svg>
+);
+
+const WhatsAppIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+  </svg>
+);
+
+const ExternalLinkIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    <polyline points="15 3 21 3 21 9" />
+    <line x1="10" y1="14" x2="21" y2="3" />
+  </svg>
+);
+
+const ArrowUpRightIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="7" y1="17" x2="17" y2="7" />
+    <polyline points="7 7 17 7 17 17" />
+  </svg>
+);
 
 // Floating Boba Pearl particles animation
 const BobaBubbles = () => {
@@ -182,7 +212,7 @@ export default function ComingSoon() {
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.03, y: -4 }}
                 whileTap={{ scale: 0.98 }}
-                className="group relative flex flex-col justify-between p-6 rounded-3xl bg-gradient-to-b from-[#25160E] to-[#160D07] border border-[#FC8019]/40 hover:border-[#FC8019] shadow-xl hover:shadow-[#FC8019]/25 transition-all duration-300 overflow-hidden"
+                className="group relative flex flex-col justify-between p-6 rounded-3xl bg-gradient-to-b from-[#25160E] to-[#160D07] border border-[#FC8019]/40 hover:border-[#FC8019] shadow-xl hover:shadow-[#FC8019]/25 transition-all duration-300 overflow-hidden cursor-pointer"
               >
                 <div className="absolute top-0 right-0 w-24 h-24 bg-[#FC8019]/15 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
                 
@@ -192,7 +222,7 @@ export default function ComingSoon() {
                       S
                     </div>
                     <span className="inline-flex items-center gap-1 text-[11px] font-bold text-orange-400 bg-orange-500/10 px-2.5 py-1 rounded-full border border-orange-500/20">
-                      Live Delivery <ArrowUpRight size={12} />
+                      Live Delivery <ArrowUpRightIcon className="w-3 h-3" />
                     </span>
                   </div>
 
@@ -207,7 +237,7 @@ export default function ComingSoon() {
 
                 <div className="mt-6 flex items-center justify-between text-xs font-bold text-[#FC8019] border-t border-white/5 pt-3 group-hover:translate-x-1 transition-transform">
                   <span>Open Swiggy</span>
-                  <ExternalLink size={14} />
+                  <ExternalLinkIcon className="w-3.5 h-3.5" />
                 </div>
               </motion.a>
 
@@ -218,7 +248,7 @@ export default function ComingSoon() {
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.03, y: -4 }}
                 whileTap={{ scale: 0.98 }}
-                className="group relative flex flex-col justify-between p-6 rounded-3xl bg-gradient-to-b from-[#281113] to-[#180A0B] border border-[#E23744]/40 hover:border-[#E23744] shadow-xl hover:shadow-[#E23744]/25 transition-all duration-300 overflow-hidden"
+                className="group relative flex flex-col justify-between p-6 rounded-3xl bg-gradient-to-b from-[#281113] to-[#180A0B] border border-[#E23744]/40 hover:border-[#E23744] shadow-xl hover:shadow-[#E23744]/25 transition-all duration-300 overflow-hidden cursor-pointer"
               >
                 <div className="absolute top-0 right-0 w-24 h-24 bg-[#E23744]/15 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
                 
@@ -228,7 +258,7 @@ export default function ComingSoon() {
                       Z
                     </div>
                     <span className="inline-flex items-center gap-1 text-[11px] font-bold text-red-400 bg-red-500/10 px-2.5 py-1 rounded-full border border-red-500/20">
-                      Live Delivery <ArrowUpRight size={12} />
+                      Live Delivery <ArrowUpRightIcon className="w-3 h-3" />
                     </span>
                   </div>
 
@@ -243,7 +273,7 @@ export default function ComingSoon() {
 
                 <div className="mt-6 flex items-center justify-between text-xs font-bold text-[#E23744] border-t border-white/5 pt-3 group-hover:translate-x-1 transition-transform">
                   <span>Open Zomato</span>
-                  <ExternalLink size={14} />
+                  <ExternalLinkIcon className="w-3.5 h-3.5" />
                 </div>
               </motion.a>
 
@@ -381,7 +411,7 @@ export default function ComingSoon() {
               target="_blank"
               rel="noopener noreferrer"
               whileTap={{ scale: 0.97 }}
-              className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-[#FC8019] to-[#E56A05] text-white shadow-lg shadow-orange-500/30 font-bold border border-orange-400/30"
+              className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-[#FC8019] to-[#E56A05] text-white shadow-lg shadow-orange-500/30 font-bold border border-orange-400/30 cursor-pointer"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white text-[#FC8019] flex items-center justify-center font-black text-xl shadow-md">
@@ -398,7 +428,7 @@ export default function ComingSoon() {
               </div>
               <div className="flex items-center gap-1 text-xs bg-black/20 px-3 py-1.5 rounded-full">
                 <span>Order Now</span>
-                <ArrowUpRight size={14} />
+                <ArrowUpRightIcon className="w-3.5 h-3.5" />
               </div>
             </motion.a>
 
@@ -408,7 +438,7 @@ export default function ComingSoon() {
               target="_blank"
               rel="noopener noreferrer"
               whileTap={{ scale: 0.97 }}
-              className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-[#E23744] to-[#C9222F] text-white shadow-lg shadow-red-500/30 font-bold border border-red-400/30"
+              className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-[#E23744] to-[#C9222F] text-white shadow-lg shadow-red-500/30 font-bold border border-red-400/30 cursor-pointer"
             >
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white text-[#E23744] flex items-center justify-center font-black text-xl italic shadow-md">
@@ -425,7 +455,7 @@ export default function ComingSoon() {
               </div>
               <div className="flex items-center gap-1 text-xs bg-black/20 px-3 py-1.5 rounded-full">
                 <span>Order Now</span>
-                <ArrowUpRight size={14} />
+                <ArrowUpRightIcon className="w-3.5 h-3.5" />
               </div>
             </motion.a>
 
@@ -439,7 +469,7 @@ export default function ComingSoon() {
               rel="noopener noreferrer"
               className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-gray-300 flex items-center gap-1.5 hover:text-white"
             >
-              <Instagram size={14} className="text-pink-400" />
+              <InstagramIcon className="w-3.5 h-3.5 text-pink-400" />
               <span>@POPOBOB</span>
             </a>
             <a 
@@ -448,7 +478,7 @@ export default function ComingSoon() {
               rel="noopener noreferrer"
               className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-gray-300 flex items-center gap-1.5 hover:text-white"
             >
-              <MessageCircle size={14} className="text-emerald-400" />
+              <WhatsAppIcon className="w-3.5 h-3.5 text-emerald-400" />
               <span>WhatsApp</span>
             </a>
           </div>
@@ -482,7 +512,7 @@ export default function ComingSoon() {
           <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
             <span>© {new Date().getFullYear()} Pop O' Bob. All rights reserved.</span>
             <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="hover:text-pink-400 transition-colors">
-              <Instagram size={16} />
+              <InstagramIcon className="w-4 h-4" />
             </a>
           </div>
 
