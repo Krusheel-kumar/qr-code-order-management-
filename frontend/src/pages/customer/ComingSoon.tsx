@@ -1,59 +1,38 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, MapPin } from 'lucide-react';
 
+import horizontalLogo from '../../assets/Horizontal Wordmark with Emblem.png';
 import brandEmblem from '../../assets/Brand Emblem.png';
-import wordmarkLogo from '../../assets/Wordmark Logo.png';
-import heroBanner from '../../assets/herobanner1.png';
-import demoImage from '../../assets/demo.png';
+import bobaCupImage from '../../assets/boba-cup.png';
+import honeydewCupImage from '../../assets/honeydew.png';
 
 // Swiggy and Zomato direct URLs
 const SWIGGY_URL = 'https://www.swiggy.com/city/hyderabad/pop-o-bob-bubble-tea-cafe';
 const ZOMATO_URL = 'https://www.zomato.com/hyderabad/restaurants/pop-obob-bubble-tea-cafe';
-const INSTAGRAM_URL = 'https://www.instagram.com/popobobofficial?igsh=MWQ0a2trdmwycDdjMg==';
-const WHATSAPP_URL = 'https://wa.me/919999999999?text=Hi%20Pop%20O%20Bob!';
 
-// Inline SVGs to avoid any Lucide export version incompatibilities
-const InstagramIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+// Decorative Organic Tea Leaf SVG
+const TeaLeaf = ({ className = '', style = {} }: { className?: string; style?: React.CSSProperties }) => (
+  <svg 
+    viewBox="0 0 64 64" 
+    className={`fill-[#4A7C3A] pointer-events-none select-none ${className}`}
+    style={style}
+  >
+    <path d="M58 8C52 18 42 24 30 26C18 28 8 22 2 16C6 28 14 38 24 44C34 50 48 48 58 40C62 36 64 26 64 16C64 12 62 10 58 8Z" />
+    <path d="M2 16C18 28 36 34 58 40" stroke="#376029" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.6" />
   </svg>
 );
 
-const WhatsAppIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-  </svg>
-);
-
-const ExternalLinkIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-    <polyline points="15 3 21 3 21 9" />
-    <line x1="10" y1="14" x2="21" y2="3" />
-  </svg>
-);
-
-const ArrowUpRightIcon = ({ className = "w-3.5 h-3.5" }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="7" y1="17" x2="17" y2="7" />
-    <polyline points="7 7 17 7 17 17" />
-  </svg>
-);
-
-// Floating Boba Pearl particles animation
-const BobaBubbles = () => {
+// Floating Boba Pearls in the warm cream atmosphere
+const AmbientBobaBubbles = () => {
   const bubbles = [
-    { size: 14, left: '8%', delay: 0, duration: 7 },
-    { size: 22, left: '18%', delay: 2, duration: 8.5 },
-    { size: 10, left: '30%', delay: 1, duration: 6 },
-    { size: 28, left: '42%', delay: 3.5, duration: 9 },
-    { size: 16, left: '55%', delay: 1.5, duration: 7.5 },
-    { size: 24, left: '68%', delay: 2.8, duration: 8 },
-    { size: 12, left: '82%', delay: 0.5, duration: 6.5 },
-    { size: 20, left: '92%', delay: 4, duration: 9.5 },
+    { size: 14, left: '6%', delay: 0, duration: 8 },
+    { size: 20, left: '14%', delay: 2.2, duration: 9 },
+    { size: 10, left: '26%', delay: 1, duration: 7 },
+    { size: 24, left: '38%', delay: 3, duration: 10 },
+    { size: 16, left: '62%', delay: 1.8, duration: 8.5 },
+    { size: 22, left: '74%', delay: 2.6, duration: 9.5 },
+    { size: 12, left: '86%', delay: 0.6, duration: 7.2 },
+    { size: 18, left: '94%', delay: 3.8, duration: 10.5 },
   ];
 
   return (
@@ -61,12 +40,12 @@ const BobaBubbles = () => {
       {bubbles.map((b, i) => (
         <motion.div
           key={i}
-          initial={{ y: '110vh', opacity: 0, scale: 0.8 }}
+          initial={{ y: '115vh', opacity: 0, scale: 0.8 }}
           animate={{
             y: '-10vh',
-            opacity: [0, 0.45, 0.45, 0],
-            scale: [0.8, 1, 1, 0.9],
-            x: [0, i % 2 === 0 ? 25 : -25, 0],
+            opacity: [0, 0.5, 0.5, 0],
+            scale: [0.8, 1, 1, 0.85],
+            x: [0, i % 2 === 0 ? 20 : -20, 0],
           }}
           transition={{
             duration: b.duration,
@@ -79,8 +58,8 @@ const BobaBubbles = () => {
             left: b.left,
             width: `${b.size}px`,
             height: `${b.size}px`,
-            background: 'radial-gradient(circle at 30% 30%, #FFE082, #B78103 60%, #1A0B05 100%)',
-            boxShadow: '0 0 20px rgba(255, 193, 7, 0.25)',
+            background: 'radial-gradient(circle at 35% 35%, #F4A261, #8B4513 70%, #2B170B 100%)',
+            boxShadow: '0 4px 15px rgba(139, 69, 19, 0.2)',
           }}
         />
       ))}
@@ -89,435 +68,321 @@ const BobaBubbles = () => {
 };
 
 export default function ComingSoon() {
-  const outlets = [
-    'Flip Side Adventure Park',
-    'Manikonda',
-    'Film Nagar',
-    'Inorbit Mall',
-    'Sharath City Mall',
-  ];
-
   return (
-    <div className="relative min-h-screen bg-[#0D0B0A] text-white overflow-x-hidden font-sans flex flex-col justify-between selection:bg-[#FFD54F] selection:text-black">
+    <div className="relative min-h-screen bg-[#FDF8EE] text-[#1F1610] overflow-x-hidden font-sans flex flex-col items-center justify-between selection:bg-[#F9BF29] selection:text-black">
       
-      {/* Background Ambience & Lighting */}
-      <div className="fixed inset-0 pointer-events-none select-none z-0">
-        {/* Soft radial glow orbs */}
-        <div className="absolute -top-[15%] left-[10%] w-[500px] md:w-[700px] h-[500px] md:h-[700px] bg-[#FF9933] opacity-20 blur-[150px] rounded-full" />
-        <div className="absolute top-[40%] -right-[10%] w-[450px] md:w-[650px] h-[450px] md:h-[650px] bg-[#E23744] opacity-15 blur-[160px] rounded-full" />
-        <div className="absolute -bottom-[15%] left-[25%] w-[500px] md:w-[800px] h-[500px] md:h-[800px] bg-[#FFD54F] opacity-15 blur-[180px] rounded-full" />
-        {/* Subtle grid pattern overlay */}
-        <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
+      {/* ========================================================================= */}
+      {/* ORGANIC BACKGROUND WAVES & TEA LEAF ACCENTS */}
+      {/* ========================================================================= */}
+      <div className="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden">
+        
+        {/* Top-Left Golden Yellow Fluid Shape */}
+        <div 
+          className="absolute -top-[10%] -left-[12%] w-[320px] sm:w-[480px] lg:w-[600px] h-[320px] sm:h-[480px] lg:h-[600px] rounded-full bg-gradient-to-br from-[#FCD34D] via-[#FBBF24] to-[#F59E0B] opacity-75 blur-[2px]"
+          style={{
+            clipPath: 'ellipse(70% 60% at 30% 30%)',
+          }}
+        />
+
+        {/* Right Fluid Organic Curve */}
+        <div 
+          className="absolute top-[25%] -right-[15%] w-[300px] sm:w-[450px] lg:w-[550px] h-[380px] sm:h-[500px] lg:h-[650px] rounded-full bg-gradient-to-bl from-[#FDE68A] via-[#FCD34D] to-[#FBBF24] opacity-50 blur-[2px]"
+          style={{
+            clipPath: 'ellipse(60% 70% at 70% 50%)',
+          }}
+        />
+
+        {/* Bottom-Left Golden Swirl Wave */}
+        <div 
+          className="absolute -bottom-[12%] -left-[15%] w-[350px] sm:w-[520px] lg:w-[650px] h-[350px] sm:h-[520px] lg:h-[650px] rounded-full bg-gradient-to-tr from-[#FCD34D] via-[#FBBF24] to-[#FDE68A] opacity-65"
+          style={{
+            clipPath: 'ellipse(70% 65% at 35% 65%)',
+          }}
+        />
+
+        {/* Bottom-Right Golden Swirl Wave */}
+        <div 
+          className="absolute -bottom-[10%] -right-[10%] w-[260px] sm:w-[380px] h-[260px] sm:h-[380px] rounded-full bg-gradient-to-tl from-[#FBBF24] to-[#FDE68A] opacity-45"
+        />
+
+        {/* Blurred Fresh Green Tea Leaves at Perimeter (matching user reference image) */}
+        <motion.div 
+          animate={{ y: [0, 8, 0], rotate: [0, 3, 0] }}
+          transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-[18%] -left-3 sm:left-4 z-10 w-16 sm:w-24 h-16 sm:h-24 opacity-80 blur-[0.6px]"
+        >
+          <TeaLeaf className="w-full h-full transform -rotate-45" />
+        </motion.div>
+
+        <motion.div 
+          animate={{ y: [0, -10, 0], rotate: [0, -4, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-[6%] -right-4 sm:right-6 z-10 w-20 sm:w-28 h-20 sm:h-28 opacity-75 blur-[1px]"
+        >
+          <TeaLeaf className="w-full h-full transform rotate-[130deg]" />
+        </motion.div>
+
+        <motion.div 
+          animate={{ y: [0, 10, 0], rotate: [0, 4, 0] }}
+          transition={{ duration: 6.5, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute bottom-[28%] -right-5 sm:right-3 z-10 w-20 sm:w-28 h-20 sm:h-28 opacity-80 blur-[0.8px]"
+        >
+          <TeaLeaf className="w-full h-full transform rotate-[75deg]" />
+        </motion.div>
+
+        <motion.div 
+          animate={{ y: [0, -8, 0], rotate: [0, -3, 0] }}
+          transition={{ duration: 7.5, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute bottom-[10%] -left-4 sm:left-6 z-10 w-16 sm:w-22 h-16 sm:h-22 opacity-75 blur-[0.8px]"
+        >
+          <TeaLeaf className="w-full h-full transform rotate-12" />
+        </motion.div>
+
       </div>
 
       {/* Floating boba bubbles */}
-      <BobaBubbles />
+      <AmbientBobaBubbles />
 
       {/* ========================================================================= */}
-      {/* TOP NAVBAR (Both Desktop & Mobile) */}
+      {/* 1. TOP HEADER / BRAND LOGO (Centered as in reference poster) */}
       {/* ========================================================================= */}
-      <header className="relative z-20 w-full px-4 sm:px-8 py-5 border-b border-white/10 backdrop-blur-md bg-black/20">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          
-          {/* Logo brand group */}
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex items-center gap-3 sm:gap-4"
-          >
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full p-1 bg-gradient-to-tr from-[#FFD54F] to-[#FF9933] shadow-lg shadow-yellow-500/20 flex items-center justify-center">
-              <img src={brandEmblem} alt="Pop O' Bob" className="w-full h-full object-contain drop-shadow" />
-            </div>
-            <div className="flex flex-col">
-              <img src={wordmarkLogo} alt="Pop O' Bob" className="h-5 sm:h-6 w-auto object-contain brightness-125" />
-              <span className="text-[9px] sm:text-[11px] font-bold text-[#FFD54F] tracking-[0.2em] uppercase mt-0.5">
-                Good Times Repeat
-              </span>
-            </div>
-          </motion.div>
-
-          {/* Live Kitchen Status Pill */}
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs sm:text-sm font-semibold shadow-sm"
-          >
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
-            </span>
-            <span className="hidden sm:inline">Kitchens Live for Delivery</span>
-            <span className="sm:hidden">Kitchens Live</span>
-          </motion.div>
-
-        </div>
+      <header className="relative z-20 w-full pt-8 pb-4 px-4 flex flex-col items-center">
+        <motion.div 
+          initial={{ opacity: 0, y: -15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="flex items-center justify-center gap-3"
+        >
+          {/* Logo container with fallback to horizontal or emblem */}
+          <img 
+            src={horizontalLogo} 
+            alt="POP O' BOB - Specialty Bubble Tea" 
+            className="h-10 sm:h-12 md:h-14 w-auto object-contain drop-shadow-sm"
+            onError={(e) => {
+              // Fallback if horizontal logo fails
+              (e.target as HTMLElement).style.display = 'none';
+            }}
+          />
+        </motion.div>
       </header>
 
       {/* ========================================================================= */}
-      {/* MAIN CONTENT AREA */}
+      {/* 2. MAIN POSTER SECTION (Matching the exact uploaded design) */}
       {/* ========================================================================= */}
-      <main className="relative z-10 flex-1 max-w-7xl mx-auto w-full px-4 sm:px-8 py-8 sm:py-16 flex flex-col justify-center">
+      <main className="relative z-10 w-full max-w-xl mx-auto px-4 py-2 sm:py-4 flex flex-col items-center text-center">
         
-        {/* ========================================================================= */}
-        {/* DESKTOP VIEWPORT (lg:grid 2 columns) */}
-        {/* ========================================================================= */}
-        <div className="hidden lg:grid lg:grid-cols-12 gap-12 items-center">
-          
-          {/* Left Column: Heading & Swiggy/Zomato Cards */}
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="lg:col-span-7 flex flex-col items-start text-left"
-          >
-            {/* Glowing Tagline Pill */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-yellow-500/15 via-orange-500/15 to-red-500/15 border border-yellow-500/30 text-yellow-300 text-xs font-bold uppercase tracking-widest mb-6 backdrop-blur-md shadow-lg shadow-yellow-500/10">
-              <Sparkles size={14} className="text-yellow-400 animate-spin" style={{ animationDuration: '4s' }} />
-              Something New Is Coming
-            </div>
+        {/* Top Sunburst Rays (above "Something New") */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="mb-1 flex justify-center text-[#F59E0B]"
+        >
+          <svg className="w-8 h-4 sm:w-10 sm:h-5" viewBox="0 0 36 20" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round">
+            <line x1="18" y1="2" x2="18" y2="8" />
+            <line x1="7" y1="6" x2="12" y2="11" />
+            <line x1="29" y1="6" x2="24" y2="11" />
+          </svg>
+        </motion.div>
 
-            {/* Main Headline */}
-            <h1 className="text-5xl xl:text-6xl font-black tracking-tight leading-[1.1] mb-6 text-white font-['Outfit',sans-serif]">
-              We Are Upgrading <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFD54F] via-[#FFA726] to-[#FF7043] drop-shadow-sm">
-                Your Experience.
-              </span>
-            </h1>
+        {/* Headline Row 1: "Something New" */}
+        <motion.h1 
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.15 }}
+          className="text-4xl sm:text-5xl md:text-6xl font-black text-[#1A0B05] tracking-tight leading-none italic font-['Outfit',sans-serif]"
+        >
+          Something New
+        </motion.h1>
 
-            {/* Description Paragraph */}
-            <p className="text-lg xl:text-xl text-gray-300 leading-relaxed font-normal mb-8 max-w-xl">
-              We're cooking up something big! An elevated digital ordering platform with handcrafted new flavours, fresh boba creations, and exciting exclusive offers is coming very soon.
-            </p>
-
-            {/* Still Live On Announcement Box */}
-            <div className="w-full max-w-xl p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl mb-8">
-              <div className="flex items-center gap-2 text-yellow-400 text-sm font-bold uppercase tracking-wider mb-2">
-                <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
-                Still Live for Orders
-              </div>
-              <p className="text-gray-300 text-sm leading-relaxed">
-                While our web ordering gets revamped, our kitchens are actively preparing your favourite drinks! Order instantly on Swiggy and Zomato below.
-              </p>
-            </div>
-
-            {/* The Swiggy & Zomato Delivery Cards */}
-            <div className="grid grid-cols-2 gap-5 w-full max-w-xl">
-              
-              {/* SWIGGY CARD */}
-              <motion.a
-                href={SWIGGY_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.03, y: -4 }}
-                whileTap={{ scale: 0.98 }}
-                className="group relative flex flex-col justify-between p-6 rounded-3xl bg-gradient-to-b from-[#25160E] to-[#160D07] border border-[#FC8019]/40 hover:border-[#FC8019] shadow-xl hover:shadow-[#FC8019]/25 transition-all duration-300 overflow-hidden cursor-pointer"
-              >
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[#FC8019]/15 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
-                
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 rounded-2xl bg-[#FC8019] text-white flex items-center justify-center font-black text-2xl shadow-lg shadow-orange-500/40 group-hover:scale-110 transition-transform">
-                      S
-                    </div>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-orange-400 bg-orange-500/10 px-2.5 py-1 rounded-full border border-orange-500/20">
-                      Live Delivery <ArrowUpRightIcon className="w-3 h-3" />
-                    </span>
-                  </div>
-
-                  <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Order On</span>
-                  <h3 className="text-2xl font-black text-white group-hover:text-orange-300 transition-colors">
-                    Swiggy
-                  </h3>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Lightning fast delivery to your location
-                  </p>
-                </div>
-
-                <div className="mt-6 flex items-center justify-between text-xs font-bold text-[#FC8019] border-t border-white/5 pt-3 group-hover:translate-x-1 transition-transform">
-                  <span>Open Swiggy</span>
-                  <ExternalLinkIcon className="w-3.5 h-3.5" />
-                </div>
-              </motion.a>
-
-              {/* ZOMATO CARD */}
-              <motion.a
-                href={ZOMATO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.03, y: -4 }}
-                whileTap={{ scale: 0.98 }}
-                className="group relative flex flex-col justify-between p-6 rounded-3xl bg-gradient-to-b from-[#281113] to-[#180A0B] border border-[#E23744]/40 hover:border-[#E23744] shadow-xl hover:shadow-[#E23744]/25 transition-all duration-300 overflow-hidden cursor-pointer"
-              >
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[#E23744]/15 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
-                
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="w-12 h-12 rounded-2xl bg-[#E23744] text-white flex items-center justify-center font-black text-2xl italic shadow-lg shadow-red-500/40 group-hover:scale-110 transition-transform">
-                      Z
-                    </div>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-red-400 bg-red-500/10 px-2.5 py-1 rounded-full border border-red-500/20">
-                      Live Delivery <ArrowUpRightIcon className="w-3 h-3" />
-                    </span>
-                  </div>
-
-                  <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Order On</span>
-                  <h3 className="text-2xl font-black text-white group-hover:text-red-300 transition-colors">
-                    Zomato
-                  </h3>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Freshly handcrafted boba & exclusive deals
-                  </p>
-                </div>
-
-                <div className="mt-6 flex items-center justify-between text-xs font-bold text-[#E23744] border-t border-white/5 pt-3 group-hover:translate-x-1 transition-transform">
-                  <span>Open Zomato</span>
-                  <ExternalLinkIcon className="w-3.5 h-3.5" />
-                </div>
-              </motion.a>
-
-            </div>
-
-          </motion.div>
-
-          {/* Right Column: Visual Product Showcase */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="lg:col-span-5 relative flex items-center justify-center"
-          >
-            {/* Visual Card Frame */}
-            <div className="relative w-full max-w-md aspect-[4/5] rounded-[2.5rem] bg-gradient-to-b from-white/10 to-white/5 border border-white/20 p-6 shadow-2xl backdrop-blur-2xl flex flex-col justify-between overflow-hidden">
-              
-              {/* Background cup image preview */}
-              <div className="absolute inset-0 z-0">
-                <img 
-                  src={heroBanner} 
-                  alt="Pop O' Bob drinks" 
-                  className="w-full h-full object-cover scale-105 opacity-50 blur-[1px]" 
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-              </div>
-
-              {/* Floating feature pills on showcase */}
-              <div className="relative z-10 flex flex-wrap gap-2">
-                <span className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-xs font-semibold text-yellow-300 flex items-center gap-1.5 shadow-md">
-                  ✨ 20+ Premium Flavours
-                </span>
-                <span className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-xs font-semibold text-white flex items-center gap-1.5 shadow-md">
-                  🧋 100% Fresh Brewed Daily
-                </span>
-              </div>
-
-              {/* Center product floating presentation */}
-              <motion.div 
-                animate={{ y: [0, -12, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                className="relative z-10 flex justify-center my-auto drop-shadow-[0_25px_35px_rgba(0,0,0,0.6)]"
-              >
-                <img 
-                  src={demoImage} 
-                  alt="Signature Boba" 
-                  className="max-h-64 object-contain" 
-                />
-              </motion.div>
-
-              {/* Bottom Card Footer */}
-              <div className="relative z-10 p-4 rounded-2xl bg-black/70 backdrop-blur-md border border-white/10">
-                <p className="text-xs font-bold text-[#FFD54F] uppercase tracking-wider mb-1">
-                  Craving Something Special?
-                </p>
-                <p className="text-xs text-gray-300">
-                  Tap Swiggy or Zomato on the left for doorstep delivery within minutes!
-                </p>
-              </div>
-
-            </div>
-          </motion.div>
-
-        </div>
-
-        {/* ========================================================================= */}
-        {/* MOBILE VIEWPORT (block lg:hidden) */}
-        {/* ========================================================================= */}
-        <div className="block lg:hidden flex flex-col items-center text-center">
-          
-          {/* Animated Tagline Pill */}
-          <motion.div 
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-yellow-500/15 via-orange-500/15 to-red-500/15 border border-yellow-500/30 text-yellow-300 text-[11px] font-bold uppercase tracking-wider mb-4 backdrop-blur-md shadow-md"
-          >
-            <Sparkles size={13} className="text-yellow-400 animate-spin" style={{ animationDuration: '4s' }} />
-            Something New Is Coming
-          </motion.div>
-
-          {/* Mobile Main Heading */}
-          <motion.h1 
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-3xl sm:text-4xl font-black tracking-tight leading-tight mb-3 text-white font-['Outfit',sans-serif]"
-          >
-            We Are Upgrading <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FFD54F] via-[#FFA726] to-[#FF7043]">
-              Your Experience.
+        {/* Headline Row 2: "Is Coming." with Yellow Badge and Side Rays */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.25 }}
+          className="flex items-center justify-center gap-2 mt-2 mb-3"
+        >
+          <div className="bg-[#FFC938] px-5 sm:px-7 py-1 sm:py-1.5 rounded-2xl sm:rounded-3xl shadow-sm border border-[#F59E0B]/30 transform -rotate-1">
+            <span className="text-4xl sm:text-5xl md:text-6xl font-black text-[#1A0B05] tracking-tight italic font-['Outfit',sans-serif] inline-block">
+              Is Coming.
             </span>
-          </motion.h1>
+          </div>
 
-          {/* Mobile Subtitle */}
-          <motion.p 
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-sm text-gray-300 leading-relaxed font-normal mb-6 max-w-sm px-2"
-          >
-            We are upgrading your experience with new flavours and existing offers coming soon!
-          </motion.p>
+          {/* Right side sunbeam rays next to badge */}
+          <div className="text-[#F59E0B] flex flex-col gap-1 pl-1">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round">
+              <line x1="2" y1="7" x2="10" y2="8" />
+              <line x1="2" y1="13" x2="10" y2="11" />
+            </svg>
+          </div>
+        </motion.div>
 
-          {/* Floating drink showcase thumbnail on mobile */}
+        {/* Subtitle Description */}
+        <motion.p 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.35 }}
+          className="text-base sm:text-lg text-[#3D2C20] font-medium leading-snug max-w-sm sm:max-w-md mx-auto mb-4 px-2"
+        >
+          We're upgrading your experience with new flavours and exciting offers.
+        </motion.p>
+
+        {/* "Coming Soon." Dark Brown Pill Badge */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.45 }}
+          className="mb-5"
+        >
+          <div className="inline-block bg-[#231207] text-[#FFC938] px-7 py-2 rounded-full font-black text-sm sm:text-base tracking-wide shadow-md border border-[#3E2210]">
+            Coming Soon.
+          </div>
+        </motion.div>
+
+        {/* ========================================================================= */}
+        {/* 3. CENTER DRINK SHOWCASE (Brown Sugar Boba cup with pedestal & accents) */}
+        {/* ========================================================================= */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.92, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="relative w-full max-w-[280px] sm:max-w-[340px] md:max-w-[380px] my-1 flex flex-col items-center justify-center select-none"
+        >
+          {/* Subtle warm glow behind cup */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 sm:w-64 h-48 sm:h-64 bg-[#FCD34D] opacity-40 blur-3xl rounded-full pointer-events-none" />
+
+          {/* Decorative Sparkle Rays on Right of Cup */}
+          <div className="absolute right-0 top-1/3 text-[#F59E0B] pointer-events-none z-20">
+            <svg className="w-6 h-6 sm:w-8 sm:h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round">
+              <line x1="4" y1="18" x2="10" y2="14" />
+              <line x1="8" y1="6" x2="12" y2="12" />
+              <line x1="20" y1="12" x2="14" y2="12" />
+            </svg>
+          </div>
+
+          {/* Boba Cup Image with subtle floating motion */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.25 }}
-            className="relative w-full max-w-xs mb-6 rounded-3xl overflow-hidden border border-white/15 bg-white/5 backdrop-blur-xl p-4 shadow-xl"
+            animate={{ y: [0, -6, 0] }}
+            transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
+            className="relative z-10 w-full flex items-center justify-center drop-shadow-[0_18px_25px_rgba(43,23,11,0.25)]"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-16 h-16 rounded-2xl bg-black/40 overflow-hidden shrink-0 border border-white/10 flex items-center justify-center">
-                <img src={demoImage} alt="Boba" className="w-full h-full object-contain p-1" />
-              </div>
-              <div className="text-left">
-                <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">
-                  Kitchens Active Now
-                </span>
-                <span className="text-sm font-bold text-white block">
-                  Pop O' Bob Bubble Tea
-                </span>
-                <span className="text-xs text-gray-400 block mt-0.5">
-                  Available for Delivery on Swiggy & Zomato
-                </span>
-              </div>
-            </div>
+            <img 
+              src={bobaCupImage} 
+              alt="Pop O' Bob Handcrafted Specialty Bubble Tea" 
+              className="max-h-[260px] sm:max-h-[320px] md:max-h-[360px] w-auto object-contain"
+              onError={(e) => {
+                // Fallback to honeydew cup if needed
+                (e.target as HTMLImageElement).src = honeydewCupImage;
+              }}
+            />
           </motion.div>
 
-          {/* Mobile Swiggy & Zomato Action Cards */}
-          <div className="w-full max-w-sm flex flex-col gap-3.5 mb-6">
+          {/* Marble Coaster / Base shadow */}
+          <div className="w-3/4 h-3 bg-[#422919]/15 blur-md rounded-full mt-[-6px] z-0" />
+        </motion.div>
+
+        {/* ========================================================================= */}
+        {/* 4. DELIVERY CALLOUT & ACTION BUTTONS */}
+        {/* ========================================================================= */}
+        <motion.div 
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.55 }}
+          className="w-full max-w-sm sm:max-w-md mt-4 sm:mt-6 flex flex-col items-center"
+        >
+          {/* Headline: Craving boba? We're live on */}
+          <h2 className="text-xl sm:text-2xl font-black italic text-[#1A0B05] tracking-tight mb-3 font-['Outfit',sans-serif]">
+            Craving boba? We're live on
+          </h2>
+
+          {/* Side-by-side Swiggy & Zomato Delivery Buttons */}
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full">
             
-            {/* SWIGGY MOBILE BUTTON */}
+            {/* SWIGGY BUTTON */}
             <motion.a
               href={SWIGGY_URL}
               target="_blank"
               rel="noopener noreferrer"
+              whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.97 }}
-              className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-[#FC8019] to-[#E56A05] text-white shadow-lg shadow-orange-500/30 font-bold border border-orange-400/30 cursor-pointer"
+              className="group relative flex flex-col items-center justify-center py-3.5 px-4 rounded-2xl sm:rounded-3xl bg-gradient-to-b from-[#FF7A00] to-[#E8590C] text-white shadow-lg shadow-orange-500/35 border border-orange-400/40 cursor-pointer overflow-hidden transition-all duration-300"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white text-[#FC8019] flex items-center justify-center font-black text-xl shadow-md">
-                  S
-                </div>
-                <div className="text-left">
-                  <span className="text-[10px] uppercase tracking-wider text-orange-100 block font-semibold leading-none mb-0.5">
-                    Order Delivery on
-                  </span>
-                  <span className="text-lg font-black text-white leading-tight">
-                    Swiggy
-                  </span>
-                </div>
+              {/* Subtle light shine */}
+              <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+              <div className="flex items-center gap-2 mb-1">
+                {/* Swiggy Pin Emblem SVG */}
+                <svg viewBox="0 0 24 24" className="w-6 h-6 sm:w-7 sm:h-7 fill-white shrink-0 drop-shadow-sm">
+                  <path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 12 8 12s8-6.75 8-12c0-4.42-3.58-8-8-8zm0 11c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z"/>
+                </svg>
+                <span className="text-xl sm:text-2xl font-black tracking-tight leading-none drop-shadow-sm">
+                  Swiggy
+                </span>
               </div>
-              <div className="flex items-center gap-1 text-xs bg-black/20 px-3 py-1.5 rounded-full">
+
+              <div className="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-orange-100 opacity-95 group-hover:translate-x-0.5 transition-transform">
                 <span>Order Now</span>
-                <ArrowUpRightIcon className="w-3.5 h-3.5" />
+                <span className="text-xs">↗</span>
               </div>
             </motion.a>
 
-            {/* ZOMATO MOBILE BUTTON */}
+            {/* ZOMATO BUTTON */}
             <motion.a
               href={ZOMATO_URL}
               target="_blank"
               rel="noopener noreferrer"
+              whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.97 }}
-              className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-[#E23744] to-[#C9222F] text-white shadow-lg shadow-red-500/30 font-bold border border-red-400/30 cursor-pointer"
+              className="group relative flex flex-col items-center justify-center py-3.5 px-4 rounded-2xl sm:rounded-3xl bg-gradient-to-b from-[#E23744] to-[#B81D2B] text-white shadow-lg shadow-red-500/35 border border-red-400/40 cursor-pointer overflow-hidden transition-all duration-300"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white text-[#E23744] flex items-center justify-center font-black text-xl italic shadow-md">
-                  Z
-                </div>
-                <div className="text-left">
-                  <span className="text-[10px] uppercase tracking-wider text-red-100 block font-semibold leading-none mb-0.5">
-                    Order Delivery on
-                  </span>
-                  <span className="text-lg font-black text-white leading-tight">
-                    Zomato
-                  </span>
-                </div>
+              {/* Subtle light shine */}
+              <div className="absolute inset-0 bg-gradient-to-t from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+              <div className="flex items-center mb-1">
+                <span className="text-2xl sm:text-3xl font-black italic tracking-tighter drop-shadow-sm font-sans">
+                  zomato
+                  <sup className="text-[10px] font-normal not-italic ml-0.5 opacity-90">®</sup>
+                </span>
               </div>
-              <div className="flex items-center gap-1 text-xs bg-black/20 px-3 py-1.5 rounded-full">
+
+              <div className="flex items-center gap-1 text-[11px] sm:text-xs font-bold text-red-100 opacity-95 group-hover:translate-x-0.5 transition-transform">
                 <span>Order Now</span>
-                <ArrowUpRightIcon className="w-3.5 h-3.5" />
+                <span className="text-xs">↗</span>
               </div>
             </motion.a>
 
           </div>
 
-          {/* Social Quick Links on Mobile */}
-          <div className="flex items-center gap-3 mb-4">
-            <a 
-              href={INSTAGRAM_URL}
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-gray-300 flex items-center gap-1.5 hover:text-white"
-            >
-              <InstagramIcon className="w-3.5 h-3.5 text-pink-400" />
-              <span>@POPOBOB</span>
-            </a>
-            <a 
-              href={WHATSAPP_URL}
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-gray-300 flex items-center gap-1.5 hover:text-white"
-            >
-              <WhatsAppIcon className="w-3.5 h-3.5 text-emerald-400" />
-              <span>WhatsApp</span>
-            </a>
+        </motion.div>
+
+        {/* ========================================================================= */}
+        {/* 5. FOOTER / TAGLINE (Heart & Elegant Slogan) */}
+        {/* ========================================================================= */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.65 }}
+          className="w-full max-w-sm mx-auto mt-6 sm:mt-8 mb-4 flex flex-col items-center"
+        >
+          {/* Heart icon with delicate accent dividers */}
+          <div className="flex items-center justify-center gap-3 w-full mb-2 opacity-60">
+            <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-[#CBB69D] to-transparent" />
+            <svg className="w-4 h-4 text-[#F59E0B] fill-[#F59E0B]" viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-[#CBB69D] to-transparent" />
           </div>
 
-        </div>
+          {/* Slogan */}
+          <p className="text-xs sm:text-sm italic font-medium text-[#6B5344] tracking-wide text-center">
+            New flavours. Exciting offers. Same boba love.
+          </p>
+        </motion.div>
 
       </main>
 
-      {/* ========================================================================= */}
-      {/* FOOTER BAR (Outlets & Copyright) */}
-      {/* ========================================================================= */}
-      <footer className="relative z-20 w-full px-4 sm:px-8 py-6 border-t border-white/10 bg-black/40 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
-          
-          {/* Outlets List */}
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 text-xs text-gray-400">
-            <span className="flex items-center gap-1 font-semibold text-yellow-400 mr-1">
-              <MapPin size={13} /> Our Outlets:
-            </span>
-            {outlets.map((outlet, idx) => (
-              <span 
-                key={idx} 
-                className="px-2.5 py-1 rounded-md bg-white/5 border border-white/10 text-[11px] text-gray-300"
-              >
-                {outlet}
-              </span>
-            ))}
-          </div>
-
-          {/* Copyright & Social */}
-          <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
-            <span>© {new Date().getFullYear()} Pop O' Bob. All rights reserved.</span>
-            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="hover:text-pink-400 transition-colors">
-              <InstagramIcon className="w-4 h-4" />
-            </a>
-          </div>
-
-        </div>
-      </footer>
+      {/* Tiny bottom spacer */}
+      <div className="h-4 pointer-events-none" />
 
     </div>
   );
