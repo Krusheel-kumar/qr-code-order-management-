@@ -120,6 +120,8 @@ export default function ComingSoon() {
                   href={SWIGGY_URL}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="Order Pop O’ Bob on Swiggy"
+                  title="Order Pop O’ Bob on Swiggy"
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.97 }}
                   className="group relative flex flex-col items-center justify-center py-3.5 px-4 rounded-2xl bg-[#FC8019] hover:bg-[#E56A05] text-white shadow-lg shadow-orange-500/20 cursor-pointer overflow-hidden transition-all duration-200"
@@ -221,6 +223,8 @@ export default function ComingSoon() {
                 href={SWIGGY_URL}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Order Pop O’ Bob on Swiggy"
+                title="Order Pop O’ Bob on Swiggy"
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.97 }}
                 className="group relative flex flex-col items-center justify-center py-3.5 px-4 rounded-2xl bg-[#FC8019] hover:bg-[#E56A05] text-white shadow-lg shadow-orange-500/20 cursor-pointer overflow-hidden transition-all duration-200"
