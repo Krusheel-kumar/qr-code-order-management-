@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 import horizontalLogo from '../../assets/Horizontal Wordmark with Emblem.png';
-import bobaCupPortrait from '../../assets/boba-cup-portrait.png';
+import chocolateBobaCup from '../../assets/chocolate-boba-cup.png';
 import honeydewCupImage from '../../assets/honeydew.png';
 
 // Swiggy and Zomato direct URLs
@@ -88,7 +88,7 @@ export default function ComingSoon() {
           initial={{ opacity: 0, y: 15, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.7, delay: 0.35 }}
-          className="relative w-full max-w-[260px] sm:max-w-[290px] mb-7 select-none"
+          className="relative w-full max-w-[270px] sm:max-w-[300px] mb-7 select-none"
         >
           {/* Ambient soft glow */}
           <div className="absolute inset-0 bg-[#E5A93C]/20 rounded-[2.2rem] blur-2xl transform scale-95 pointer-events-none" />
@@ -97,12 +97,12 @@ export default function ComingSoon() {
           <motion.div 
             whileHover={{ y: -4, scale: 1.02 }}
             transition={{ duration: 0.3 }}
-            className="relative z-10 w-full aspect-[3/4] rounded-[2.2rem] overflow-hidden shadow-[0_20px_45px_-12px_rgba(26,11,5,0.18)] border border-white/60 bg-white"
+            className="relative z-10 w-full aspect-[4/5] rounded-[2.2rem] overflow-hidden shadow-[0_20px_45px_-12px_rgba(26,11,5,0.16)] border border-[#EADBCE]/80 bg-gradient-to-b from-white via-[#FDFBF9] to-[#F8EFE4] flex items-center justify-center p-3 sm:p-4"
           >
             <img 
-              src={bobaCupPortrait} 
-              alt="Pop O' Bob Handcrafted Specialty Bubble Tea" 
-              className="w-full h-full object-cover"
+              src={chocolateBobaCup} 
+              alt="Pop O' Bob Handcrafted Chocolate Boba Cup" 
+              className="w-full h-full object-contain drop-shadow-[0_16px_24px_rgba(45,15,5,0.22)]"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = honeydewCupImage;
               }}
