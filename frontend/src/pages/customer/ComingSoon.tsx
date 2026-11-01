@@ -6,7 +6,7 @@ import chocolateTeaCoaster from '../../assets/chocolate-tea-coaster.png';
 import honeydewCupImage from '../../assets/honeydew.png';
 
 // Swiggy and Zomato direct URLs
-const SWIGGY_URL = 'https://www.swiggy.com/city/hyderabad/pop-o-bob-bubble-tea-cafe';
+const SWIGGY_URL = 'https://www.swiggy.com';
 const ZOMATO_URL = 'https://www.zomato.com/hyderabad/restaurants/pop-obob-bubble-tea-cafe';
 
 // Joyful Sparkle / Burst Rays Accent (as shown in poster reference)
