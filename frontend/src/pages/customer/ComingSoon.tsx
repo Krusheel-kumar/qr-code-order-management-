@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 import horizontalLogo from '../../assets/logo-wordmark-tight.png';
-import chocolateBobaCup from '../../assets/chocolate-boba-cup.png';
+import chocolateTeaCoaster from '../../assets/chocolate-tea-coaster.png';
 import honeydewCupImage from '../../assets/honeydew.png';
 
 // Swiggy and Zomato direct URLs
@@ -97,12 +97,12 @@ export default function ComingSoon() {
           <motion.div 
             whileHover={{ y: -4, scale: 1.02 }}
             transition={{ duration: 0.3 }}
-            className="relative z-10 w-full aspect-[4/5] rounded-[2.2rem] overflow-hidden shadow-[0_20px_45px_-12px_rgba(26,11,5,0.16)] border border-[#EADBCE]/80 bg-gradient-to-b from-white via-[#FDFBF9] to-[#F8EFE4] flex items-center justify-center p-3 sm:p-4"
+            className="relative z-10 w-full aspect-[3/4] rounded-[2.2rem] overflow-hidden shadow-[0_20px_45px_-12px_rgba(26,11,5,0.16)] border border-[#EADBCE]/80 bg-gradient-to-b from-white via-[#FDFBF9] to-[#F8EFE4] flex items-center justify-center p-2.5 sm:p-3"
           >
             <img 
-              src={chocolateBobaCup} 
-              alt="Pop O' Bob Handcrafted Chocolate Boba Cup" 
-              className="w-full h-full object-contain drop-shadow-[0_16px_24px_rgba(45,15,5,0.22)]"
+              src={chocolateTeaCoaster} 
+              alt="Pop O' Bob Chocolate Brown Bubble Tea on Wooden Coaster" 
+              className="w-full h-full object-contain drop-shadow-[0_12px_20px_rgba(45,15,5,0.18)]"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = honeydewCupImage;
               }}
