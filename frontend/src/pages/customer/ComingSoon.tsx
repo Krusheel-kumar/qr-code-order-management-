@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-import horizontalLogo from '../../assets/Horizontal Wordmark with Emblem.png';
+import horizontalLogo from '../../assets/logo-wordmark-tight.png';
 import chocolateBobaCup from '../../assets/chocolate-boba-cup.png';
 import honeydewCupImage from '../../assets/honeydew.png';
 
@@ -24,11 +24,11 @@ export default function ComingSoon() {
       </div>
 
       {/* ========================================================================= */}
-      {/* 1. BIGGER, PROMINENT CENTERED BRAND HEADER */}
+      {/* 1. BIGGER, PROMINENT CENTERED BRAND HEADER AT THE VERY TOP */}
       {/* ========================================================================= */}
-      <header className="relative z-20 w-full pt-10 sm:pt-14 pb-4 px-4 sm:px-8 flex flex-col items-center justify-center">
+      <header className="relative z-20 w-full pt-5 sm:pt-7 pb-2 px-4 sm:px-8 flex flex-col items-center justify-center">
         <motion.div 
-          initial={{ opacity: 0, y: -12 }}
+          initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           className="flex items-center justify-center"
@@ -36,7 +36,7 @@ export default function ComingSoon() {
           <img 
             src={horizontalLogo} 
             alt="POP O' BOB - Specialty Bubble Tea" 
-            className="h-12 sm:h-16 md:h-20 w-auto object-contain drop-shadow-sm select-none" 
+            className="w-56 sm:w-68 md:w-80 h-auto object-contain drop-shadow-sm select-none" 
           />
         </motion.div>
       </header>
