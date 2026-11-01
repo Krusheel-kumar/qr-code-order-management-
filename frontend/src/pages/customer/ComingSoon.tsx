@@ -24,19 +24,19 @@ export default function ComingSoon() {
       </div>
 
       {/* ========================================================================= */}
-      {/* 1. BIGGER, PROMINENT CENTERED BRAND HEADER AT THE VERY TOP */}
+      {/* 1. REFINED BRAND HEADER AT TOP */}
       {/* ========================================================================= */}
-      <header className="relative z-20 w-full pt-5 sm:pt-7 pb-2 px-4 sm:px-8 flex flex-col items-center justify-center">
+      <header className="relative z-20 w-full pt-6 sm:pt-8 pb-2 sm:pb-3 px-4 sm:px-8 flex flex-col items-center justify-center">
         <motion.div 
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.5 }}
           className="flex items-center justify-center"
         >
           <img 
             src={horizontalLogo} 
             alt="POP O' BOB - Specialty Bubble Tea" 
-            className="w-56 sm:w-68 md:w-80 h-auto object-contain drop-shadow-sm select-none" 
+            className="w-36 sm:w-40 md:w-44 h-auto object-contain drop-shadow-sm select-none" 
           />
         </motion.div>
       </header>
