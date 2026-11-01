@@ -63,19 +63,18 @@ export default function ComingSoon() {
           {/* ===================================================================== */}
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
             
-            {/* Headline Hierarchy: One clear H1 followed by H2 */}
+            {/* Headline */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
               className="flex flex-col items-center lg:items-start"
             >
-              <h1 className="text-3xl sm:text-4xl lg:text-[46px] font-black text-[#140804] tracking-[-0.03em] leading-[1.12] font-['Outfit',sans-serif]">
-                Specialty Bubble Tea by Pop O’ Bob
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#140804] tracking-[-0.03em] leading-[1.08] font-['Outfit',sans-serif]">
+                <span className="sr-only">Specialty Bubble Tea by Pop O’ Bob - </span>
+                Something New <br />
+                <span className="text-[#D97706] inline-block mt-1">Is Coming.</span>
               </h1>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#D97706] tracking-tight mt-2 font-['Outfit',sans-serif]">
-                Something New Is Coming.
-              </h2>
             </motion.div>
 
             {/* Subtitle */}
