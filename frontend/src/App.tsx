@@ -4,6 +4,7 @@ import { getStoreSettings } from './api';
 import { useMenuStore } from './store/useMenuStore';
 
 // Screens
+import ComingSoon from './pages/customer/ComingSoon';
 import DiscoveryHome from './pages/customer/DiscoveryHome';
 import PickupLocations from './pages/customer/PickupLocations';
 import DeliveryOptions from './pages/customer/DeliveryOptions';
@@ -126,48 +127,25 @@ function App() {
       {!isStoreActive && <StoreClosedOverlay />}
       <Router>
         <Routes>
-          <Route path="/pickup-locations" element={<PickupLocations />} />
-          <Route path="/delivery-options" element={<DeliveryOptions />} />
+          {/* Live Customer Experience (Functional only to Swiggy & Zomato) */}
+          <Route path="/" element={<ComingSoon />} />
+          <Route path="/home" element={<ComingSoon />} />
+          <Route path="/delivery-options" element={<ComingSoon />} />
           
-          {/* Screens with Bottom Nav */}
-          <Route element={<MainLayout />}>
-            {/* Screen 02 - 08 */}
-            <Route path="/" element={<DiscoveryHome />} />
-            <Route path="/home" element={<DiscoveryHome />} />
-            
-            {/* Screen 09 */}
-            <Route path="/categories" element={<CategoryHub />} />
-            <Route path="/offers" element={<OffersHub />} />
-            
-            {/* Screen 10 */}
-            <Route path="/menu" element={<FullMenu />} />
-
-            {/* Screen 17 */}
-            <Route path="/cart" element={<Cart />} />
-            
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsOfService />} />
+          {/* Internal Development Preview (Accessible via /preview for active development) */}
+          <Route path="/preview" element={<MainLayout />}>
+            <Route index element={<DiscoveryHome />} />
+            <Route path="menu" element={<FullMenu />} />
+            <Route path="categories" element={<CategoryHub />} />
+            <Route path="offers" element={<OffersHub />} />
+            <Route path="cart" element={<Cart />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="privacy" element={<PrivacyPolicy />} />
+            <Route path="terms" element={<TermsOfService />} />
           </Route>
 
-          {/* Full Screen Flows (No Bottom Nav) */}
-          
-          {/* AI Chatbot Flow */}
-          <Route path="/quiz" element={<AIChatScreen />} />
-          
-          {/* Order Lifecycle */}
-          <Route path="/processing" element={<ProcessingSuccess />} />
-          <Route path="/tracking/:id" element={<OrderTracking />} />
-          <Route path="/receipt/:id" element={<OrderReceipt />} />
-
-          {/* AI Engagement Layer Screens */}
-          <Route path="/ai/welcome" element={<POPBuddyWelcome />} />
-          <Route path="/ai/intro" element={<POPBuddyIntro />} />
-          <Route path="/ai/join" element={<POPBuddyJoin />} />
-          <Route path="/ai/maybe-later" element={<POPBuddyMaybeLater />} />
-          <Route path="/ai/home" element={<POPBuddyHome />} />
-          <Route path="/order-center" element={<OrderCenter />} />
-
+          {/* All other routes fallback to ComingSoon while system is upgrading */}
+          <Route path="*" element={<ComingSoon />} />
         </Routes>
       </Router>
     </>
