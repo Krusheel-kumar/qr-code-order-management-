@@ -4,7 +4,6 @@ import { getStoreSettings } from './api';
 import { useMenuStore } from './store/useMenuStore';
 
 // Screens
-import SplashScreen from './pages/customer/SplashScreen';
 import DiscoveryHome from './pages/customer/DiscoveryHome';
 import PickupLocations from './pages/customer/PickupLocations';
 import DeliveryOptions from './pages/customer/DeliveryOptions';
@@ -127,14 +126,13 @@ function App() {
       {!isStoreActive && <StoreClosedOverlay />}
       <Router>
         <Routes>
-          {/* Screen 01 */}
-          <Route path="/" element={<SplashScreen />} />
           <Route path="/pickup-locations" element={<PickupLocations />} />
           <Route path="/delivery-options" element={<DeliveryOptions />} />
           
           {/* Screens with Bottom Nav */}
           <Route element={<MainLayout />}>
             {/* Screen 02 - 08 */}
+            <Route path="/" element={<DiscoveryHome />} />
             <Route path="/home" element={<DiscoveryHome />} />
             
             {/* Screen 09 */}
