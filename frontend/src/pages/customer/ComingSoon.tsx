@@ -26,6 +26,10 @@ function SparkleBurst({ className }: { className?: string }) {
 }
 
 export default function ComingSoon() {
+  React.useEffect(() => {
+    document.title = "Pop O’ Bob® | Specialty Bubble Tea & Online Ordering";
+  }, []);
+
   return (
     <div className="relative min-h-screen bg-[#FFF8EE] text-[#1A0B05] overflow-x-hidden font-sans flex flex-col justify-between selection:bg-[#F3C644] selection:text-black">
       
@@ -41,7 +45,7 @@ export default function ComingSoon() {
         >
           <img 
             src={horizontalLogo} 
-            alt="POP O' BOB - Specialty Bubble Tea" 
+            alt="Pop O’ Bob official logo - Specialty Bubble Tea" 
             className="w-36 sm:w-40 md:w-44 h-auto object-contain drop-shadow-sm select-none" 
           />
         </motion.div>
@@ -59,17 +63,19 @@ export default function ComingSoon() {
           {/* ===================================================================== */}
           <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
             
-            {/* Headline: Modern, Bold Editorial Typography */}
+            {/* Headline Hierarchy: One clear H1 followed by H2 */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
               className="flex flex-col items-center lg:items-start"
             >
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-[#140804] tracking-[-0.03em] leading-[1.08] font-['Outfit',sans-serif]">
-                Something New <br />
-                <span className="text-[#D97706] inline-block mt-1">Is Coming.</span>
+              <h1 className="text-3xl sm:text-4xl lg:text-[46px] font-black text-[#140804] tracking-[-0.03em] leading-[1.12] font-['Outfit',sans-serif]">
+                Specialty Bubble Tea by Pop O’ Bob
               </h1>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#D97706] tracking-tight mt-2 font-['Outfit',sans-serif]">
+                Something New Is Coming.
+              </h2>
             </motion.div>
 
             {/* Subtitle */}
@@ -103,9 +109,9 @@ export default function ComingSoon() {
               transition={{ duration: 0.6, delay: 0.35 }}
               className="hidden lg:flex flex-col items-start w-full max-w-md"
             >
-              <h2 className="text-lg sm:text-xl font-bold italic text-[#1A0B05] tracking-tight mb-3 font-['Outfit',sans-serif]">
+              <h3 className="text-lg sm:text-xl font-bold italic text-[#1A0B05] tracking-tight mb-3 font-['Outfit',sans-serif]">
                 Craving boba? We're live on
-              </h2>
+              </h3>
 
               <div className="grid grid-cols-2 gap-4 w-full">
                 
@@ -173,7 +179,7 @@ export default function ComingSoon() {
             <div className="relative w-full max-w-[270px] sm:max-w-[330px] lg:max-w-[400px] flex justify-center items-center">
               <img 
                 src={chocolateTeaCoaster} 
-                alt="Pop O' Bob Chocolate Bubble Tea on Wooden Pedestal" 
+                alt="Pop O’ Bob handcrafted specialty bubble tea on wooden pedestal" 
                 className="w-full h-auto object-contain drop-shadow-[0_16px_24px_rgba(50,20,5,0.12)] transition-transform duration-300 hover:scale-[1.02]"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = honeydewCupImage;
@@ -204,9 +210,9 @@ export default function ComingSoon() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="flex lg:hidden flex-col items-center w-full max-w-sm mx-auto -mt-1 mb-2"
           >
-            <h2 className="text-lg sm:text-xl font-bold italic text-[#1A0B05] tracking-tight mb-3 font-['Outfit',sans-serif] text-center">
+            <h3 className="text-lg sm:text-xl font-bold italic text-[#1A0B05] tracking-tight mb-3 font-['Outfit',sans-serif] text-center">
               Craving boba? We're live on
-            </h2>
+            </h3>
 
             <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full">
               

@@ -1,0 +1,5 @@
+# Robots.txt for Pop O' Bob (https://popobob.com/)
+User-agent: *
+Allow: /
+
+Sitemap: https://popobob.com/sitemap.xml

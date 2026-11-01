@@ -2,9 +2,103 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/Brand%20Emblem.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>POP O'BOB® - Premium Order Experience</title>
+    
+    <!-- Primary SEO Metadata -->
+    <title>Pop O’ Bob® | Specialty Bubble Tea &amp; Online Ordering</title>
+    <meta name="description" content="Discover Pop O’ Bob specialty bubble tea. Explore your favourite flavours, find an outlet, and order online through Swiggy and Zomato." />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://popobob.com/" />
+    <meta name="theme-color" content="#FFF8EE" />
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/png" href="/Brand%20Emblem.png" />
+    <link rel="apple-touch-icon" href="/Brand%20Emblem.png" />
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:site_name" content="Pop O’ Bob" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Pop O’ Bob® | Specialty Bubble Tea" />
+    <meta property="og:description" content="Your favourite bubble tea, exciting flavours, and easy online ordering. Discover Pop O’ Bob." />
+    <meta property="og:url" content="https://popobob.com/" />
+    <meta property="og:image" content="https://popobob.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Pop O’ Bob Specialty Bubble Tea on Wooden Pedestal" />
+
+    <!-- Twitter / X Cards -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Pop O’ Bob® | Specialty Bubble Tea" />
+    <meta name="twitter:description" content="Your favourite bubble tea, exciting flavours, and easy online ordering. Discover Pop O’ Bob." />
+    <meta name="twitter:image" content="https://popobob.com/og-image.png" />
+    <meta name="twitter:image:alt" content="Pop O’ Bob Specialty Bubble Tea on Wooden Pedestal" />
+
+    <!-- Schema.org JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://popobob.com/#organization",
+          "name": "Pop O’ Bob",
+          "alternateName": ["Pop O Bob", "PopOBob", "Pop O' Bob Bubble Tea"],
+          "url": "https://popobob.com/",
+          "logo": "https://popobob.com/Brand%20Emblem.png",
+          "image": "https://popobob.com/og-image.png",
+          "description": "Discover Pop O’ Bob specialty bubble tea. Explore your favourite flavours, find an outlet, and order online through Swiggy and Zomato.",
+          "sameAs": [
+            "https://www.instagram.com/popobobofficial",
+            "https://www.swiggy.com/city/hyderabad/pop-o-bob-bubble-tea-cafe",
+            "https://www.zomato.com/hyderabad/restaurants/pop-obob-bubble-tea-cafe"
+          ]
+        },
+        {
+          "@type": "Restaurant",
+          "@id": "https://popobob.com/#restaurant",
+          "name": "Pop O’ Bob® | Specialty Bubble Tea",
+          "image": "https://popobob.com/og-image.png",
+          "url": "https://popobob.com/",
+          "servesCuisine": ["Bubble Tea", "Beverages", "Desserts", "Cafe"],
+          "priceRange": "₹₹",
+          "hasMenu": "https://popobob.com/",
+          "acceptsReservations": "false",
+          "parentOrganization": {
+            "@id": "https://popobob.com/#organization"
+          },
+          "potentialAction": [
+            {
+              "@type": "OrderAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.swiggy.com/city/hyderabad/pop-o-bob-bubble-tea-cafe",
+                "inLanguage": "en",
+                "actionPlatform": [
+                  "http://schema.org/DesktopWebPlatform",
+                  "http://schema.org/MobileWebPlatform"
+                ]
+              },
+              "deliveryMethod": "http://purl.org/goodrelations/v1#DeliveryModeOwnFleet"
+            },
+            {
+              "@type": "OrderAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.zomato.com/hyderabad/restaurants/pop-obob-bubble-tea-cafe",
+                "inLanguage": "en",
+                "actionPlatform": [
+                  "http://schema.org/DesktopWebPlatform",
+                  "http://schema.org/MobileWebPlatform"
+                ]
+              },
+              "deliveryMethod": "http://purl.org/goodrelations/v1#DeliveryModeOwnFleet"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
