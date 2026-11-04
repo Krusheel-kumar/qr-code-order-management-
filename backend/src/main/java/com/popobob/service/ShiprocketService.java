@@ -180,8 +180,10 @@ public class ShiprocketService {
                 Map<String, Object> itemMap = new HashMap<>();
                 itemMap.put("name", item.getProductName() != null ? item.getProductName() : "Specialty Boba");
                 itemMap.put("sku", item.getProductId() != null ? item.getProductId().toString() : "BOBA-ITEM");
-                itemMap.put("units", item.getQuantity() != null ? item.getQuantity() : 1);
-                itemMap.put("selling_price", item.getPrice() != null ? item.getPrice().doubleValue() : 150.0);
+                int units = item.getQuantity() != null && item.getQuantity() > 0 ? item.getQuantity() : 1;
+                double sellingPrice = item.getSubtotal() != null ? (item.getSubtotal().doubleValue() / units) : 150.0;
+                itemMap.put("units", units);
+                itemMap.put("selling_price", sellingPrice);
                 itemsList.add(itemMap);
             }
         } else {
