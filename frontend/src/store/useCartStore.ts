@@ -21,13 +21,21 @@ interface CartStore {
   tableNumber: string;
   customerName: string;
   customerPhone: string;
-  orderType: 'DINE_IN' | 'PICKUP' | null;
+  orderType: 'DINE_IN' | 'PICKUP' | 'DELIVERY' | null;
   storeId: string | null;
+  deliveryAddress: string;
+  deliveryPincode: string;
+  deliveryCity: string;
+  deliveryFee: number;
   setTableNumber: (table: string) => void;
   setCustomerName: (name: string) => void;
   setCustomerPhone: (phone: string) => void;
-  setOrderType: (type: 'DINE_IN' | 'PICKUP' | null) => void;
+  setOrderType: (type: 'DINE_IN' | 'PICKUP' | 'DELIVERY' | null) => void;
   setStoreId: (id: string | null) => void;
+  setDeliveryAddress: (address: string) => void;
+  setDeliveryPincode: (pincode: string) => void;
+  setDeliveryCity: (city: string) => void;
+  setDeliveryFee: (fee: number) => void;
 }
 
 export const useCartStore = create<CartStore>()(
@@ -39,11 +47,19 @@ export const useCartStore = create<CartStore>()(
       customerPhone: '',
       orderType: 'PICKUP',
       storeId: null,
+      deliveryAddress: '',
+      deliveryPincode: '',
+      deliveryCity: 'Hyderabad',
+      deliveryFee: 0,
       setTableNumber: (table) => set({ tableNumber: table }),
       setCustomerName: (name) => set({ customerName: name }),
       setCustomerPhone: (phone) => set({ customerPhone: phone }),
       setOrderType: (type) => set({ orderType: type }),
       setStoreId: (id) => set({ storeId: id }),
+      setDeliveryAddress: (address) => set({ deliveryAddress: address }),
+      setDeliveryPincode: (pincode) => set({ deliveryPincode: pincode }),
+      setDeliveryCity: (city) => set({ deliveryCity: city }),
+      setDeliveryFee: (fee) => set({ deliveryFee: fee }),
       addItem: (item) => set((state) => {
         // Check if identical item already exists (same product and exact same customization)
         const existingItemIndex = state.items.findIndex(

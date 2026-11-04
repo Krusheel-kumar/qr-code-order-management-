@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { MapPin, Bell, ChevronLeft, FileText } from 'lucide-react';
+import { MapPin, Bell, ChevronLeft, FileText, Truck, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { STORES } from '../../data/stores';
 import { useOrderStore } from '../../store/useOrderStore';
@@ -161,15 +161,29 @@ export default function OrderTracking() {
             <div className="bg-white rounded-[32px] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 mb-6 flex flex-col gap-4">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-[#FFFBF2] flex items-center justify-center text-[#D4AF37] shrink-0">
-                  <MapPin size={22} fill="currentColor" className="text-[#D4AF37]/20" />
+                  {orderData?.orderType === 'DELIVERY' ? (
+                    <Truck size={22} className="text-[#D4AF37]" />
+                  ) : (
+                    <MapPin size={22} fill="currentColor" className="text-[#D4AF37]/20" />
+                  )}
                 </div>
                 <div>
                   <h4 className="font-bold text-[15px] text-[#1A0B05]">
-                    {orderData?.orderType === 'DINE_IN' ? 'Dine-in at' : 'Pickup from'}
+                    {orderData?.orderType === 'DELIVERY'
+                      ? 'Doorstep Delivery'
+                      : orderData?.orderType === 'DINE_IN'
+                      ? 'Dine-in at'
+                      : 'Pickup from'}
                   </h4>
-                  <p className="text-gray-500 text-sm font-medium mt-0.5">
-                    {storeInfo?.name || "POP O'BOB®"} | {storeInfo?.address || 'Film Nagar'}
-                  </p>
+                  {orderData?.orderType === 'DELIVERY' ? (
+                    <p className="text-gray-500 text-sm font-medium mt-0.5">
+                      {orderData.deliveryAddress || 'Delivery Address'} ({orderData.deliveryPincode || 'Hyderabad'})
+                    </p>
+                  ) : (
+                    <p className="text-gray-500 text-sm font-medium mt-0.5">
+                      {storeInfo?.name || "POP O'BOB®"} | {storeInfo?.address || 'Film Nagar'}
+                    </p>
+                  )}
                   {orderData?.tableNumber && (
                     <p className="text-[#D4AF37] font-bold text-sm mt-1">
                       Table No. {orderData.tableNumber}
@@ -180,14 +194,46 @@ export default function OrderTracking() {
               
               <div className="h-px w-full bg-gray-100" />
               
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center shrink-0">
-                  <Bell size={16} className="text-gray-400" />
+              {orderData?.orderType === 'DELIVERY' ? (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-bold text-gray-500 uppercase tracking-wider">Courier Service</span>
+                    <span className="font-black text-[#D4AF37] uppercase tracking-wider bg-[#FFF9E6] px-2.5 py-0.5 rounded-full">
+                      Shiprocket
+                    </span>
+                  </div>
+                  {orderData.shiprocketCourierName && (
+                    <p className="text-sm font-bold text-[#1A0B05]">
+                      Partner: <span className="text-[#D4AF37]">{orderData.shiprocketCourierName}</span>
+                    </p>
+                  )}
+                  {orderData.shiprocketAwb && (
+                    <p className="text-xs font-semibold text-gray-500">
+                      Tracking AWB: <span className="font-mono text-gray-800">{orderData.shiprocketAwb}</span>
+                    </p>
+                  )}
+                  {orderData.shiprocketTrackingUrl && (
+                    <a
+                      href={orderData.shiprocketTrackingUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] hover:underline pt-1"
+                    >
+                      <span>Track live on courier map</span>
+                      <ExternalLink size={12} />
+                    </a>
+                  )}
                 </div>
-                <p className="text-[13px] text-gray-500 font-medium">
-                  We will announce your order number when it's ready!
-                </p>
-              </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center shrink-0">
+                    <Bell size={16} className="text-gray-400" />
+                  </div>
+                  <p className="text-[13px] text-gray-500 font-medium">
+                    We will announce your order number when it's ready!
+                  </p>
+                </div>
+              )}
             </div>
 
             <button 

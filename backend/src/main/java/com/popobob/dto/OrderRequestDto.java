@@ -15,5 +15,9 @@ public class OrderRequestDto {
     private UUID userId;
     private Integer pointsUsed;
     private String couponCode;
+    private String deliveryAddress;
+    private String deliveryPincode;
+    private String deliveryCity;
+    private java.math.BigDecimal deliveryFee;
     private List<OrderItemDto> items;
 }

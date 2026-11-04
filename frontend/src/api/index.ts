@@ -91,3 +91,16 @@ export const getLoyaltyAnalytics = async () => {
   const res = await apiClient.get('/admin/loyalty/analytics');
   return res.data;
 };
+
+// Shiprocket Delivery Integration
+export const checkDeliveryServiceability = async (pincode: string, weight = 0.5) => {
+  const res = await apiClient.get('/delivery/serviceability', {
+    params: { pincode, weight }
+  });
+  return res.data;
+};
+
+export const trackDelivery = async (identifier: string) => {
+  const res = await apiClient.get(`/delivery/track/${identifier}`);
+  return res.data;
+};

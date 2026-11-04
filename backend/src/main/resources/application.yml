@@ -47,3 +47,9 @@ gemini:
 msg91:
   auth-key: ${MSG91_AUTH_KEY}
   template-id: ${MSG91_TEMPLATE_ID:SecureOTPWidget5TUR}
+
+shiprocket:
+  email: ${SHIPROCKET_EMAIL:krusheel@gmail.com}
+  password: ${SHIPROCKET_PASSWORD:qexAiN!3LrIc0$3SOVBSHWuKEyKmQTkD}
+  base-url: ${SHIPROCKET_BASE_URL:https://apiv2.shiprocket.in/v1/external}
+  pickup-location: ${SHIPROCKET_PICKUP_LOCATION:Home}

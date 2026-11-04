@@ -46,6 +46,18 @@ public class Order {
     private BigDecimal packingChargeAmount;
     private Boolean packingChargeApplied;
 
+    // Delivery & Shiprocket Details
+    private String deliveryAddress;
+    private String deliveryPincode;
+    private String deliveryCity;
+    private BigDecimal deliveryFee;
+    private Long shiprocketOrderId;
+    private Long shiprocketShipmentId;
+    private String shiprocketAwb;
+    private String shiprocketCourierName;
+    private String shiprocketTrackingUrl;
+    private String deliveryStatus;
+
     private LocalDateTime createdAt = LocalDateTime.now();
     
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)

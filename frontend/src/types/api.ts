@@ -64,4 +64,8 @@ export interface OrderPayload {
   pointsUsed: number;
   couponCode: string | null;
   items: OrderItemPayload[];
+  deliveryAddress?: string;
+  deliveryPincode?: string;
+  deliveryCity?: string;
+  deliveryFee?: number;
 }

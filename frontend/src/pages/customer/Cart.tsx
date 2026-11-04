@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2, Ticket, Wallet, Loader2 } from 'lucide-react';
+import { ArrowLeft, Trash2, Ticket, Wallet, Loader2, Truck, ShoppingBag, MapPin, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { useCartStore } from '../../store/useCartStore';
 import { useAuthStore } from '../../store/useAuthStore';
-import { getStoreSettings } from '../../api';
+import { getStoreSettings, checkDeliveryServiceability } from '../../api';
 import CheckoutAuthGate from '../../components/ui/CheckoutAuthGate';
 import AuthModal from '../../components/ui/AuthModal';
 import { Button } from '../../components/ui/Button';
@@ -30,6 +30,12 @@ export default function Cart() {
   
   const [isAuthGateOpen, setIsAuthGateOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+
+  // Shiprocket Delivery State
+  const [checkingDelivery, setCheckingDelivery] = useState(false);
+  const [deliveryServiceable, setDeliveryServiceable] = useState<boolean | null>(null);
+  const [courierInfo, setCourierInfo] = useState<any>(null);
+  const [deliveryError, setDeliveryError] = useState<string | null>(null);
   
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -84,9 +90,41 @@ export default function Cart() {
 
   const totalDiscount = loyaltyDiscount + couponDiscount;
   const taxes = Math.round((subtotal - totalDiscount) * (storeSettings.taxRate / 100)); 
+  const handleCheckPincode = async (pincode: string) => {
+    const clean = pincode.trim();
+    cartStore.setDeliveryPincode(clean);
+    if (clean.length !== 6) {
+      setDeliveryServiceable(null);
+      setCourierInfo(null);
+      return;
+    }
+    setCheckingDelivery(true);
+    setDeliveryError(null);
+    try {
+      const data = await checkDeliveryServiceability(clean);
+      if (data && data.serviceable) {
+        setDeliveryServiceable(true);
+        setCourierInfo(data.recommendedCourier || null);
+        const rate = Math.round(Number(data.estimatedDeliveryFee || 40));
+        cartStore.setDeliveryFee(rate);
+      } else {
+        setDeliveryServiceable(false);
+        setCourierInfo(null);
+        setDeliveryError(data?.error || 'Doorstep delivery is not available for this pincode.');
+      }
+    } catch (err: any) {
+      setDeliveryServiceable(false);
+      setDeliveryError('Could not verify delivery serviceability. Please try again.');
+    } finally {
+      setCheckingDelivery(false);
+    }
+  };
+
   const isPickup = cartStore.orderType === 'PICKUP';
-  const appliedPackingCharge = isPickup ? storeSettings.packingCharge : 0;
-  const total = Math.max(0, subtotal - totalDiscount + taxes + appliedPackingCharge);
+  const isDelivery = cartStore.orderType === 'DELIVERY';
+  const appliedPackingCharge = (isPickup || isDelivery) ? storeSettings.packingCharge : 0;
+  const currentDeliveryFee = isDelivery ? (cartStore.deliveryFee || 40) : 0;
+  const total = Math.max(0, subtotal - totalDiscount + taxes + appliedPackingCharge + currentDeliveryFee);
 
   const initiateCheckout = () => {
     if (cartItems.length === 0) return;
@@ -99,6 +137,20 @@ export default function Cart() {
     if (finalOrderType === 'PICKUP' && !cartStore.storeId) {
       alert("Store not selected. Please go back and select a store.");
       return;
+    }
+    if (finalOrderType === 'DELIVERY') {
+      if (!cartStore.deliveryAddress || cartStore.deliveryAddress.trim().length < 5) {
+        alert("Please enter your complete delivery street address.");
+        return;
+      }
+      if (!cartStore.deliveryPincode || cartStore.deliveryPincode.trim().length !== 6) {
+        alert("Please enter a valid 6-digit delivery pincode.");
+        return;
+      }
+      if (deliveryServiceable === false) {
+        alert("Sorry, delivery is not available to this pincode. Please switch to Pickup or try another pincode.");
+        return;
+      }
     }
     
     if (!user) {
@@ -133,7 +185,7 @@ export default function Cart() {
           const orderPayload: any = {
             customerName: cartStore.customerName || user?.username,
             customerPhone: cartStore.customerPhone || user?.phoneNumber,
-            tableNumber: finalOrderType === 'PICKUP' ? null : cartStore.tableNumber,
+            tableNumber: finalOrderType === 'DINE_IN' ? cartStore.tableNumber : null,
             storeId: cartStore.storeId,
             orderType: finalOrderType,
             paymentReference: paymentRef,
@@ -150,6 +202,13 @@ export default function Cart() {
               customizationsList: item.customizationsList || []
             }))
           };
+          
+          if (finalOrderType === 'DELIVERY') {
+            orderPayload.deliveryAddress = cartStore.deliveryAddress;
+            orderPayload.deliveryPincode = cartStore.deliveryPincode;
+            orderPayload.deliveryCity = cartStore.deliveryCity || 'Hyderabad';
+            orderPayload.deliveryFee = currentDeliveryFee;
+          }
           
           if (user) orderPayload.userId = user.id;
           
@@ -388,6 +447,21 @@ export default function Cart() {
                   <span className="font-bold text-[#1A0B05]">₹{appliedPackingCharge}</span>
                 </div>
               )}
+              {isDelivery && (
+                <>
+                  <div className="flex justify-between text-gray-600">
+                    <span>Packing Charge</span>
+                    <span className="font-bold text-[#1A0B05]">₹{appliedPackingCharge}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-600">
+                    <span className="flex items-center gap-1.5">
+                      <Truck size={14} className="text-[#D4AF37]" />
+                      <span>Delivery Fee (Shiprocket)</span>
+                    </span>
+                    <span className="font-bold text-[#1A0B05]">₹{currentDeliveryFee}</span>
+                  </div>
+                </>
+              )}
               <div className="border-t border-gray-100 pt-4 flex justify-between font-black text-xl text-[#1A0B05]">
                 <span>To Pay</span>
                 <span>₹{total}</span>
@@ -401,7 +475,108 @@ export default function Cart() {
             </div>
           )}
 
+          {/* Fulfillment Type Selector */}
           <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)] space-y-4">
+            <div>
+              <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">
+                Fulfillment Method
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => cartStore.setOrderType('PICKUP')}
+                  className={`py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+                    cartStore.orderType === 'PICKUP'
+                      ? 'border-[#1A0B05] bg-[#1A0B05] text-white shadow-sm'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <ShoppingBag size={15} />
+                  <span>Store Pickup</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => cartStore.setOrderType('DELIVERY')}
+                  className={`py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
+                    cartStore.orderType === 'DELIVERY'
+                      ? 'border-[#1A0B05] bg-[#1A0B05] text-white shadow-sm'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Truck size={15} />
+                  <span>Doorstep Delivery</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Delivery Fields */}
+            {cartStore.orderType === 'DELIVERY' && (
+              <div className="pt-2 border-t border-gray-100 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-black text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                    <MapPin size={13} className="text-[#D4AF37]" />
+                    Delivery Address
+                  </span>
+                  <span className="text-[10px] font-bold text-[#D4AF37] uppercase tracking-wider bg-[#FFF9E6] px-2 py-0.5 rounded-full">
+                    Shiprocket Direct
+                  </span>
+                </div>
+
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Flat / Building, Street, Landmark *"
+                    value={cartStore.deliveryAddress}
+                    onChange={(e) => cartStore.setDeliveryAddress(e.target.value)}
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl px-3 py-2.5 outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-semibold text-[13px]"
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    maxLength={6}
+                    placeholder="6-digit Pincode *"
+                    value={cartStore.deliveryPincode}
+                    onChange={(e) => handleCheckPincode(e.target.value)}
+                    className="flex-1 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2.5 outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-semibold text-[13px]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleCheckPincode(cartStore.deliveryPincode)}
+                    disabled={checkingDelivery}
+                    className="px-4 py-2.5 bg-[#1A0B05] text-white rounded-xl text-xs font-bold hover:bg-[#D4AF37] hover:text-[#1A0B05] transition-all disabled:opacity-50 shrink-0"
+                  >
+                    {checkingDelivery ? <Loader2 size={14} className="animate-spin" /> : 'Check'}
+                  </button>
+                </div>
+
+                {/* Serviceability Status Badge */}
+                {deliveryServiceable === true && (
+                  <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-2.5 rounded-xl text-xs font-semibold flex items-start gap-2">
+                    <CheckCircle2 size={16} className="text-emerald-600 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold">Serviceable to {cartStore.deliveryPincode}!</p>
+                      <p className="text-[11px] text-emerald-700 mt-0.5">
+                        {courierInfo?.courier_name ? `Via ${courierInfo.courier_name} • ` : 'Via Shiprocket partner • '}
+                        Delivery fee: ₹{currentDeliveryFee}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {deliveryServiceable === false && (
+                  <div className="bg-amber-50 border border-amber-200 text-amber-900 p-2.5 rounded-xl text-xs font-medium flex items-start gap-2">
+                    <AlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold text-amber-800">Not serviceable directly</p>
+                      <p className="text-[11px] text-amber-700 mt-0.5">{deliveryError}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {cartStore.orderType === 'DINE_IN' && (
               <div>
                 <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 px-1">
@@ -640,6 +815,106 @@ export default function Cart() {
                     </div>
                   )}
 
+                  {/* Fulfillment Method Selector (Desktop) */}
+                  <div>
+                    <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-3">
+                      Fulfillment Method
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => cartStore.setOrderType('PICKUP')}
+                        className={`py-3.5 px-4 rounded-2xl border text-sm font-bold flex items-center justify-center gap-2.5 transition-all ${
+                          cartStore.orderType === 'PICKUP'
+                            ? 'border-[#1A0B05] bg-[#1A0B05] text-white shadow-md'
+                            : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                        }`}
+                      >
+                        <ShoppingBag size={18} />
+                        <span>Store Pickup</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => cartStore.setOrderType('DELIVERY')}
+                        className={`py-3.5 px-4 rounded-2xl border text-sm font-bold flex items-center justify-center gap-2.5 transition-all ${
+                          cartStore.orderType === 'DELIVERY'
+                            ? 'border-[#1A0B05] bg-[#1A0B05] text-white shadow-md'
+                            : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                        }`}
+                      >
+                        <Truck size={18} />
+                        <span>Doorstep Delivery</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Delivery Address & Pincode (Desktop) */}
+                  {cartStore.orderType === 'DELIVERY' && (
+                    <div className="p-5 rounded-2xl bg-[#FDFCF9] border border-gray-200 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-black text-[#1A0B05] uppercase tracking-wider flex items-center gap-2">
+                          <MapPin size={16} className="text-[#D4AF37]" />
+                          Delivery Address & Location
+                        </span>
+                        <span className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider bg-[#FFF9E6] px-2.5 py-1 rounded-full">
+                          Shiprocket Live
+                        </span>
+                      </div>
+
+                      <div>
+                        <input
+                          type="text"
+                          placeholder="Complete Address (Flat / House No, Street, Landmark) *"
+                          value={cartStore.deliveryAddress}
+                          onChange={(e) => cartStore.setDeliveryAddress(e.target.value)}
+                          className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-semibold text-sm"
+                        />
+                      </div>
+
+                      <div className="flex gap-3">
+                        <input
+                          type="text"
+                          maxLength={6}
+                          placeholder="6-digit Pincode *"
+                          value={cartStore.deliveryPincode}
+                          onChange={(e) => handleCheckPincode(e.target.value)}
+                          className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-[#D4AF37] focus:ring-2 focus:ring-[#D4AF37]/20 transition-all font-semibold text-sm"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleCheckPincode(cartStore.deliveryPincode)}
+                          disabled={checkingDelivery}
+                          className="px-6 py-3 bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] rounded-xl text-xs font-bold transition-all disabled:opacity-50 flex items-center gap-2"
+                        >
+                          {checkingDelivery && <Loader2 size={14} className="animate-spin" />}
+                          <span>Verify Pincode</span>
+                        </button>
+                      </div>
+
+                      {deliveryServiceable === true && (
+                        <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 p-3.5 rounded-xl text-xs font-semibold flex items-start gap-2.5">
+                          <CheckCircle2 size={18} className="text-emerald-600 shrink-0 mt-0.5" />
+                          <div>
+                            <p className="font-bold text-sm">Delivery Available to {cartStore.deliveryPincode}!</p>
+                            <p className="text-xs text-emerald-700 mt-0.5">
+                              {courierInfo?.courier_name ? `Dispatched via ${courierInfo.courier_name}` : 'Dispatched via Shiprocket'} • Shipping fee: ₹{currentDeliveryFee}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {deliveryServiceable === false && (
+                        <div className="bg-amber-50 border border-amber-200 text-amber-900 p-3.5 rounded-xl text-xs font-medium flex items-start gap-2.5">
+                          <AlertTriangle size={18} className="text-amber-600 shrink-0 mt-0.5" />
+                          <div>
+                            <p className="font-bold text-sm text-amber-800">Pincode not currently serviceable</p>
+                            <p className="text-xs text-amber-700 mt-0.5">{deliveryError}</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {cartStore.orderType === 'DINE_IN' && (
                     <input
                       type="text"
@@ -677,6 +952,21 @@ export default function Cart() {
                       <span>Packing Charge</span>
                       <span className="text-[#1A0B05] font-bold">₹{appliedPackingCharge}</span>
                     </div>
+                  )}
+                  {isDelivery && (
+                    <>
+                      <div className="flex justify-between text-gray-600">
+                        <span>Packing & Handling</span>
+                        <span className="text-[#1A0B05] font-bold">₹{appliedPackingCharge}</span>
+                      </div>
+                      <div className="flex justify-between text-gray-600">
+                        <span className="flex items-center gap-1.5">
+                          <Truck size={15} className="text-[#D4AF37]" />
+                          <span>Delivery Fee (Shiprocket)</span>
+                        </span>
+                        <span className="text-[#1A0B05] font-bold">₹{currentDeliveryFee}</span>
+                      </div>
+                    </>
                   )}
                   <div className="border-t border-gray-100 pt-5 flex justify-between items-baseline mt-4">
                     <span className="font-black text-base uppercase tracking-wider text-[#1A0B05]">Total to Pay</span>

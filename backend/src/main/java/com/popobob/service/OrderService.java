@@ -54,6 +54,10 @@ public class OrderService {
         order.setStoreId(request.getStoreId());
         order.setPaymentReference(request.getPaymentReference());
         order.setPaymentStatus(request.getPaymentReference() != null ? "PAID" : "PENDING");
+        order.setDeliveryAddress(request.getDeliveryAddress());
+        order.setDeliveryPincode(request.getDeliveryPincode());
+        order.setDeliveryCity(request.getDeliveryCity());
+        order.setDeliveryFee(request.getDeliveryFee() != null ? request.getDeliveryFee() : BigDecimal.ZERO);
         
         if (request.getUserId() != null) {
             userRepository.findById(request.getUserId()).ifPresent(order::setUser);
@@ -284,6 +288,9 @@ public class OrderService {
         order.setPackingChargeApplied(packingApplied);
         
         totalAmount = totalAmount.add(taxes).add(packingChargeAmt);
+        if ("DELIVERY".equalsIgnoreCase(request.getOrderType()) && request.getDeliveryFee() != null) {
+            totalAmount = totalAmount.add(request.getDeliveryFee());
+        }
         
         order.setTotalAmount(totalAmount);
         
