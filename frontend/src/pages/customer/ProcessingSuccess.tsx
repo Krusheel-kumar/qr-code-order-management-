@@ -87,7 +87,8 @@ export default function ProcessingSuccess() {
         
       } catch (err: any) {
         console.error("Failed to place order:", err);
-        setError("Payment received, but order creation was delayed. Don't worry, our team is on it!");
+        const detail = err?.response?.data?.dev_message || err?.response?.data?.error || err?.message;
+        setError(detail ? `Order placement issue: ${detail}` : "Payment received, but order creation was delayed. Don't worry, our team is on it!");
       }
     };
 
@@ -173,20 +174,31 @@ export default function ProcessingSuccess() {
               <AlertCircle size={40} strokeWidth={2} />
             </div>
             <h2 className="font-heading font-black text-2xl mb-3">Order Delayed</h2>
-            <p className="text-gray-600 font-medium mb-8 leading-relaxed">
+            <p className="text-gray-600 font-medium mb-8 leading-relaxed text-sm">
               {error}
             </p>
             <button 
+              onClick={() => {
+                hasProcessed.current = false;
+                setError(null);
+                setCurrentStep(0);
+                window.location.reload();
+              }}
+              className="bg-[#D4AF37] hover:bg-[#b89528] text-[#1A0B05] w-full py-4 rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-[0_8px_20px_rgba(212,175,55,0.2)] mb-3"
+            >
+              Try Again
+            </button>
+            <button 
               onClick={() => window.location.href = 'tel:+919999999999'}
-              className="bg-[#1A0B05] hover:bg-[#D4AF37] text-white hover:text-[#1A0B05] w-full py-4 rounded-2xl font-black uppercase tracking-widest text-sm transition-all shadow-[0_8px_20px_rgba(0,0,0,0.1)]"
+              className="bg-[#1A0B05] hover:bg-[#33170a] text-white w-full py-3.5 rounded-2xl font-bold uppercase tracking-wider text-xs transition-all"
             >
               Contact Support
             </button>
             <button 
-              onClick={() => navigate('/home')}
-              className="mt-4 font-bold text-gray-500"
+              onClick={() => navigate('/cart')}
+              className="mt-4 font-bold text-gray-500 hover:text-[#1A0B05] text-sm"
             >
-              Back to Home
+              Back to Cart
             </button>
           </motion.div>
         ) : (
