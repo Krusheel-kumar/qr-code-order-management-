@@ -280,7 +280,7 @@ public class OrderService {
         
         BigDecimal packingChargeAmt = BigDecimal.ZERO;
         boolean packingApplied = false;
-        if ("PICKUP".equalsIgnoreCase(request.getOrderType())) {
+        if ("PICKUP".equalsIgnoreCase(request.getOrderType()) || "DELIVERY".equalsIgnoreCase(request.getOrderType())) {
             packingChargeAmt = settings.getPackingCharge() != null ? new BigDecimal(settings.getPackingCharge().toString()) : new BigDecimal("15");
             packingApplied = true;
         }
