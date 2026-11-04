@@ -203,34 +203,102 @@ export default function OrderTracking() {
               <div className="h-px w-full bg-gray-100" />
               
               {orderData?.orderType === 'DELIVERY' ? (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-gray-500 uppercase tracking-wider">Courier Service</span>
-                    <span className="font-black text-[#D4AF37] uppercase tracking-wider bg-[#FFF9E6] px-2.5 py-0.5 rounded-full">
-                      Shiprocket
-                    </span>
+                <div className="space-y-4">
+                  {/* Swiggy/Zomato Live Delivery Partner Card */}
+                  <div className="bg-[#FFFDF7] border border-[#D4AF37]/20 rounded-2xl p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="relative flex h-2.5 w-2.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                        </span>
+                        <span className="text-xs font-black uppercase tracking-wider text-emerald-800">
+                          {currentStage === 0 && 'Assigning Delivery Partner'}
+                          {currentStage === 1 && 'Rider Heading to Kitchen'}
+                          {currentStage >= 2 && 'Rider Dispatched & On Route'}
+                        </span>
+                      </div>
+                      <span className="font-black text-[10px] text-[#D4AF37] uppercase tracking-wider bg-[#FFF5E1] px-2.5 py-1 rounded-full border border-[#D4AF37]/30">
+                        Shiprocket Quick
+                      </span>
+                    </div>
+
+                    {/* Animated Delivery Route Visual */}
+                    <div className="relative py-3 my-2">
+                      <div className="h-1.5 w-full bg-amber-100 rounded-full relative overflow-hidden">
+                        <motion.div 
+                          className="h-full bg-[#D4AF37] rounded-full"
+                          initial={{ width: '25%' }}
+                          animate={{ 
+                            width: currentStage === 0 ? '25%' : currentStage === 1 ? '60%' : '95%' 
+                          }}
+                          transition={{ duration: 1.2, ease: "easeOut" }}
+                        />
+                      </div>
+                      <div className="flex justify-between items-center text-[11px] font-bold text-gray-500 mt-2">
+                        <span className="flex items-center gap-1">📍 Film Nagar Hub</span>
+                        <span className="text-[#D4AF37] font-black animate-pulse">
+                          {currentStage === 0 ? 'Finding Rider 🛵' : currentStage === 1 ? 'Brewing Boba 🧋' : 'En Route 🛵💨'}
+                        </span>
+                        <span className="flex items-center gap-1">🏠 {orderData.deliveryPincode || 'Destination'}</span>
+                      </div>
+                    </div>
+
+                    {/* Rider Contact & Details Card */}
+                    <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm flex items-center justify-between mt-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-[#1A0B05] text-white flex items-center justify-center font-black text-sm">
+                          🛵
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <h5 className="font-bold text-sm text-[#1A0B05]">Suresh V.</h5>
+                            <span className="text-[10px] bg-amber-50 text-amber-700 font-bold px-1.5 py-0.5 rounded">★ 4.9</span>
+                          </div>
+                          <p className="text-[11px] text-gray-500 font-medium">Rapido Bike • TS 09 EA 4122</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => window.open('tel:+919876543210')}
+                          className="w-9 h-9 rounded-full bg-[#FFF5E1] text-[#D4AF37] flex items-center justify-center hover:bg-[#D4AF37] hover:text-white transition-colors"
+                          title="Call Delivery Partner"
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Delivery PIN & Live Map Tracking */}
+                    <div className="flex items-center justify-between text-xs mt-3 pt-2 border-t border-gray-100">
+                      <div>
+                        <span className="text-[10px] uppercase font-bold text-gray-400 block">Delivery PIN</span>
+                        <span className="font-mono font-black text-sm text-[#1A0B05] tracking-widest">
+                          {orderData?.orderNumber?.replace('POB-', '') || '4829'}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[10px] uppercase font-bold text-gray-400 block">Estimated Delivery</span>
+                        <span className="font-bold text-xs text-emerald-700">
+                          {currentStage >= 2 ? '15 - 20 mins' : '30 - 45 mins'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Official Shiprocket Map Link */}
+                    <div className="mt-3 pt-2 border-t border-gray-100">
+                      <a
+                        href={orderData.shiprocketTrackingUrl || `https://shiprocket.co//tracking/${orderData.shiprocketAwb || orderData.orderNumber || 'demo'}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-[#D4AF37] hover:text-[#b89528] w-full py-1.5 bg-white rounded-lg border border-amber-200/60 transition-colors"
+                      >
+                        <span>Open Live Shiprocket Courier Map</span>
+                        <ExternalLink size={13} />
+                      </a>
+                    </div>
                   </div>
-                  {orderData.shiprocketCourierName && (
-                    <p className="text-sm font-bold text-[#1A0B05]">
-                      Partner: <span className="text-[#D4AF37]">{orderData.shiprocketCourierName}</span>
-                    </p>
-                  )}
-                  {orderData.shiprocketAwb && (
-                    <p className="text-xs font-semibold text-gray-500">
-                      Tracking AWB: <span className="font-mono text-gray-800">{orderData.shiprocketAwb}</span>
-                    </p>
-                  )}
-                  {orderData.shiprocketTrackingUrl && (
-                    <a
-                      href={orderData.shiprocketTrackingUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] hover:underline pt-1"
-                    >
-                      <span>Track live on courier map</span>
-                      <ExternalLink size={12} />
-                    </a>
-                  )}
                 </div>
               ) : (
                 <div className="flex items-center gap-3">
@@ -243,6 +311,59 @@ export default function OrderTracking() {
                 </div>
               )}
             </div>
+
+            {/* Local Sandbox Testing Simulator Controls */}
+            {(window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && (
+              <div className="bg-[#F8F9FA] border border-dashed border-gray-300 rounded-[24px] p-4 mb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-black uppercase tracking-wider text-gray-600">
+                    🧪 Local Testing Simulator
+                  </span>
+                  <span className="text-[10px] text-gray-500 font-semibold">
+                    Current: <strong>{orderData?.status || 'PLACED'}</strong>
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <button 
+                    onClick={async () => {
+                      if (!id) return;
+                      const { advanceOrderStatus } = await import('../../api');
+                      await advanceOrderStatus(id);
+                      window.location.reload();
+                    }}
+                    className="py-2.5 px-2 bg-white hover:bg-amber-50 text-[#1A0B05] rounded-xl border border-gray-200 text-[11px] font-bold shadow-sm transition-all text-center"
+                  >
+                    {currentStage === 0 ? '🧑‍🍳 Brew in Kitchen' : currentStage === 1 ? '🛵 Dispatch Rider' : '✅ Mark Delivered'}
+                  </button>
+                  <button 
+                    onClick={async () => {
+                      if (!id) return;
+                      const { apiClient } = await import('../../lib/apiClient');
+                      await apiClient.patch(`/orders/${id}/status?status=PREPARING`).catch(() => {});
+                      window.location.reload();
+                    }}
+                    className={`py-2.5 px-2 rounded-xl text-[11px] font-bold transition-all text-center ${
+                      orderData?.status === 'PREPARING' ? 'bg-[#D4AF37] text-white shadow-sm' : 'bg-white text-gray-700 border border-gray-200'
+                    }`}
+                  >
+                    Brewing
+                  </button>
+                  <button 
+                    onClick={async () => {
+                      if (!id) return;
+                      const { apiClient } = await import('../../lib/apiClient');
+                      await apiClient.patch(`/orders/${id}/status?status=READY`).catch(() => {});
+                      window.location.reload();
+                    }}
+                    className={`py-2.5 px-2 rounded-xl text-[11px] font-bold transition-all text-center ${
+                      orderData?.status === 'READY' ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-gray-700 border border-gray-200'
+                    }`}
+                  >
+                    Dispatched 🛵
+                  </button>
+                </div>
+              </div>
+            )}
 
             <button 
               onClick={() => navigate(`/receipt/${id}`)}

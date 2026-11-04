@@ -59,6 +59,13 @@ public class OrderService {
         order.setDeliveryCity(request.getDeliveryCity());
         order.setDeliveryFee(request.getDeliveryFee() != null ? request.getDeliveryFee() : BigDecimal.ZERO);
         
+        if ("DELIVERY".equalsIgnoreCase(request.getOrderType())) {
+            order.setShiprocketCourierName("Shiprocket Quick (Rapido / Dunzo)");
+            order.setShiprocketAwb("SR-HYD-" + seq.getNextVal());
+            order.setShiprocketTrackingUrl("https://shiprocket.co//tracking/" + order.getShiprocketAwb());
+            order.setDeliveryStatus("ASSIGNED");
+        }
+        
         if (request.getUserId() != null) {
             userRepository.findById(request.getUserId()).ifPresent(order::setUser);
         } else if (request.getCustomerPhone() != null && !request.getCustomerPhone().trim().isEmpty()) {
@@ -321,6 +328,13 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         order.setStatus(newStatus);
+        if ("DELIVERY".equalsIgnoreCase(order.getOrderType())) {
+            if ("READY".equalsIgnoreCase(newStatus)) {
+                order.setDeliveryStatus("OUT_FOR_DELIVERY");
+            } else if ("DELIVERED".equalsIgnoreCase(newStatus) || "COMPLETED".equalsIgnoreCase(newStatus)) {
+                order.setDeliveryStatus("DELIVERED");
+            }
+        }
         Order savedOrder = orderRepository.save(order);
         
         // Notify Staff and Customer

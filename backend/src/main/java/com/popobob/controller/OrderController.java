@@ -37,6 +37,22 @@ public class OrderController {
         return orderService.updateOrderStatus(id, status);
     }
 
+    @PostMapping("/{id}/advance-status")
+    public Order advanceStatus(@PathVariable UUID id) {
+        Order order = orderService.getOrderById(id);
+        String nextStatus;
+        if ("PLACED".equalsIgnoreCase(order.getStatus()) || "NEW".equalsIgnoreCase(order.getStatus())) {
+            nextStatus = "PREPARING";
+        } else if ("PREPARING".equalsIgnoreCase(order.getStatus())) {
+            nextStatus = "READY";
+        } else if ("READY".equalsIgnoreCase(order.getStatus())) {
+            nextStatus = "DELIVERED";
+        } else {
+            nextStatus = "PLACED";
+        }
+        return orderService.updateOrderStatus(id, nextStatus);
+    }
+
     @GetMapping("/history")
     public List<Order> getOrderHistory() {
         return orderService.getAllOrdersHistory();

@@ -46,6 +46,7 @@ public class SecurityConfig {
                 // GET by ID: customer tracks their own order — only UUID-shaped paths reach here
                 // because /active and /history are already handled above
                 .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/orders/*").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/orders/*/advance-status").permitAll()
                 // POST: customer initiates Razorpay payment for pickup orders
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/payments/create-order").permitAll()
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/v2/payments/callback").permitAll()

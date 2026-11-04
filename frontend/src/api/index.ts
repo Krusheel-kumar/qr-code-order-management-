@@ -76,6 +76,8 @@ export const placeOrder = async (order: OrderPayload) => {
 
 export const getOrderById = async (id: string) => (await apiClient.get(`/orders/${id}`)).data;
 
+export const advanceOrderStatus = async (id: string) => (await apiClient.post(`/orders/${id}/advance-status`)).data;
+
 // AI Engagement Layer
 export const getAIContext = async (params: { orderId?: string; customerName?: string; guest?: boolean }) => {
   const res = await apiClient.get('/ai/context', { params });
