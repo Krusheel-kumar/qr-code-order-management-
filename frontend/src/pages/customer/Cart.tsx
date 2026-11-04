@@ -556,10 +556,10 @@ export default function Cart() {
                   <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 p-2.5 rounded-xl text-xs font-semibold flex items-start gap-2">
                     <CheckCircle2 size={16} className="text-emerald-600 shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-bold">Serviceable to {cartStore.deliveryPincode}!</p>
-                      <p className="text-[11px] text-emerald-700 mt-0.5">
-                        {courierInfo?.courier_name ? `Via ${courierInfo.courier_name} • ` : 'Via Shiprocket partner • '}
-                        Delivery fee: ₹{currentDeliveryFee}
+                      <p className="font-bold text-[#1A0B05]">Instant Bike Delivery Available! 🛵</p>
+                      <p className="text-[11px] text-emerald-800 mt-0.5">
+                        {courierInfo?.distance ? `${courierInfo.distance} km from Film Nagar • ` : ''}
+                        30–45 min direct rider • ₹{currentDeliveryFee}
                       </p>
                     </div>
                   </div>
@@ -895,9 +895,10 @@ export default function Cart() {
                         <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 p-3.5 rounded-xl text-xs font-semibold flex items-start gap-2.5">
                           <CheckCircle2 size={18} className="text-emerald-600 shrink-0 mt-0.5" />
                           <div>
-                            <p className="font-bold text-sm">Delivery Available to {cartStore.deliveryPincode}!</p>
-                            <p className="text-xs text-emerald-700 mt-0.5">
-                              {courierInfo?.courier_name ? `Dispatched via ${courierInfo.courier_name}` : 'Dispatched via Shiprocket'} • Shipping fee: ₹{currentDeliveryFee}
+                            <p className="font-bold text-sm text-[#1A0B05]">Instant Food & Boba Delivery Available! 🛵</p>
+                            <p className="text-xs text-emerald-800 mt-1">
+                              {courierInfo?.distance ? `${courierInfo.distance} km road distance from Film Nagar • ` : ''}
+                              On-demand bike messenger (30–45 mins) • Delivery fee: ₹{currentDeliveryFee}
                             </p>
                           </div>
                         </div>

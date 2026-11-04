@@ -27,9 +27,11 @@ public class DeliveryController {
     @GetMapping("/serviceability")
     public ResponseEntity<Map<String, Object>> checkServiceability(
             @RequestParam String pincode,
-            @RequestParam(required = false, defaultValue = "0.5") Double weight) {
+            @RequestParam(required = false, defaultValue = "0.5") Double weight,
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lng) {
         
-        Map<String, Object> serviceability = shiprocketService.checkServiceability(pincode, weight);
+        Map<String, Object> serviceability = shiprocketService.checkServiceability(pincode, weight, lat, lng);
         return ResponseEntity.ok(serviceability);
     }
 

@@ -92,10 +92,10 @@ export const getLoyaltyAnalytics = async () => {
   return res.data;
 };
 
-// Shiprocket Delivery Integration
-export const checkDeliveryServiceability = async (pincode: string, weight = 0.5) => {
+// Shiprocket Quick Hyperlocal Delivery Integration
+export const checkDeliveryServiceability = async (pincode: string, weight = 0.5, lat?: number, lng?: number) => {
   const res = await apiClient.get('/delivery/serviceability', {
-    params: { pincode, weight }
+    params: { pincode, weight, lat, lng }
   });
   return res.data;
 };

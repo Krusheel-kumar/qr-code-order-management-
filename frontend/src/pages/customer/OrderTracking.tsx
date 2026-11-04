@@ -5,10 +5,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { STORES } from '../../data/stores';
 import { useOrderStore } from '../../store/useOrderStore';
 
-const STAGES = [
+const PICKUP_STAGES = [
   { id: 'PLACED', label: 'Order Confirmed' },
-  { id: 'PREPARING', label: 'Preparing' },
+  { id: 'PREPARING', label: 'Freshly Brewing' },
   { id: 'READY', label: 'Ready For Pickup' },
+];
+
+const DELIVERY_STAGES = [
+  { id: 'PLACED', label: 'Order Confirmed' },
+  { id: 'PREPARING', label: 'Freshly Brewing with Love' },
+  { id: 'READY', label: 'Rider Dispatched & On The Way 🛵' },
 ];
 
 export default function OrderTracking() {
@@ -17,6 +23,8 @@ export default function OrderTracking() {
   const [currentStage, setCurrentStage] = useState(0); 
   const [orderData, setOrderData] = useState<any>(null);
   const [isExiting] = useState(false);
+
+  const activeStages = orderData?.orderType === 'DELIVERY' ? DELIVERY_STAGES : PICKUP_STAGES;
   useEffect(() => {
     if (!id) return;
     
@@ -115,13 +123,13 @@ export default function OrderTracking() {
                   <motion.div 
                     className="w-full bg-[#D4AF37] rounded-full origin-top"
                     initial={{ scaleY: 0 }}
-                    animate={{ scaleY: currentStage / (STAGES.length - 1) }}
+                    animate={{ scaleY: currentStage / (activeStages.length - 1) }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                   />
                 </div>
 
                 <div className="space-y-7">
-                  {STAGES.map((stage, idx) => {
+                  {activeStages.map((stage, idx) => {
                     const isCompleted = idx <= currentStage;
                     const isCurrent = idx === currentStage;
                     

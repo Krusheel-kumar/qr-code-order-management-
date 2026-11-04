@@ -78,16 +78,58 @@ public class ShiprocketService {
         throw new RuntimeException("Unable to acquire Shiprocket authentication token.");
     }
 
+    // Film Nagar Outlet Coordinates
+    public static final double PICKUP_LAT = 17.4152044;
+    public static final double PICKUP_LNG = 78.4076438;
+    public static final String PICKUP_PINCODE = "500096";
+
+    private static final Map<String, double[]> HYD_COORDINATES = Map.ofEntries(
+        Map.entry("500096", new double[]{17.4152, 78.4076}), // Film Nagar / Jubilee Hills
+        Map.entry("500033", new double[]{17.4325, 78.4070}), // Jubilee Hills
+        Map.entry("500034", new double[]{17.4168, 78.4382}), // Banjara Hills
+        Map.entry("500081", new double[]{17.4435, 78.3772}), // Madhapur / Hitech City
+        Map.entry("500032", new double[]{17.4401, 78.3489}), // Gachibowli
+        Map.entry("500084", new double[]{17.4699, 78.3578}), // Kondapur
+        Map.entry("500045", new double[]{17.4399, 78.4285}), // Yousufguda
+        Map.entry("500082", new double[]{17.4256, 78.4528}), // Somajiguda / Panjagutta
+        Map.entry("500016", new double[]{17.4447, 78.4664}), // Begumpet
+        Map.entry("500018", new double[]{17.4563, 78.4439}), // Sanath Nagar / Erragadda
+        Map.entry("500089", new double[]{17.3995, 78.3758}), // Manikonda
+        Map.entry("500075", new double[]{17.3871, 78.3428}), // Gandipet / Narsingi
+        Map.entry("500072", new double[]{17.4933, 78.3914})  // Kukatpally
+    );
+
+    public double[] resolveCoordinates(String pincode, Double lat, Double lng) {
+        if (lat != null && lng != null && lat > 0 && lng > 0) {
+            return new double[]{lat, lng};
+        }
+        if (pincode != null && HYD_COORDINATES.containsKey(pincode.trim())) {
+            return HYD_COORDINATES.get(pincode.trim());
+        }
+        return new double[]{17.4200, 78.4100};
+    }
+
     /**
-     * Check delivery serviceability and rates from outlet pincode (500096) to customer pincode.
+     * Check on-demand hyperlocal delivery serviceability and rates using Shiprocket Quick.
      */
     public Map<String, Object> checkServiceability(String deliveryPincode, Double weight) {
+        return checkServiceability(deliveryPincode, weight, null, null);
+    }
+
+    public Map<String, Object> checkServiceability(String deliveryPincode, Double weight, Double lat, Double lng) {
         double parcelWeight = (weight != null && weight > 0) ? weight : 0.5;
-        String pickupPincode = "500096"; // Film Nagar Outlet default
+        double[] coords = resolveCoordinates(deliveryPincode, lat, lng);
+        double destLat = coords[0];
+        double destLng = coords[1];
 
         String token = getAuthToken();
-        String url = baseUrl + "/courier/serviceability/?pickup_postcode=" + pickupPincode +
+        String url = baseUrl + "/courier/serviceability/?pickup_postcode=" + PICKUP_PINCODE +
                 "&delivery_postcode=" + deliveryPincode +
+                "&lat_from=" + PICKUP_LAT +
+                "&long_from=" + PICKUP_LNG +
+                "&lat_to=" + destLat +
+                "&long_to=" + destLng +
+                "&is_new_hyperlocal=1" +
                 "&weight=" + parcelWeight +
                 "&cod=0";
 
@@ -102,27 +144,34 @@ public class ShiprocketService {
             ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, request, Map.class);
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 Map<String, Object> body = response.getBody();
-                Map<String, Object> data = (Map<String, Object>) body.get("data");
+                Object dataObj = body.get("data");
 
-                if (data != null) {
+                if (dataObj instanceof List) {
+                    List<Map<String, Object>> courierList = (List<Map<String, Object>>) dataObj;
+                    if (!courierList.isEmpty()) {
+                        Map<String, Object> quickCourier = courierList.get(0);
+                        result.put("serviceable", true);
+                        result.put("isHyperlocal", true);
+                        result.put("courierName", "Shiprocket Quick (Instant Bike Delivery)");
+                        result.put("recommendedCourier", quickCourier);
+                        result.put("estimatedDeliveryFee", quickCourier.get("rates"));
+                        result.put("distanceKm", quickCourier.get("distance"));
+                        result.put("estimatedTime", "30-45 mins (Direct Bike Rider)");
+                        result.put("etdHours", quickCourier.get("etd_hours"));
+                        result.put("couriers", courierList);
+                        return result;
+                    }
+                } else if (dataObj instanceof Map) {
+                    Map<String, Object> data = (Map<String, Object>) dataObj;
                     List<Map<String, Object>> couriers = (List<Map<String, Object>>) data.get("available_courier_companies");
                     boolean isServiceable = couriers != null && !couriers.isEmpty();
-
                     result.put("serviceable", isServiceable);
-                    result.put("courierCount", couriers != null ? couriers.size() : 0);
-                    result.put("couriers", couriers);
-
+                    result.put("isHyperlocal", false);
                     if (isServiceable) {
-                        // Find lowest rate courier as recommended
-                        Map<String, Object> bestCourier = couriers.stream()
-                                .min(Comparator.comparingDouble(c -> {
-                                    Object r = c.get("rate");
-                                    return r instanceof Number ? ((Number) r).doubleValue() : 999.0;
-                                })).orElse(couriers.get(0));
-
+                        Map<String, Object> bestCourier = couriers.get(0);
                         result.put("recommendedCourier", bestCourier);
                         result.put("estimatedDeliveryFee", bestCourier.get("rate"));
-                        result.put("estimatedTime", bestCourier.get("etd"));
+                        result.put("estimatedTime", "Same-Day / Next-Day Delivery");
                     }
                     return result;
                 }
@@ -130,7 +179,7 @@ public class ShiprocketService {
         } catch (HttpClientErrorException e) {
             log.warn("Shiprocket serviceability check failed for pincode {}: {}", deliveryPincode, e.getResponseBodyAsString());
             result.put("serviceable", false);
-            result.put("error", "Pincode currently not serviceable or invalid: " + deliveryPincode);
+            result.put("error", "Location currently not serviceable for instant delivery: " + deliveryPincode);
             return result;
         } catch (Exception e) {
             log.error("Shiprocket serviceability check error: {}", e.getMessage(), e);
@@ -140,6 +189,7 @@ public class ShiprocketService {
         }
 
         result.put("serviceable", false);
+        result.put("error", "No instant bike rider available for this location.");
         return result;
     }
 
@@ -202,6 +252,12 @@ public class ShiprocketService {
         payload.put("breadth", 10);
         payload.put("height", 14);
         payload.put("weight", 0.5);
+
+        // Hyperlocal Food Delivery parameters
+        double[] coords = resolveCoordinates(order.getDeliveryPincode(), null, null);
+        payload.put("is_hyperlocal", 1);
+        payload.put("lat", String.valueOf(coords[0]));
+        payload.put("long", String.valueOf(coords[1]));
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
 
