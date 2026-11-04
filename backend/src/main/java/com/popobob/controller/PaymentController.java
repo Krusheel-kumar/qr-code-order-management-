@@ -24,6 +24,16 @@ public class PaymentController {
         try {
             double parsedAmount = Double.parseDouble(data.get("amount").toString());
             int amount = (int) Math.round(parsedAmount);
+
+            // Local development sandbox fallback
+            if (keyId == null || keyId.contains("placeholder") || keyId.startsWith("rzp_test_placeholder")) {
+                Map<String, Object> mockResponse = Map.of(
+                    "id", "order_mock_" + System.currentTimeMillis(),
+                    "amount", amount * 100,
+                    "currency", "INR"
+                );
+                return ResponseEntity.ok(mockResponse);
+            }
             
             RazorpayClient razorpay = new RazorpayClient(keyId, keySecret);
             

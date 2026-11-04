@@ -221,12 +221,19 @@ export default function Cart() {
       } else {
           try {
             const rzpOrder = await createRazorpayOrder(total);
+
+            // Local development sandbox checkout simulation
+            if (rzpOrder.id && (rzpOrder.id.startsWith("order_mock_") || !import.meta.env.VITE_RAZORPAY_KEY_ID)) {
+                compilePayloadAndNavigate("SIMULATED_LOCAL_PAYMENT_" + Date.now(), "PAID");
+                return;
+            }
+
             const options = {
                 key: import.meta.env.VITE_RAZORPAY_KEY_ID,
                 amount: rzpOrder.amount,
                 currency: rzpOrder.currency,
                 name: "POP O'BOB®",
-                description: 'Premium Pickup Order',
+                description: 'Specialty Boba Order',
                 order_id: rzpOrder.id,
                 handler: function (response: any) {
                     compilePayloadAndNavigate(response.razorpay_payment_id, "PAID");
