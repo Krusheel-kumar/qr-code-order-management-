@@ -122,30 +122,66 @@ function App() {
     };
   }, []);
 
+  const isLocal = typeof window !== 'undefined' && (
+    window.location.hostname === 'localhost' || 
+    window.location.hostname === '127.0.0.1' ||
+    window.location.search.includes('mode=full')
+  );
+
   return (
     <>
       {!isStoreActive && <StoreClosedOverlay />}
       <Router>
         <Routes>
-          {/* Live Customer Experience (Functional only to Swiggy & Zomato) */}
-          <Route path="/" element={<ComingSoon />} />
-          <Route path="/home" element={<ComingSoon />} />
-          <Route path="/delivery-options" element={<ComingSoon />} />
-          
-          {/* Internal Development Preview (Accessible via /preview for active development) */}
-          <Route path="/preview" element={<MainLayout />}>
-            <Route index element={<DiscoveryHome />} />
-            <Route path="menu" element={<FullMenu />} />
-            <Route path="categories" element={<CategoryHub />} />
-            <Route path="offers" element={<OffersHub />} />
-            <Route path="cart" element={<Cart />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="privacy" element={<PrivacyPolicy />} />
-            <Route path="terms" element={<TermsOfService />} />
-          </Route>
+          {isLocal ? (
+            /* Local Testing: Full Direct Access to Store, Cart, Delivery & Tracking */
+            <Route path="/" element={<MainLayout />}>
+              <Route index element={<DiscoveryHome />} />
+              <Route path="home" element={<DiscoveryHome />} />
+              <Route path="menu" element={<FullMenu />} />
+              <Route path="categories" element={<CategoryHub />} />
+              <Route path="offers" element={<OffersHub />} />
+              <Route path="cart" element={<Cart />} />
+              <Route path="delivery-options" element={<DeliveryOptions />} />
+              <Route path="locations" element={<PickupLocations />} />
+              <Route path="orders" element={<OrderCenter />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="privacy" element={<PrivacyPolicy />} />
+              <Route path="terms" element={<TermsOfService />} />
+              <Route path="processing" element={<ProcessingSuccess />} />
+              <Route path="tracking/:id" element={<OrderTracking />} />
+              <Route path="receipt/:id" element={<OrderReceipt />} />
+            </Route>
+          ) : (
+            /* Live Production: Public ComingSoon / Partner Links Safe Fallback */
+            <>
+              <Route path="/" element={<ComingSoon />} />
+              <Route path="/home" element={<ComingSoon />} />
+              <Route path="/delivery-options" element={<ComingSoon />} />
+              
+              {/* Internal Preview on Production */}
+              <Route path="/preview" element={<MainLayout />}>
+                <Route index element={<DiscoveryHome />} />
+                <Route path="menu" element={<FullMenu />} />
+                <Route path="categories" element={<CategoryHub />} />
+                <Route path="offers" element={<OffersHub />} />
+                <Route path="cart" element={<Cart />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="privacy" element={<PrivacyPolicy />} />
+                <Route path="terms" element={<TermsOfService />} />
+                <Route path="processing" element={<ProcessingSuccess />} />
+                <Route path="tracking/:id" element={<OrderTracking />} />
+                <Route path="receipt/:id" element={<OrderReceipt />} />
+              </Route>
+              
+              <Route path="*" element={<ComingSoon />} />
+            </>
+          )}
 
-          {/* All other routes fallback to ComingSoon while system is upgrading */}
-          <Route path="*" element={<ComingSoon />} />
+          {/* Standalone Route handlers */}
+          <Route path="/processing" element={<ProcessingSuccess />} />
+          <Route path="/tracking/:id" element={<OrderTracking />} />
+          <Route path="/receipt/:id" element={<OrderReceipt />} />
         </Routes>
       </Router>
     </>
